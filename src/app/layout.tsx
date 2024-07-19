@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Nabla } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "@/providers/ThemeProvider";
+import Navbar from "@/components/Navbar";
+import { MyFooter } from "@/components/MyFooter";
+import { headers } from "next/headers";
+import { useRouter } from "next/router";
+import path from "path";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -14,9 +20,25 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // BELOW : only works on server components
+  // const headersList = headers();
+  // const pathname = headersList.get("x-invoke-path") || "";
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={`${inter.className} dark:bg-black`}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {/* {pathname !== "/dashboard" && <Navbar />} */}
+          <Navbar />
+          {children}
+          {/* {pathname !== "/dashboard" && <MyFooter />} */}
+          <MyFooter />
+        </ThemeProvider>
+      </body>
     </html>
   );
 }
