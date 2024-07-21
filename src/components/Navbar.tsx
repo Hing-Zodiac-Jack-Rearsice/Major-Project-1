@@ -6,12 +6,13 @@ import Link from "next/link";
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { usePathname } from "next/navigation";
-
-import path from "path";
+import { signOut, useSession } from "next-auth/react";
+import { log } from "console";
 
 export default function Navbar() {
   const pathName = usePathname();
-  if (pathName.startsWith("/dashboard")) {
+  const { data: session } = useSession();
+  if (pathName.startsWith("/admin")) {
     // dont render the navbar from home page when in dashboard route
     return null;
   } else {
@@ -23,15 +24,30 @@ export default function Navbar() {
         </Link>
         <div className="flex">
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium mr-4">
-            <Link href="dashboard" className="hover:underline underline-offset-4" prefetch={false}>
+            <Link
+              href="admin/dashboard"
+              className="hover:underline underline-offset-4"
+              prefetch={false}
+            >
               Dashboard
             </Link>
             <Link href="plans" className="hover:underline underline-offset-4" prefetch={false}>
               Plans
             </Link>
-            <Link href="login" className="hover:underline underline-offset-4" prefetch={false}>
-              Login
-            </Link>
+            {!session ? (
+              <Link href="login" className="hover:underline underline-offset-4" prefetch={false}>
+                Login
+              </Link>
+            ) : (
+              <Link
+                href="login"
+                className="hover:underline underline-offset-4"
+                prefetch={false}
+                onClick={() => signOut()}
+              >
+                Sign out
+              </Link>
+            )}
           </nav>
           <Sheet>
             <SheetTrigger asChild>
@@ -43,7 +59,7 @@ export default function Navbar() {
             <SheetContent side="right" className="md:hidden ">
               <div className="grid gap-4 p-4">
                 <Link
-                  href="dashboard"
+                  href="admin/dashboard"
                   className="flex items-center gap-2 py-2 text-lg font-medium hover:bg-muted/50 rounded-md"
                   prefetch={false}
                 >
@@ -56,13 +72,24 @@ export default function Navbar() {
                 >
                   Plans
                 </Link>
-                <Link
-                  href="login"
-                  className="flex items-center gap-2 py-2 text-lg font-medium hover:bg-muted/50 rounded-md"
-                  prefetch={false}
-                >
-                  Login
-                </Link>
+                {!session ? (
+                  <Link
+                    href="login"
+                    className="flex items-center gap-2 py-2 text-lg font-medium hover:bg-muted/50 rounded-md"
+                    prefetch={false}
+                  >
+                    Login
+                  </Link>
+                ) : (
+                  <Link
+                    href="login"
+                    className="flex items-center gap-2 py-2 text-lg font-medium hover:bg-muted/50 rounded-md"
+                    prefetch={false}
+                    onClick={() => signOut()}
+                  >
+                    Sign out
+                  </Link>
+                )}
               </div>
             </SheetContent>
           </Sheet>

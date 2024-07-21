@@ -9,7 +9,7 @@ import path from "path";
 export function MyFooter() {
   const pathName = usePathname();
 
-  if (pathName.startsWith("/dashboard")) {
+  if (pathName.startsWith("/admin")) {
     return null;
   } else {
     return (

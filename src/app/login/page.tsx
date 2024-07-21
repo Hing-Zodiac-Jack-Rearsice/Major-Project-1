@@ -1,4 +1,6 @@
+import { Button } from "@/components/ui/button";
 import { SignupFormDemo } from "@/components/ui/SignUpForm";
+
 import React from "react";
 
 const page = () => {
