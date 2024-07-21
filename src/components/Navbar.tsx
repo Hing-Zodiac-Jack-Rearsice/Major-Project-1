@@ -12,6 +12,7 @@ import { log } from "console";
 export default function Navbar() {
   const pathName = usePathname();
   const { data: session } = useSession();
+  console.log(session);
   if (pathName.startsWith("/admin")) {
     // dont render the navbar from home page when in dashboard route
     return null;
@@ -39,14 +40,12 @@ export default function Navbar() {
                 Login
               </Link>
             ) : (
-              <Link
-                href="login"
-                className="hover:underline underline-offset-4"
-                prefetch={false}
+              <p
+                className="hover:underline underline-offset-4 cursor-pointer"
                 onClick={() => signOut()}
               >
                 Sign out
-              </Link>
+              </p>
             )}
           </nav>
           <Sheet>
@@ -81,14 +80,12 @@ export default function Navbar() {
                     Login
                   </Link>
                 ) : (
-                  <Link
-                    href="login"
-                    className="flex items-center gap-2 py-2 text-lg font-medium hover:bg-muted/50 rounded-md"
-                    prefetch={false}
+                  <p
+                    className="flex items-center gap-2 py-2 text-lg font-medium hover:bg-muted/50 rounded-md cursor-pointer"
                     onClick={() => signOut()}
                   >
                     Sign out
-                  </Link>
+                  </p>
                 )}
               </div>
             </SheetContent>
