@@ -12,7 +12,8 @@ import { log } from "console";
 export default function Navbar() {
   const pathName = usePathname();
   const { data: session } = useSession();
-  console.log(session);
+  // comment below to stop showing the session in console
+  // console.log(session);
   if (pathName.startsWith("/admin")) {
     // dont render the navbar from home page when in dashboard route
     return null;

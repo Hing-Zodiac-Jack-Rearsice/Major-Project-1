@@ -1,5 +1,4 @@
 import React from "react";
-
 /**
  * v0 by Vercel.
  * @see https://v0.dev/t/M8TMybGl9XT
@@ -41,6 +40,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Pagination, PaginationContent, PaginationItem } from "@/components/ui/pagination";
+import { useSession } from "next-auth/react";
 
 export default function page() {
   return (
