@@ -4,6 +4,7 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
 
+// This can be used for next time or other projects
 const prisma = new PrismaClient().$extends(withAccelerate());
 // import prisma from "./db";
 // const prisma = new PrismaClient();
