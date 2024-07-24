@@ -24,7 +24,10 @@ model User {
   role String?
   // Optional for WebAuthn support
   Authenticator Authenticator[]
- 
+  // Stripe priceID 
+  priceID String?
+  // CustomerID for stripe
+  customerID String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

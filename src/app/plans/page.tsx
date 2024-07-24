@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 
 /**
@@ -14,8 +15,12 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useSession } from "next-auth/react";
 
 export default function Component() {
+  const { data: session } = useSession();
+  const paymentLink = "https://buy.stripe.com/test_8wM6r52FXemJg4EaEE";
+
   return (
     <div className="container mx-auto py-12 px-4 md:px-6 mt-16">
       <h1 className="text-4xl font-bold text-center">Affordable plans for any situation</h1>
@@ -57,7 +62,14 @@ export default function Component() {
             <p className="text-muted-foreground">Free for 7 days, then $9.99 per month after.</p>
           </CardContent>
           <CardFooter>
-            <Button className="w-full">Try now</Button>
+            {/* starts the sombot subscription link */}
+            <a
+              className="w-full"
+              target="_blank"
+              href={paymentLink + "?prefilled_email=" + session?.user?.email}
+            >
+              <Button className="w-full"> Try now </Button>
+            </a>
           </CardFooter>
         </Card>
         <Card className="bg-card text-card-foreground shadow-md">
@@ -77,7 +89,7 @@ export default function Component() {
     </div>
   );
 }
-function CheckIcon(props) {
+function CheckIcon(props: any) {
   return (
     <svg
       {...props}
