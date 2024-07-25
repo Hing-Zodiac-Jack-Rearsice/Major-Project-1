@@ -80,7 +80,7 @@ const config = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate"), flowbite.plugin(), addVariablesForColors],
+  plugins: [require("tailwindcss-animate"), addVariablesForColors, flowbite.plugin()],
 } satisfies Config;
 
 function addVariablesForColors({ addBase, theme }: any) {

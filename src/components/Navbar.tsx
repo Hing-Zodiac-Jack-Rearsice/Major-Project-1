@@ -26,6 +26,9 @@ export default function Navbar() {
         </Link>
         <div className="flex">
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium mr-4">
+            <Link href="/events" className="hover:underline underline-offset-4" prefetch={false}>
+              Events
+            </Link>
             <Link
               href="admin/dashboard"
               className="hover:underline underline-offset-4"
@@ -48,6 +51,11 @@ export default function Navbar() {
                 Sign out
               </p>
             )}
+            {session?.user?.role === "admin" && (
+              <a className="underline-offset-4 bg-yellow-300 p-2 rounded-sm dark:text-black font-bold">
+                ADMIN
+              </a>
+            )}
           </nav>
           <Sheet>
             <SheetTrigger asChild>
@@ -58,6 +66,13 @@ export default function Navbar() {
             </SheetTrigger>
             <SheetContent side="right" className="md:hidden ">
               <div className="grid gap-4 p-4">
+                <Link
+                  href="/events"
+                  className="flex items-center gap-2 py-2 text-lg font-medium hover:bg-muted/50 rounded-md"
+                  prefetch={false}
+                >
+                  Events
+                </Link>
                 <Link
                   href="admin/dashboard"
                   className="flex items-center gap-2 py-2 text-lg font-medium hover:bg-muted/50 rounded-md"
