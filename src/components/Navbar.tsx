@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import Logo from "./ui/logo";
+
 import { ThemeToggle } from "./ui/ThemeToggle";
 import Link from "next/link";
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { log } from "console";
+import Logo from "./ui/SombotLogo";
 
 export default function Navbar() {
   const pathName = usePathname();
@@ -28,6 +29,13 @@ export default function Navbar() {
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium mr-4">
             <Link href="/events" className="hover:underline underline-offset-4" prefetch={false}>
               Events
+            </Link>
+            <Link
+              href="/events/clzaz65is0001oolazxmiw08p"
+              className="hover:underline underline-offset-4"
+              prefetch={false}
+            >
+              TEST PG
             </Link>
             <Link
               href="admin/dashboard"

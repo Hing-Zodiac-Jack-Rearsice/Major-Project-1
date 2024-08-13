@@ -1,6 +1,6 @@
 import React from "react";
 
-const Logo = ({ width = 1000, height = 1000 }: { width?: number; height?: number }) => {
+const SombotLogo = ({ width = 1000, height = 1000 }: { width?: number; height?: number }) => {
   return (
     <div>
       <img
@@ -21,4 +21,4 @@ const Logo = ({ width = 1000, height = 1000 }: { width?: number; height?: number
   );
 };
 
-export default Logo;
+export default SombotLogo;

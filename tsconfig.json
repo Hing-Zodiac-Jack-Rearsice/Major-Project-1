@@ -27,7 +27,8 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "src/lib/auth.ts",
-    "src/app/api/webhook/stripe/route.ts"
+    "src/app/api/webhook/stripe/route.ts",
+    "src/lib/nodemailer.js"
   ],
   "exclude": ["node_modules"]
 }

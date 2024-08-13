@@ -2,7 +2,7 @@
 
 import { Footer } from "flowbite-react";
 import { BsDribbble, BsFacebook, BsGithub, BsInstagram, BsTwitter } from "react-icons/bs";
-import Logo from "./ui/logo";
+import Logo from "./ui/SombotLogo";
 import { usePathname } from "next/navigation";
 import path from "path";
 

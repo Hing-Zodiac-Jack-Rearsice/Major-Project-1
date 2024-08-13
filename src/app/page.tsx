@@ -14,6 +14,7 @@ export default function Home() {
           rangeY={800}
           particleCount={500}
           baseHue={150}
+          baseSpeed={0}
           className="flex items-center flex-col justify-center px-2 md:px-10  py-4 w-full h-full text-white z-0"
         >
           <h2 className="text-2xl md:text-6xl font-bold text-center">

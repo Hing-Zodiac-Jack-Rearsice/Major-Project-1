@@ -28,6 +28,8 @@ model User {
   priceID String?
   // CustomerID for stripe
   customerID String?
+  events Event[]
+  tickets Ticket[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -90,3 +92,29 @@ model Authenticator {
   @@unique([userId, credentialID])
 }
 
+model Event{
+  id String @id @default(cuid()) @map("_id")
+  eventName String
+  userEmail String
+  ticketAmount Int @default(100)
+  ticketPrice Int
+  location String
+  date DateTime
+  description String
+  imageUrl String?
+  // user datatype referencing User model above by connecting userEmail from [Event] to email from [User]
+  user User @relation(fields: [userEmail], references: [email])
+  tickets Ticket[]
+}
+model Ticket{
+  id String @id @default(cuid()) @map("_id")
+  eventId String
+  eventName String 
+  userEmail String
+  // url stored in firebase 
+  qrCodeUrl String?
+  // references the user Email which purchased the ticket
+  user User @relation(fields: [userEmail], references: [email])
+  // references the event id 
+  event Event @relation(fields: [eventId], references: [id])
+}

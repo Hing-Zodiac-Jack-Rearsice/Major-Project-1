@@ -1,0 +1,282 @@
+import React, { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlusSquare, faSquarePlus } from "@fortawesome/free-regular-svg-icons";
+import { Textarea } from "@/components/ui/textarea";
+import { add, format } from "date-fns";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { TimePickerDemo } from "@/components/ui/time-picker-demo";
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { app } from "@/lib/firebase";
+const EventForm = () => {
+  const [date, setDate] = React.useState<Date>();
+  const [eventName, setEventName] = useState("");
+  const [description, setDescription] = useState("");
+  const [location, setLocation] = useState("");
+  const [ticketAmount, setTicketAmount] = useState(100);
+  const [ticketPrice, setTicketPrice] = useState(1);
+  const [file, setFile] = useState<File | null>(null);
+  const handleSelect = (newDay: Date | undefined) => {
+    if (!newDay) return;
+    if (!date) {
+      setDate(newDay);
+      return;
+    }
+    const diff = newDay.getTime() - date.getTime();
+    const diffInDays = diff / (1000 * 60 * 60 * 24);
+    const newDateFull = add(date, { days: Math.ceil(diffInDays) });
+    setDate(newDateFull);
+  };
+
+  const uploadImage = async (file: File): Promise<string> => {
+    console.log(file);
+    if (!file) {
+      throw new Error("No file selected");
+    }
+
+    const storage = getStorage(app);
+    const metadata = {
+      contentType: "image/jpg",
+    };
+
+    const storageRef = ref(storage, "event_images/" + file.name);
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    return new Promise((resolve, reject) => {
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log("Upload is " + progress + "% done");
+          switch (snapshot.state) {
+            case "paused":
+              console.log("Upload is paused");
+              break;
+            case "running":
+              console.log("Upload is running");
+              break;
+          }
+        },
+        (error) => {
+          switch (error.code) {
+            case "storage/unauthorized":
+              reject(new Error("User doesn't have permission to access the object"));
+              break;
+            case "storage/canceled":
+              reject(new Error("User canceled the upload"));
+              break;
+            case "storage/unknown":
+              reject(new Error("Unknown error occurred, inspect error.serverResponse"));
+              break;
+          }
+        },
+        async () => {
+          try {
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+            // console.log("File available at", downloadURL);
+            resolve(downloadURL);
+          } catch (error) {
+            reject(error);
+          }
+        }
+      );
+    });
+  };
+
+  const handleUpload = async () => {
+    if (file) {
+      const imageUrl = await uploadImage(file);
+      const response = await fetch("/api/events", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          eventName: eventName,
+          ticketAmount: ticketAmount,
+          ticketPrice: ticketPrice,
+          location: location,
+          date: date,
+          description: description,
+          imageUrl: imageUrl,
+        }),
+      });
+      if (response.ok) {
+        alert("Event created successfully");
+      }
+    } else {
+      alert("Please select an image");
+    }
+  };
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="outline">
+          <FontAwesomeIcon icon={faSquarePlus} className="w-5 h-5" />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px] text-sm max-h-96 overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Create event</DialogTitle>
+          <DialogDescription>Fill the form below to create a new event.</DialogDescription>
+        </DialogHeader>
+        <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="name" className="text-left">
+              Event name
+            </Label>
+            <Input
+              id="name"
+              value={eventName}
+              onChange={(e) => {
+                setEventName(e.target.value);
+              }}
+            />
+          </div>
+          <div className="flex flex-col gap-2 md:gap-3">
+            <Label htmlFor="name" className="text-left">
+              Location
+            </Label>
+            <Input
+              id="name"
+              value={location}
+              onChange={(e) => {
+                setLocation(e.target.value);
+              }}
+            />
+          </div>
+          <div className="flex flex-col gap-2 md:gap-3">
+            <Label htmlFor="username" className="text-left">
+              Description
+            </Label>
+            <Textarea value={description} onChange={(e) => setDescription(e.target.value)} />
+          </div>
+          <div className="flex flex-col gap-2 md:gap-3">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex-1">
+                <Label htmlFor="ticketAmount" className="text-left">
+                  Tickets amount
+                </Label>
+                <Input
+                  type="number"
+                  id="ticketAmount"
+                  defaultValue={100}
+                  max={1000}
+                  min={100}
+                  value={ticketAmount}
+                  onChange={(e) => {
+                    setTicketAmount(parseInt(e.target.value));
+                  }}
+                />
+              </div>
+              <div className="flex-1">
+                <Label htmlFor="ticketPrice" className="text-left">
+                  Tickets price
+                </Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="number"
+                    id="ticketPrice"
+                    defaultValue={1}
+                    max={100}
+                    min={1}
+                    value={ticketPrice}
+                    className="w-full"
+                    onChange={(e) => {
+                      setTicketPrice(parseInt(e.target.value));
+                    }}
+                  />
+                  <span className="currency-symbol">$</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2 md:gap-3">
+            <Label htmlFor="username" className="text-left">
+              Date & Time
+            </Label>
+            {/* date picker content */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant={"outline"}
+                  className={cn(
+                    " justify-start text-left font-normal",
+                    !date && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {date ? format(date, "PPP HH:mm:ss") : <span>Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0">
+                <Calendar
+                  mode="single"
+                  selected={date}
+                  onSelect={(d) => handleSelect(d)}
+                  initialFocus
+                />
+                <div className="p-3 border-t border-border">
+                  <TimePickerDemo setDate={setDate} date={date} />
+                </div>
+              </PopoverContent>
+            </Popover>
+          </div>
+          <div className="flex flex-col gap-2 md:gap-3">
+            <Label htmlFor="picture" className="text-left">
+              Image
+            </Label>
+            <Input
+              type="file"
+              id="picture"
+              onChange={(e) => {
+                if (e.target.files) {
+                  // console.log(e.target.files[0]);
+                  setFile(e.target.files[0]);
+                  // console.log(file);
+                }
+              }}
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button type="submit" onClick={() => handleUpload()}>
+            Create
+          </Button>
+          {/* BELOW: used to test firebase image upload function */}
+          {/* <Button
+            type="submit"
+            onClick={() => {
+              if (file) {
+                uploadImage(file);
+              }
+            }}
+          >
+            test img
+          </Button> */}
+          {/* BELOW: in order to log datetime */}
+          {/* <Button type="submit" onClick={() => console.log(date)}>
+            Log datetime
+          </Button> */}
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default EventForm;
