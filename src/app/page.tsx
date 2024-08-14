@@ -11,10 +11,9 @@ export default function Home() {
       <div className="w-full mx-auto h-screen overflow-hidden mt-16">
         <Vortex
           backgroundColor="black"
-          rangeY={800}
+          rangeY={500}
           particleCount={500}
           baseHue={150}
-          baseSpeed={0}
           className="flex items-center flex-col justify-center px-2 md:px-10  py-4 w-full h-full text-white z-0"
         >
           <h2 className="text-2xl md:text-6xl font-bold text-center">
@@ -30,7 +29,7 @@ export default function Home() {
               </button>
             </Link>
 
-            <button className="px-4 py-2   ">Learn more</button>
+            <button className="px-4 py-2">Learn more</button>
           </div>
         </Vortex>
       </div>

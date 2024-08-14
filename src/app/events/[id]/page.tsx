@@ -54,7 +54,30 @@ const page = () => {
     });
     if (res.ok) {
       await sendMail(qrUrl);
+      await addUserToAttendace();
       alert("Ticket created successfully");
+    }
+  };
+  const addUserToAttendace = async () => {
+    try {
+      const res = await fetch(`/api/attendance/${id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          eventId: event.id,
+          userEmail: session?.user.email,
+          eventName: event.eventName,
+        }),
+      });
+      if (!res.ok) {
+        throw new Error("Failed to add user to the list of attendees");
+      } else {
+        alert(`Added ${session?.user.email} to the list of attendees`);
+      }
+    } catch (error) {
+      console.log(error, "Failed to add user to the list of attendees");
     }
   };
   const uploadQr = async (qrBuffer: Buffer): Promise<string> => {
@@ -360,6 +383,7 @@ const page = () => {
           <div className="my-4">
             <h1 className="text-xl font-semibold">Event Description</h1>
             <p>{event.description}</p>
+            {/* <p onClick={() => addUserToAttendace()}>ADD USER TO ATTENDANCE</p> */}
           </div>
         </div>
       </div>

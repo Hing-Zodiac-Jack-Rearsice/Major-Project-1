@@ -30,6 +30,7 @@ model User {
   customerID String?
   events Event[]
   tickets Ticket[]
+  attendances Attendance[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -105,6 +106,7 @@ model Event{
   // user datatype referencing User model above by connecting userEmail from [Event] to email from [User]
   user User @relation(fields: [userEmail], references: [email])
   tickets Ticket[]
+  attendances Attendance[]
 }
 model Ticket{
   id String @id @default(cuid()) @map("_id")
@@ -117,4 +119,13 @@ model Ticket{
   user User @relation(fields: [userEmail], references: [email])
   // references the event id 
   event Event @relation(fields: [eventId], references: [id])
+}
+model Attendance{
+  id String @id @default(cuid()) @map("_id")
+  eventId String
+  eventName String
+  userEmail String 
+  status String @default("absent")
+  user User @relation(fields: [userEmail], references: [email])
+  event Event @relation(fields: [eventId], references: [id])  
 }
