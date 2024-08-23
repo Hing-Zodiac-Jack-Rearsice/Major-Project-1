@@ -10,7 +10,9 @@ export async function POST(request: Request) {
       subject: body.subject,
       text: body.text,
       html: `<div>
-          <img src="${body.qrUrl}" alt="QR Code" />
+         <div style="text-align: center;">
+            <img src="${body.qrUrl}" alt="QR Code" style="display: block; margin: 0 auto;" />
+          </div>
           <p>${body.text}</p>
         </div>`,
     });

@@ -134,8 +134,26 @@ const page = () => {
   const sendMail = async (qrUrl: string) => {
     const mailData = {
       email: session?.user.email,
-      subject: "qrcode",
-      text: "Testing some Mailgun awesomness!",
+      subject: `🎫 Your Ticket to ${event.eventName} is Here!`,
+      text: `Hi <b>${session?.user.name}</b>,
+Your ticket to ${event.eventName} is attached! We're excited to have you join us.<br> 
+Below are the details for the event, along with your unique QR code for entry.<br>
+<br>
+Ticket Details:<br>
+<br>
+Event: ${event.eventName}<br>
+Date: ${formattedDate}<br>
+Time: ${formattedTime}<br>
+Location: ${event.location}<br>
+<br>
+Important Information:<br>
+<br>
+QR Code: Please present the QR code at the entrance for scanning.<br>
+<br>
+Looking forward to seeing you at ${event.eventName}!<br>
+<br>
+Best Regards,<br>
+The ${event.eventName} Team`,
       qrUrl: qrUrl,
     };
     const res = await fetch(`/api/mail`, {
