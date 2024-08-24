@@ -4,7 +4,6 @@ import { Footer } from "flowbite-react";
 import { BsDribbble, BsFacebook, BsGithub, BsInstagram, BsTwitter } from "react-icons/bs";
 import Logo from "./ui/SombotLogo";
 import { usePathname } from "next/navigation";
-import path from "path";
 
 export function MyFooter() {
   const pathName = usePathname();
@@ -40,8 +39,8 @@ export function MyFooter() {
               <div>
                 <Footer.Title title="Legal" />
                 <Footer.LinkGroup col>
+                  <Footer.Link href="/terms-and-conditions">Terms & Conditions</Footer.Link>
                   <Footer.Link href="#">Privacy Policy</Footer.Link>
-                  <Footer.Link href="#">Terms &amp; Conditions</Footer.Link>
                 </Footer.LinkGroup>
               </div>
             </div>

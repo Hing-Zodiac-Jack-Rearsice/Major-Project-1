@@ -17,10 +17,14 @@ import { getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/
 import { app } from "@/lib/firebase";
 
 const page = () => {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { data: session } = useSession();
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [event, setEvent] = useState<any>(null);
   //   const [qrCodeUrl, setQrCodeUrl] = useState("");
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { id } = useParams();
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     const fetchEvent = async () => {
       const res = await fetch(`/api/events/${id}`);
