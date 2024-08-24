@@ -9,6 +9,7 @@ interface ChartCardProps {
   title: string;
   ChartComponent: React.ComponentType<ChartComponentProps>;
   data: any;
+  className?: string; // Add className to the props
 }
 
 const ChartCard: React.FC<ChartCardProps> = ({

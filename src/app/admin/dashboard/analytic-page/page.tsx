@@ -156,7 +156,7 @@ const AnalyticsPage: React.FC = () => {
       >
         Analytics Dashboard
       </motion.h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
         {cardData.map((item, index) => (
           <StatCard
             key={index}
