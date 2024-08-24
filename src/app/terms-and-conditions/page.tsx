@@ -3,7 +3,7 @@ import React from "react";
 const TermsAndConditions = () => {
   return (
     <div className="container mx-auto p-4 pt-16">
-      <h1 className="text-3xl font-bold mb-4 text-white">Terms and Conditions</h1>
+      <h1 className="text-3xl font-bold mb-4">Terms and Conditions</h1>
       <p className="mb-4">
         Welcome to Sombot. These terms and conditions outline the rules and regulations for the use of our website and services. By accessing this website, we assume you accept these terms and conditions in full. Do not continue to use Sombot if you do not agree to all of the terms and conditions stated on this page.
       </p>
