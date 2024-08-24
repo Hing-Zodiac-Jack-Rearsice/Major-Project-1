@@ -7,6 +7,12 @@ import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, PointElement,
 ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineElement, Title, Tooltip, Legend, ArcElement);
 
 const AnalyticsPage = () => {
+
+  const totalTimeToSellOut = 10; // in days
+  const numberOfTicketsSold = 500;
+
+  const averageTicketSalesTime = totalTimeToSellOut / numberOfTicketsSold;
+
   const barData = {
     labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
     datasets: [
@@ -79,7 +85,7 @@ const AnalyticsPage = () => {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-6 pl-20">
       <h1 className="text-3xl font-bold mb-6">Analytics Dashboard</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
         <Card>
@@ -108,10 +114,10 @@ const AnalyticsPage = () => {
         </Card>
         <Card>
           <CardHeader>
-            <h2 className="text-xl font-semibold">Other Metric</h2>
+            <h2 className="text-xl font-semibold">Average Ticket Sales Time</h2>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">89</p>
+            <p className="text-2xl font-bold">{averageTicketSalesTime.toFixed(2)} days/ticket</p>
           </CardContent>
         </Card>
         <Card>
