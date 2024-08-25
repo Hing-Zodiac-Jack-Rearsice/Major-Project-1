@@ -30,13 +30,13 @@ export default function Navbar() {
             <Link href="/events" className="hover:underline underline-offset-4" prefetch={false}>
               Events
             </Link>
-            <Link
+            {/* <Link
               href="/events/clzaz65is0001oolazxmiw08p"
               className="hover:underline underline-offset-4"
               prefetch={false}
             >
               TEST PG
-            </Link>
+            </Link> */}
             <Link
               href="admin/dashboard"
               className="hover:underline underline-offset-4"

@@ -15,6 +15,13 @@ export async function GET(request: Request) {
     } catch (error) {
       console.log(error, "fetching all events error");
     }
+  } else if (session?.user.role === "user") {
+    try {
+      const events = await prisma.event.findMany();
+      return new NextResponse(JSON.stringify({ events }), { status: 200 });
+    } catch (error) {
+      console.log(error, "fetching all events error");
+    }
   } else {
     return new NextResponse(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
   }
