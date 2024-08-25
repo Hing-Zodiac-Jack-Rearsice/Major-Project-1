@@ -34,8 +34,7 @@ ChartJS.register(
 // Constants
 const TOTAL_TIME_TO_SELL_OUT = 10; // in days
 const NUMBER_OF_TICKETS_SOLD = 500;
-const AVERAGE_TICKET_SALES_TIME =
-  TOTAL_TIME_TO_SELL_OUT / NUMBER_OF_TICKETS_SOLD;
+const AVERAGE_TICKET_SALES_TIME = TOTAL_TIME_TO_SELL_OUT / NUMBER_OF_TICKETS_SOLD;
 
 // Chart Data
 const barData = {
@@ -158,35 +157,14 @@ const AnalyticsPage: React.FC = () => {
       </motion.h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
         {cardData.map((item, index) => (
-          <StatCard
-            key={index}
-            title={item.title}
-            value={item.value}
-            index={index}
-          />
+          <StatCard key={index} title={item.title} value={item.value} index={index} />
         ))}
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ChartCard
-          title="Sales Over Time"
-          ChartComponent={Bar}
-          data={barData}
-        />
-        <ChartCard
-          title="Engagement Scatter Plot"
-          ChartComponent={Scatter}
-          data={scatterData}
-        />
-        <ChartCard
-          title="Revenue Over Time"
-          ChartComponent={Line}
-          data={lineData}
-        />
-        <ChartCard
-          title="Attendee Demographics"
-          ChartComponent={Pie}
-          data={pieData}
-        />
+        <ChartCard title="Sales Over Time" ChartComponent={Bar} data={barData} />
+        <ChartCard title="Engagement Scatter Plot" ChartComponent={Scatter} data={scatterData} />
+        <ChartCard title="Revenue Over Time" ChartComponent={Line} data={lineData} />
+        <ChartCard title="Attendee Demographics" ChartComponent={Pie} data={pieData} />
       </div>
     </div>
   );

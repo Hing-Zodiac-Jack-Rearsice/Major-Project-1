@@ -28,7 +28,10 @@ model User {
   priceID String?
   // CustomerID for stripe
   customerID String?
-  events Event[]
+  // for stripe connect 
+  connectedAccountId String? @unique
+  stripeConnectedLinked Boolean @default(false)
+  events Event[] 
   tickets Ticket[]
   attendances Attendance[]
   createdAt DateTime @default(now())

@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { useSession } from "next-auth/react";
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/storage";
 import { app } from "@/lib/firebase";
+import { BuyTicket } from "@/app/actions";
 
 const page = () => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -398,9 +399,12 @@ The ${event.eventName} Team`,
               <h1 className="text-xl font-semibold">Location</h1>
               <p>{event.location}</p>
             </div>
-            <Button variant="outline" className="w-full sm:w-fit" onClick={() => handleTicket()}>
-              $ {event.ticketPrice}
-            </Button>
+            <form action={BuyTicket}>
+              <input type="hidden" name="id" value={event.id} />
+              <Button variant="outline" type="submit" className="w-full sm:w-fit">
+                $ {event.ticketPrice}
+              </Button>
+            </form>
           </div>
           <div className="my-4">
             <h1 className="text-xl font-semibold">Event Description</h1>

@@ -1,9 +1,9 @@
 import prisma from "@/lib/db";
+import { stripe } from "@/lib/stripe";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 export async function POST(request: Request) {
@@ -50,10 +50,29 @@ export async function POST(request: Request) {
           throw new Error("No user found");
         }
         if (user?.email) {
+          const StripeAccount = await stripe.accounts.create({
+            email: user.email as string,
+            controller: {
+              losses: {
+                payments: "application",
+              },
+              fees: {
+                payer: "application",
+              },
+              stripe_dashboard: {
+                type: "express",
+              },
+            },
+          });
           user = await prisma.user.update({
             where: { id: user.id },
             // update user role to grant access to dashboard
-            data: { role: "admin", priceID: priceID, customerID: customerID },
+            data: {
+              role: "admin",
+              priceID: priceID,
+              customerID: customerID,
+              connectedAccountId: StripeAccount.id,
+            },
           });
         }
         break;

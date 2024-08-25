@@ -3,12 +3,7 @@ import React from "react";
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "../ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { Input } from "../ui/input";
 import {
   Breadcrumb,
@@ -31,6 +26,7 @@ import { usePathname } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendarDays } from "@fortawesome/free-regular-svg-icons";
 import { ThemeToggle } from "../ui/ThemeToggle";
+import Billing from "./Billing";
 const SideNav = () => {
   // const pathName = usePathname();
   // console.log(String(pathName.split("/").length - 1));
@@ -40,15 +36,15 @@ const SideNav = () => {
         {/* the sideNav is here */}
         <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
           <TooltipProvider>
-            <Link
+            {/* <Link
               href="#"
               className="group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:h-8 md:w-8 md:text-base"
               prefetch={false}
             >
               <Package2Icon className="h-4 w-4 transition-all group-hover:scale-110" />
               <span className="sr-only">Acme Inc</span>
-            </Link>
-            <Tooltip>
+            </Link> */}
+            {/* <Tooltip>
               <TooltipTrigger asChild>
                 <Link
                   href="./events"
@@ -60,7 +56,7 @@ const SideNav = () => {
                 </Link>
               </TooltipTrigger>
               <TooltipContent side="right">Dashboard</TooltipContent>
-            </Tooltip>
+            </Tooltip> */}
             <Tooltip>
               <TooltipTrigger asChild>
                 <Link
@@ -74,7 +70,7 @@ const SideNav = () => {
               </TooltipTrigger>
               <TooltipContent side="right">Events</TooltipContent>
             </Tooltip>
-            <Tooltip>
+            {/* <Tooltip>
               <TooltipTrigger asChild>
                 <Link
                   href="#"
@@ -86,8 +82,8 @@ const SideNav = () => {
                 </Link>
               </TooltipTrigger>
               <TooltipContent side="right">Products</TooltipContent>
-            </Tooltip>
-            <Tooltip>
+            </Tooltip> */}
+            {/* <Tooltip>
               <TooltipTrigger asChild>
                 <Link
                   href="#"
@@ -99,7 +95,7 @@ const SideNav = () => {
                 </Link>
               </TooltipTrigger>
               <TooltipContent side="right">Customers</TooltipContent>
-            </Tooltip>
+            </Tooltip> */}
             <Tooltip>
               <TooltipTrigger asChild>
                 <Link
@@ -112,6 +108,14 @@ const SideNav = () => {
                 </Link>
               </TooltipTrigger>
               <TooltipContent side="right">Analytics</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div>
+                  <Billing />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="right">Billing</TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </nav>
@@ -232,11 +236,7 @@ const SideNav = () => {
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              variant="outline"
-              size="icon"
-              className="overflow-hidden rounded-full"
-            >
+            <Button variant="outline" size="icon" className="overflow-hidden rounded-full">
               <img
                 src="https://images.dog.ceo/breeds/labrador/Toblerone_1.jpg"
                 width={36}
