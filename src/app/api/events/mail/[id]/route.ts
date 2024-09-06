@@ -3,6 +3,19 @@ import QRCode from "qrcode";
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/storage";
 import { app } from "@/lib/firebase";
 import { NextResponse } from "next/server";
+// encryption module
+import crypto from "crypto";
+// Encryption key and IV (Initialization Vector)
+export const ENCRYPTION_KEY = Buffer.from(process.env.NEXT_PUBLIC_ENCRYPTION_KEY as string, "hex"); // 256 bits key
+export const IV = Buffer.from(process.env.NEXT_PUBLIC_IV as string, "hex"); // 128 bits IV
+
+const encrypt = (text: any) => {
+  const cipher = crypto.createCipheriv("aes-256-cbc", ENCRYPTION_KEY as any, IV as any);
+  let encrypted = cipher.update(text, "utf8", "hex");
+  encrypted += cipher.final("hex");
+  return encrypted;
+};
+
 export async function POST(request: Request, { params }: { params: { id: string } }) {
   // sessions for detecting currently logged in user
   const body = await request.json();
@@ -35,12 +48,16 @@ export async function POST(request: Request, { params }: { params: { id: string 
       });
 
       const handleTicket = async () => {
-        const qrUri = await QRCode.toDataURL(
+        const encryptedData = encrypt(
           JSON.stringify({
             eventId: uniqueEvent?.id,
             eventName: uniqueEvent?.eventName,
             userEmail: emailFromBody,
           })
+        );
+        const qrUri = await QRCode.toDataURL(
+          // encrypt qr code Data
+          encryptedData
         );
         const qrBuffer = Buffer.from(qrUri.split(",")[1], "base64");
         const qrUrl = await uploadQr(qrBuffer);

@@ -6,7 +6,7 @@ import { CardBody, CardContainer, CardItem } from "../ui/3d-card";
 import Link from "next/link";
 
 export function ClientEventCard({ event }: any) {
-  const eventDate = new Date(event.date);
+  const eventDate = new Date(event.startDate);
 
   // Format the date
   const formattedDate = eventDate.toLocaleDateString("en-US", {

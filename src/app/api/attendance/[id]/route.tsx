@@ -11,5 +11,6 @@ export async function POST(request: Request, { params }: { params: { id: string 
       eventName: body.eventName,
     },
   });
+
   return new NextResponse(JSON.stringify({ data: addUserToAttendace }), { status: 200 });
 }

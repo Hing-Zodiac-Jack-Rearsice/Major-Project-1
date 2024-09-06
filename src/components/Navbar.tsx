@@ -7,12 +7,12 @@ import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
-import { log } from "console";
 import Logo from "./ui/SombotLogo";
 
 export default function Navbar() {
   const pathName = usePathname();
   const { data: session } = useSession();
+
   // comment below to stop showing the session in console
   // console.log(session);
   if (pathName.startsWith("/admin")) {
@@ -37,18 +37,20 @@ export default function Navbar() {
             >
               TEST PG
             </Link> */}
-            <Link
-              href="admin/dashboard"
-              className="hover:underline underline-offset-4"
-              prefetch={false}
-            >
-              Dashboard
-            </Link>
+            {session?.user.role === "admin" && (
+              <Link
+                href="/admin/dashboard"
+                className="hover:underline underline-offset-4"
+                prefetch={false}
+              >
+                Dashboard
+              </Link>
+            )}
             <Link href="plans" className="hover:underline underline-offset-4" prefetch={false}>
               Plans
             </Link>
             {!session ? (
-              <Link href="login" className="hover:underline underline-offset-4" prefetch={false}>
+              <Link href="/login" className="hover:underline underline-offset-4" prefetch={false}>
                 Login
               </Link>
             ) : (
@@ -81,13 +83,16 @@ export default function Navbar() {
                 >
                   Events
                 </Link>
-                <Link
-                  href="admin/dashboard"
-                  className="flex items-center gap-2 py-2 text-lg font-medium hover:bg-muted/50 rounded-md"
-                  prefetch={false}
-                >
-                  Dashboard
-                </Link>
+                {session?.user.role === "admin" && (
+                  <Link
+                    href="admin/dashboard"
+                    className="flex items-center gap-2 py-2 text-lg font-medium hover:bg-muted/50 rounded-md"
+                    prefetch={false}
+                  >
+                    Dashboard
+                  </Link>
+                )}
+
                 <Link
                   href="plans"
                   className="flex items-center gap-2 py-2 text-lg font-medium hover:bg-muted/50 rounded-md"

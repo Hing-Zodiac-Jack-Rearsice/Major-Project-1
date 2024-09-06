@@ -23,7 +23,8 @@ import { TimePickerDemo } from "@/components/ui/time-picker-demo";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { app } from "@/lib/firebase";
 const EventForm = () => {
-  const [date, setDate] = React.useState<Date>();
+  const [startDate, setStartDate] = React.useState<Date>();
+  const [endDate, setEndDate] = React.useState<Date>();
   const [eventName, setEventName] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
@@ -32,16 +33,30 @@ const EventForm = () => {
   const [file, setFile] = useState<File | null>(null);
   const handleSelect = (newDay: Date | undefined) => {
     if (!newDay) return;
-    if (!date) {
-      setDate(newDay);
+    if (!startDate) {
+      setStartDate(newDay);
       return;
     }
-    const diff = newDay.getTime() - date.getTime();
+    const diff = newDay.getTime() - startDate.getTime();
     const diffInDays = diff / (1000 * 60 * 60 * 24);
-    const newDateFull = add(date, { days: Math.ceil(diffInDays) });
-    setDate(newDateFull);
+    const newDateFull = add(startDate, { days: Math.ceil(diffInDays) });
+    setStartDate(newDateFull);
+    setEndDate(newDateFull);
   };
+  const handleEndTimeChange = (newTime: Date | undefined) => {
+    if (!newTime || !startDate) return;
 
+    // Keep the date from `date` but change the time from `newTime`
+    const updatedEndDate = new Date(
+      startDate.getFullYear(),
+      startDate.getMonth(),
+      startDate.getDate(),
+      newTime.getHours(),
+      newTime.getMinutes(),
+      newTime.getSeconds()
+    );
+    setEndDate(updatedEndDate);
+  };
   const uploadImage = async (file: File): Promise<string> => {
     console.log(file);
     if (!file) {
@@ -110,7 +125,8 @@ const EventForm = () => {
           ticketAmount: ticketAmount,
           ticketPrice: ticketPrice,
           location: location,
-          date: date,
+          startDate: startDate,
+          endDate: endDate,
           description: description,
           imageUrl: imageUrl,
         }),
@@ -208,31 +224,56 @@ const EventForm = () => {
 
           <div className="flex flex-col gap-2 md:gap-3">
             <Label htmlFor="username" className="text-left">
-              Date & Time
+              Start Date
             </Label>
-            {/* date picker content */}
+            {/* Date Time picker content */}
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant={"outline"}
                   className={cn(
                     " justify-start text-left font-normal",
-                    !date && "text-muted-foreground"
+                    !startDate && "text-muted-foreground"
                   )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {date ? format(date, "PPP HH:mm:ss") : <span>Pick a date</span>}
+                  {startDate ? format(startDate, "PPP HH:mm:ss") : <span>Pick a date</span>}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0">
                 <Calendar
                   mode="single"
-                  selected={date}
+                  selected={startDate}
                   onSelect={(d) => handleSelect(d)}
                   initialFocus
                 />
                 <div className="p-3 border-t border-border">
-                  <TimePickerDemo setDate={setDate} date={date} />
+                  <TimePickerDemo setDate={setStartDate} date={startDate} />
+                </div>
+              </PopoverContent>
+            </Popover>
+          </div>
+          <div className="flex flex-col gap-2 md:gap-3">
+            <Label htmlFor="username" className="text-left">
+              End Date
+            </Label>
+            {/* Date Time picker content */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant={"outline"}
+                  className={cn(
+                    " justify-start text-left font-normal",
+                    !endDate && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {endDate ? format(endDate, "PPP HH:mm:ss") : <span>Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0">
+                <div className="p-3 border-t border-border">
+                  <TimePickerDemo setDate={handleEndTimeChange} date={endDate} />
                 </div>
               </PopoverContent>
             </Popover>

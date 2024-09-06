@@ -103,7 +103,8 @@ model Event{
   ticketAmount Int @default(100)
   ticketPrice Int
   location String
-  date DateTime
+  startDate DateTime
+  endDate DateTime
   description String
   imageUrl String?
   // user datatype referencing User model above by connecting userEmail from [Event] to email from [User]

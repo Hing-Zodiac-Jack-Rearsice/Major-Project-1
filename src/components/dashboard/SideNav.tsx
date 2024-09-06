@@ -25,8 +25,10 @@ import {
 import { usePathname } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendarDays } from "@fortawesome/free-regular-svg-icons";
+
 import { ThemeToggle } from "../ui/ThemeToggle";
 import Billing from "./Billing";
+import { faQrcode } from "@fortawesome/free-solid-svg-icons";
 const SideNav = () => {
   // const pathName = usePathname();
   // console.log(String(pathName.split("/").length - 1));
@@ -108,6 +110,19 @@ const SideNav = () => {
                 </Link>
               </TooltipTrigger>
               <TooltipContent side="right">Analytics</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link
+                  href="/admin/dashboard/qrscanner"
+                  className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+                  prefetch={false}
+                >
+                  <FontAwesomeIcon icon={faQrcode} className="w-5 h-5" />
+                  <span className="sr-only">Qr Scanner</span>
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent side="right">Qr Scanner</TooltipContent>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
