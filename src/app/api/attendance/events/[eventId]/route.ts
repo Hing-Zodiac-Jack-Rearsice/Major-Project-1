@@ -1,6 +1,14 @@
 import prisma from "@/lib/db";
 import { NextResponse } from "next/server";
-
+export async function GET(request: Request, { params }: { params: { eventId: string } }) {
+  const { eventId } = params;
+  const attendance = await prisma.attendance.findMany({
+    where: {
+      eventId: eventId as string,
+    },
+  });
+  return new NextResponse(JSON.stringify({ attendance }), { status: 200 });
+}
 export async function POST(request: Request, { params }: { params: { eventId: string } }) {
   // body data from qr code
   const body = await request.json();

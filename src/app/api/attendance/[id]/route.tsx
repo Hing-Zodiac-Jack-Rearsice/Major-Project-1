@@ -8,6 +8,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
     data: {
       eventId: id,
       userEmail: body.userEmail,
+      userName: body.userName,
       eventName: body.eventName,
     },
   });

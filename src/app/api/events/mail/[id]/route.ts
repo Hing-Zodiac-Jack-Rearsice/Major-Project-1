@@ -90,6 +90,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
             body: JSON.stringify({
               eventId: uniqueEvent?.id,
               userEmail: emailFromBody,
+              userName: userNameFromBody,
               eventName: uniqueEvent?.eventName,
             }),
           });

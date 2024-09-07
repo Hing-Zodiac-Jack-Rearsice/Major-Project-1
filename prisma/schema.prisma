@@ -34,6 +34,7 @@ model User {
   events Event[] 
   tickets Ticket[]
   attendances Attendance[]
+  sales Sale[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -108,9 +109,10 @@ model Event{
   description String
   imageUrl String?
   // user datatype referencing User model above by connecting userEmail from [Event] to email from [User]
-  user User @relation(fields: [userEmail], references: [email])
+  user User? @relation(fields: [userEmail], references: [email])
   tickets Ticket[]
   attendances Attendance[]
+  sales Sale[]
 }
 model Ticket{
   id String @id @default(cuid()) @map("_id")
@@ -120,7 +122,7 @@ model Ticket{
   // url stored in firebase 
   qrCodeUrl String?
   // references the user Email which purchased the ticket
-  user User @relation(fields: [userEmail], references: [email])
+  user User? @relation(fields: [userEmail], references: [email])
   // references the event id 
   event Event @relation(fields: [eventId], references: [id])
 }
@@ -128,8 +130,19 @@ model Attendance{
   id String @id @default(cuid()) @map("_id")
   eventId String
   eventName String
-  userEmail String 
+  userEmail String
+  userName String?
   status String @default("absent")
-  user User @relation(fields: [userEmail], references: [email])
+  user User? @relation(fields: [userEmail], references: [email])
   event Event @relation(fields: [eventId], references: [id])  
+}
+// working on here 
+model Sale{
+  id String @id @default(cuid()) @map("_id")
+  eventId String 
+  price Int
+  userEmail String
+  userName String
+  user User? @relation(fields: [userEmail], references: [email])
+  event Event @relation(fields: [eventId], references: [id])
 }
