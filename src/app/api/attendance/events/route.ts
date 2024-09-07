@@ -38,3 +38,44 @@ export async function POST(request: Request) {
   //   return new NextResponse(JSON.stringify({ data: updateUserAttendance }), { status: 200 });
   //   return new NextResponse(JSON.stringify({ data: updateUserAttendance }), { status: 200 });
 }
+
+export async function GET() {
+  //   const session = await auth();
+  const attendanceCounts = await prisma.event.findMany({
+    where: {
+      userEmail: "bensey873@gmail.com",
+    },
+    select: {
+      id: true,
+      eventName: true,
+      attendances: {
+        select: {
+          status: true,
+        },
+      },
+      _count: {
+        select: {
+          attendances: true,
+        },
+      },
+    },
+  });
+  const detailedResults = attendanceCounts.map((event) => {
+    const attended = event.attendances.filter((a) => a.status === "attended").length;
+    const absent = event.attendances.filter((a) => a.status === "absent").length;
+    const total = event._count.attendances;
+    const attendanceRate = total > 0 ? (attended / total) * 100 : 0;
+
+    return {
+      id: event.id,
+      eventName: event.eventName,
+      attended,
+      absent,
+      total,
+      attendanceRate: attendanceRate.toFixed(2) + "%",
+    };
+  });
+
+  // return detailedResults;
+  return new Response(JSON.stringify({ detailedResults }), { status: 200 });
+}

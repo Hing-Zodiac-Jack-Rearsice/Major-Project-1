@@ -12,7 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-export function SalesCard({ eventId }: { eventId: string }) {
+export function SalesCard({ eventId }: any) {
   const [totalSales, setTotalSales] = React.useState(0);
   const [totalRevenue, setTotalRevenue] = React.useState(0);
   const [isLoading, setIsLoading] = React.useState(true);
