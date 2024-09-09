@@ -3,6 +3,7 @@ import React from "react";
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import Logo from "../ui/SombotLogo";
 import {
   Tooltip,
   TooltipContent,
@@ -242,12 +243,20 @@ const SideNav = () => {
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link href="#" prefetch={false}>
+                {/* <Link href="#" prefetch={false}>
                   Dashboard
+                </Link> */}
+                <Link
+                  href="/"
+                  className="flex items-center gap-2 text-lg font-semibold"
+                  prefetch={false}
+                >
+                  <Logo width={32} height={32} />
+                  <h1 className="text-xl font-bold italic">SOMBOT</h1>
                 </Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
-            <BreadcrumbSeparator />
+            {/* <BreadcrumbSeparator />
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
                 <Link href="#" prefetch={false}>
@@ -258,7 +267,7 @@ const SideNav = () => {
             <BreadcrumbSeparator />
             <BreadcrumbItem>
               <BreadcrumbPage>Recent Orders</BreadcrumbPage>
-            </BreadcrumbItem>
+            </BreadcrumbItem> */}
           </BreadcrumbList>
         </Breadcrumb>
         <div className="relative ml-auto flex-1 md:grow-0">
