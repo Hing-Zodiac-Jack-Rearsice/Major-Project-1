@@ -4,13 +4,17 @@ import { signIn } from "next-auth/react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { cn } from "@/lib/utils";
-import { IconBrandGithub, IconBrandGoogle, IconBrandOnlyfans } from "@tabler/icons-react";
+import { IconBrandGoogle } from "@tabler/icons-react";
 import Logo from "./SombotLogo";
 
 export function SignupFormDemo() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log("Form submitted");
+  };
+
+  const handleGoogleSignIn = () => {
+    signIn("google", { callbackUrl: "http://localhost:3000/events" });
   };
 
   return (
@@ -48,8 +52,12 @@ export function SignupFormDemo() {
             <Input id="password" placeholder="••••••••" type="password" />
           </LabelInputContainer>
           <LabelInputContainer className="mb-8">
-            <Label htmlFor="twitterpassword">Confirm your password</Label>
-            <Input id="twitterpassword" placeholder="••••••••" type="twitterpassword" />
+            <Label htmlFor="confirm-password">Confirm your password</Label>
+            <Input
+              id="confirm-password"
+              placeholder="••••••••"
+              type="password"
+            />
           </LabelInputContainer>
 
           {/* Submit Button */}
@@ -68,10 +76,12 @@ export function SignupFormDemo() {
           <div className="flex flex-col space-y-4">
             <button
               className=" relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
-              onClick={() => signIn("google")}
+              onClick={handleGoogleSignIn}
             >
               <IconBrandGoogle className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
-              <span className="text-neutral-700 dark:text-neutral-300 text-sm">Google</span>
+              <span className="text-neutral-700 dark:text-neutral-300 text-sm">
+                Google
+              </span>
               <BottomGradient />
             </button>
           </div>
@@ -97,5 +107,9 @@ const LabelInputContainer = ({
   children: React.ReactNode;
   className?: string;
 }) => {
-  return <div className={cn("flex flex-col space-y-2 w-full", className)}>{children}</div>;
+  return (
+    <div className={cn("flex flex-col space-y-2 w-full", className)}>
+      {children}
+    </div>
+  );
 };
