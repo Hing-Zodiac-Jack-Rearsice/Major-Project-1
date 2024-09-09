@@ -4,6 +4,8 @@ import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Logo from "../ui/SombotLogo";
+import Image from "next/image";
+
 import {
   Tooltip,
   TooltipContent,
@@ -36,9 +38,11 @@ import { ThemeToggle } from "../ui/ThemeToggle";
 import Billing from "./Billing";
 import { faHouse, faQrcode } from "@fortawesome/free-solid-svg-icons";
 import Home from "@/app/page";
+
 const SideNav = () => {
   // const pathName = usePathname();
   // console.log(String(pathName.split("/").length - 1));
+
   return (
     <div>
       <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex ">
@@ -285,8 +289,16 @@ const SideNav = () => {
               size="icon"
               className="overflow-hidden rounded-full"
             >
-              <img
+              {/* <img
                 src="https://images.dog.ceo/breeds/labrador/Toblerone_1.jpg"
+                width={36}
+                height={36}
+                alt="Avatar"
+                className="overflow-hidden rounded-full"
+              /> */}
+
+              <Image
+                src="/professional-photo.jpg"
                 width={36}
                 height={36}
                 alt="Avatar"
