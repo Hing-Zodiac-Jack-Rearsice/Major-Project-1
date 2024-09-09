@@ -5,6 +5,8 @@ import { app } from "@/lib/firebase";
 import { NextResponse } from "next/server";
 // encryption module
 import crypto from "crypto";
+import prisma from "@/lib/db";
+import { error } from "console";
 // Encryption key and IV (Initialization Vector)
 export const ENCRYPTION_KEY = Buffer.from(process.env.NEXT_PUBLIC_ENCRYPTION_KEY as string, "hex"); // 256 bits key
 export const IV = Buffer.from(process.env.NEXT_PUBLIC_IV as string, "hex"); // 128 bits IV
@@ -48,6 +50,18 @@ export async function POST(request: Request, { params }: { params: { id: string 
       });
 
       const handleTicket = async () => {
+        const existingTicket = await prisma.ticket.findFirst({
+          where: {
+            eventId: uniqueEvent.id,
+            userEmail: emailFromBody,
+          },
+        });
+        if (existingTicket) {
+          return NextResponse.json(
+            { error: "You have already purchased a ticket for this event." },
+            { status: 400 }
+          );
+        }
         const encryptedData = encrypt(
           JSON.stringify({
             eventId: uniqueEvent?.id,
@@ -190,6 +204,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
           //   alert("Mail sent successfully");
         }
       };
+      // run the handleTicket()
       await handleTicket();
       return NextResponse.json({ success: `mail sent to ${emailFromBody}` }, { status: 200 });
     }

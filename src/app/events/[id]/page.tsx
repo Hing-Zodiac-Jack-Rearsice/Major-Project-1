@@ -16,6 +16,7 @@ import { useSession } from "next-auth/react";
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/storage";
 import { app } from "@/lib/firebase";
 import { BuyTicket } from "@/app/actions";
+import BuyButton from "@/components/events/BuyButton";
 
 const page = () => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -35,143 +36,143 @@ const page = () => {
     };
     fetchEvent();
   }, []);
-  const handleTicket = async () => {
-    const qrUri = await QRCode.toDataURL(
-      JSON.stringify({
-        eventId: event.id,
-        eventName: event.eventName,
-        userEmail: session?.user.email,
-      })
-    );
-    const qrBuffer = Buffer.from(qrUri.split(",")[1], "base64");
-    const qrUrl = await uploadQr(qrBuffer);
-    const res = await fetch("/api/events/tickets", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        eventId: event.id,
-        eventName: event.eventName,
-        userEmail: session?.user.email,
-        qrCodeUrl: qrUrl,
-      }),
-    });
-    if (res.ok) {
-      await sendMail(qrUrl);
-      await addUserToAttendace();
-      alert("Ticket created successfully");
-    }
-  };
-  const addUserToAttendace = async () => {
-    try {
-      const res = await fetch(`/api/attendance/${id}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          eventId: event.id,
-          userEmail: session?.user.email,
-          eventName: event.eventName,
-        }),
-      });
-      if (!res.ok) {
-        throw new Error("Failed to add user to the list of attendees");
-      } else {
-        alert(`Added ${session?.user.email} to the list of attendees`);
-      }
-    } catch (error) {
-      console.log(error, "Failed to add user to the list of attendees");
-    }
-  };
-  const uploadQr = async (qrBuffer: Buffer): Promise<string> => {
-    const storage = getStorage(app);
-    const metadata = {
-      contentType: "image/png",
-    };
-    const fileName =
-      Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-    const storageRef = ref(storage, "qrCodes/" + fileName + ".png");
-    const uploadTask = uploadBytesResumable(storageRef, qrBuffer);
+  //   const handleTicket = async () => {
+  //     const qrUri = await QRCode.toDataURL(
+  //       JSON.stringify({
+  //         eventId: event.id,
+  //         eventName: event.eventName,
+  //         userEmail: session?.user.email,
+  //       })
+  //     );
+  //     const qrBuffer = Buffer.from(qrUri.split(",")[1], "base64");
+  //     const qrUrl = await uploadQr(qrBuffer);
+  //     const res = await fetch("/api/events/tickets", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({
+  //         eventId: event.id,
+  //         eventName: event.eventName,
+  //         userEmail: session?.user.email,
+  //         qrCodeUrl: qrUrl,
+  //       }),
+  //     });
+  //     if (res.ok) {
+  //       await sendMail(qrUrl);
+  //       await addUserToAttendace();
+  //       alert("Ticket created successfully");
+  //     }
+  //   };
+  //   const addUserToAttendace = async () => {
+  //     try {
+  //       const res = await fetch(`/api/attendance/${id}`, {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({
+  //           eventId: event.id,
+  //           userEmail: session?.user.email,
+  //           eventName: event.eventName,
+  //         }),
+  //       });
+  //       if (!res.ok) {
+  //         throw new Error("Failed to add user to the list of attendees");
+  //       } else {
+  //         alert(`Added ${session?.user.email} to the list of attendees`);
+  //       }
+  //     } catch (error) {
+  //       console.log(error, "Failed to add user to the list of attendees");
+  //     }
+  //   };
+  //   const uploadQr = async (qrBuffer: Buffer): Promise<string> => {
+  //     const storage = getStorage(app);
+  //     const metadata = {
+  //       contentType: "image/png",
+  //     };
+  //     const fileName =
+  //       Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+  //     const storageRef = ref(storage, "qrCodes/" + fileName + ".png");
+  //     const uploadTask = uploadBytesResumable(storageRef, qrBuffer);
 
-    return new Promise((resolve, reject) => {
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          console.log("Upload is " + progress + "% done");
-          switch (snapshot.state) {
-            case "paused":
-              console.log("Upload is paused");
-              break;
-            case "running":
-              console.log("Upload is running");
-              break;
-          }
-        },
-        (error) => {
-          switch (error.code) {
-            case "storage/unauthorized":
-              reject(new Error("User doesn't have permission to access the object"));
-              break;
-            case "storage/canceled":
-              reject(new Error("User canceled the upload"));
-              break;
-            case "storage/unknown":
-              reject(new Error("Unknown error occurred, inspect error.serverResponse"));
-              break;
-          }
-        },
-        async () => {
-          try {
-            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-            // console.log("File available at", downloadURL);
-            resolve(downloadURL);
-          } catch (error) {
-            reject(error);
-          }
-        }
-      );
-    });
-  };
-  //   sending mail test
-  const sendMail = async (qrUrl: string) => {
-    const mailData = {
-      email: session?.user.email,
-      subject: `🎫 Your Ticket to ${event.eventName} is Here!`,
-      text: `Hi <b>${session?.user.name}</b>,
-Your ticket to ${event.eventName} is attached! We're excited to have you join us.<br> 
-Below are the details for the event, along with your unique QR code for entry.<br>
-<br>
-Ticket Details:<br>
-<br>
-Event: ${event.eventName}<br>
-Date: ${formattedDate}<br>
-Time: ${formattedTime}<br>
-Location: ${event.location}<br>
-<br>
-Important Information:<br>
-<br>
-QR Code: Please present the QR code at the entrance for scanning.<br>
-<br>
-Looking forward to seeing you at ${event.eventName}!<br>
-<br>
-Best Regards,<br>
-The ${event.eventName} Team`,
-      qrUrl: qrUrl,
-    };
-    const res = await fetch(`/api/mail`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(mailData),
-    });
-    if (res.ok) {
-      alert("Mail sent successfully");
-    }
-  };
+  //     return new Promise((resolve, reject) => {
+  //       uploadTask.on(
+  //         "state_changed",
+  //         (snapshot) => {
+  //           const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+  //           console.log("Upload is " + progress + "% done");
+  //           switch (snapshot.state) {
+  //             case "paused":
+  //               console.log("Upload is paused");
+  //               break;
+  //             case "running":
+  //               console.log("Upload is running");
+  //               break;
+  //           }
+  //         },
+  //         (error) => {
+  //           switch (error.code) {
+  //             case "storage/unauthorized":
+  //               reject(new Error("User doesn't have permission to access the object"));
+  //               break;
+  //             case "storage/canceled":
+  //               reject(new Error("User canceled the upload"));
+  //               break;
+  //             case "storage/unknown":
+  //               reject(new Error("Unknown error occurred, inspect error.serverResponse"));
+  //               break;
+  //           }
+  //         },
+  //         async () => {
+  //           try {
+  //             const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+  //             // console.log("File available at", downloadURL);
+  //             resolve(downloadURL);
+  //           } catch (error) {
+  //             reject(error);
+  //           }
+  //         }
+  //       );
+  //     });
+  //   };
+  //   //   sending mail test
+  //   const sendMail = async (qrUrl: string) => {
+  //     const mailData = {
+  //       email: session?.user.email,
+  //       subject: `🎫 Your Ticket to ${event.eventName} is Here!`,
+  //       text: `Hi <b>${session?.user.name}</b>,
+  // Your ticket to ${event.eventName} is attached! We're excited to have you join us.<br>
+  // Below are the details for the event, along with your unique QR code for entry.<br>
+  // <br>
+  // Ticket Details:<br>
+  // <br>
+  // Event: ${event.eventName}<br>
+  // Date: ${formattedDate}<br>
+  // Time: ${formattedTime}<br>
+  // Location: ${event.location}<br>
+  // <br>
+  // Important Information:<br>
+  // <br>
+  // QR Code: Please present the QR code at the entrance for scanning.<br>
+  // <br>
+  // Looking forward to seeing you at ${event.eventName}!<br>
+  // <br>
+  // Best Regards,<br>
+  // The ${event.eventName} Team`,
+  //       qrUrl: qrUrl,
+  //     };
+  //     const res = await fetch(`/api/mail`, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify(mailData),
+  //     });
+  //     if (res.ok) {
+  //       alert("Mail sent successfully");
+  //     }
+  //   };
 
   if (!event) return <div className="pl-14">Loading...</div>;
   // Create a Date object from the event.date string
@@ -399,12 +400,11 @@ The ${event.eventName} Team`,
               <h1 className="text-xl font-semibold">Location</h1>
               <p>{event.location}</p>
             </div>
-            <form action={BuyTicket}>
-              <input type="hidden" name="id" value={event.id} />
-              <Button variant="outline" type="submit" className="w-full sm:w-fit">
-                $ {event.ticketPrice}
-              </Button>
-            </form>
+            <BuyButton
+              eventId={event.id}
+              ticketPrice={event.ticketPrice}
+              userEmail={session?.user.email}
+            />
           </div>
           <div className="my-4">
             <h1 className="text-xl font-semibold">Event Description</h1>

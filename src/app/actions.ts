@@ -3,9 +3,21 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/db";
 import { stripe } from "@/lib/stripe";
 import { redirect } from "next/navigation";
+import { NextResponse } from "next/server";
+export async function checkForPurchase(eventId: any, userEmail: any) {
+  const existingTicket = await prisma.ticket.findFirst({
+    where: {
+      eventId: eventId,
+      userEmail: userEmail,
+    },
+  });
 
+  // If existingTicket is not null, it means the user has bought the ticket
+  return existingTicket !== null;
+}
 export async function BuyTicket(formData: FormData) {
   const userSession = await auth();
+
   const id = formData.get("id") as string;
   const data = await prisma.event.findUnique({
     where: {
@@ -23,6 +35,18 @@ export async function BuyTicket(formData: FormData) {
       },
     },
   });
+  const existingTicket = await prisma.ticket.findFirst({
+    where: {
+      eventId: id,
+      userEmail: userSession?.user.email as string,
+    },
+  });
+  if (existingTicket) {
+    return NextResponse.json(
+      { error: "You have already purchased a ticket for this event." },
+      { status: 400 }
+    );
+  }
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
     line_items: [
