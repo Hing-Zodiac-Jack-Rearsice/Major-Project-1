@@ -10,6 +10,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Query parameter is required" }, { status: 400 });
   }
 
+  // Perform the search using the query parameter
   try {
     const events = await prisma.event.findMany({
       where: {
