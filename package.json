@@ -48,6 +48,7 @@
     "@tabler/icons-react": "^3.11.0",
     "@types/nodemailer": "^6.4.15",
     "@types/qrcode": "^1.5.5",
+    "app": "file:",
     "chart.js": "^4.4.4",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
