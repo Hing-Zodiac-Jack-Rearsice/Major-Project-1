@@ -3,7 +3,15 @@ import React from "react";
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
+import Logo from "../ui/SombotLogo";
+import Image from "next/image";
+
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip";
 import { Input } from "../ui/input";
 import {
   Breadcrumb,
@@ -28,10 +36,13 @@ import { faCalendarDays } from "@fortawesome/free-regular-svg-icons";
 
 import { ThemeToggle } from "../ui/ThemeToggle";
 import Billing from "./Billing";
-import { faQrcode } from "@fortawesome/free-solid-svg-icons";
+import { faHouse, faQrcode } from "@fortawesome/free-solid-svg-icons";
+import Home from "@/app/page";
+
 const SideNav = () => {
   // const pathName = usePathname();
   // console.log(String(pathName.split("/").length - 1));
+
   return (
     <div>
       <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex ">
@@ -62,8 +73,22 @@ const SideNav = () => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Link
+                  href="/"
+                  className="flex h-9 w-9 items-center justify-center rounded-lg text-accent-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+                  prefetch={false}
+                >
+                  <FontAwesomeIcon icon={faHouse} className="w-5 h-5" />
+                  <span className="sr-only">Home</span>
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent side="right">Home</TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link
                   href="/admin/dashboard/events"
-                  className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-accent-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+                  className="flex h-9 w-9 items-center justify-center rounded-lg text-accent-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
                   prefetch={false}
                 >
                   <FontAwesomeIcon icon={faCalendarDays} className="w-5 h-5" />
@@ -102,7 +127,7 @@ const SideNav = () => {
               <TooltipTrigger asChild>
                 <Link
                   href="/admin/dashboard/analytic-page"
-                  className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+                  className="flex h-9 w-9 items-center justify-center rounded-lg text-accent-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
                   prefetch={false}
                 >
                   <LineChartIcon className="h-5 w-5" />
@@ -115,7 +140,7 @@ const SideNav = () => {
               <TooltipTrigger asChild>
                 <Link
                   href="/admin/dashboard/qrscanner"
-                  className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+                  className="flex h-9 w-9 items-center justify-center rounded-lg text-accent-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
                   prefetch={false}
                 >
                   <FontAwesomeIcon icon={faQrcode} className="w-5 h-5" />
@@ -222,12 +247,20 @@ const SideNav = () => {
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link href="#" prefetch={false}>
+                {/* <Link href="#" prefetch={false}>
                   Dashboard
+                </Link> */}
+                <Link
+                  href="/"
+                  className="flex items-center gap-2 text-lg font-semibold"
+                  prefetch={false}
+                >
+                  <Logo width={32} height={32} />
+                  <h1 className="text-xl font-bold italic">SOMBOT</h1>
                 </Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
-            <BreadcrumbSeparator />
+            {/* <BreadcrumbSeparator />
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
                 <Link href="#" prefetch={false}>
@@ -238,7 +271,7 @@ const SideNav = () => {
             <BreadcrumbSeparator />
             <BreadcrumbItem>
               <BreadcrumbPage>Recent Orders</BreadcrumbPage>
-            </BreadcrumbItem>
+            </BreadcrumbItem> */}
           </BreadcrumbList>
         </Breadcrumb>
         <div className="relative ml-auto flex-1 md:grow-0">
@@ -251,9 +284,21 @@ const SideNav = () => {
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="icon" className="overflow-hidden rounded-full">
-              <img
+            <Button
+              variant="outline"
+              size="icon"
+              className="overflow-hidden rounded-full"
+            >
+              {/* <img
                 src="https://images.dog.ceo/breeds/labrador/Toblerone_1.jpg"
+                width={36}
+                height={36}
+                alt="Avatar"
+                className="overflow-hidden rounded-full"
+              /> */}
+
+              <Image
+                src="/professional-photo.jpg"
                 width={36}
                 height={36}
                 alt="Avatar"
