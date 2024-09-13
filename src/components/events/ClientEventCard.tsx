@@ -7,7 +7,7 @@ import Link from "next/link";
 
 export function ClientEventCard({ event }: any) {
   const eventDate = new Date(event.startDate);
-
+  const eventEndDate = new Date(event.endDate);
   // Format the date
   const formattedDate = eventDate.toLocaleDateString("en-US", {
     year: "numeric",
@@ -17,6 +17,11 @@ export function ClientEventCard({ event }: any) {
 
   // If you want to separate the time as well, you can do that here
   const formattedTime = eventDate.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  // If you want to separate the time as well, you can do that here
+  const formattedEndTime = eventEndDate.toLocaleTimeString("en-US", {
     hour: "2-digit",
     minute: "2-digit",
   });
@@ -40,7 +45,9 @@ export function ClientEventCard({ event }: any) {
           className="text-neutral-500 text-sm max-w-sm mt-4 dark:text-neutral-300 w-full justify-between flex "
         >
           <p> {formattedDate}</p>
-          <p> {formattedTime}</p>
+          <p>
+            {formattedTime} - {formattedEndTime}
+          </p>
         </CardItem>
         <div className="flex justify-between items-center mt-5">
           <Link href={`/events/${event.id}`} className="w-full">

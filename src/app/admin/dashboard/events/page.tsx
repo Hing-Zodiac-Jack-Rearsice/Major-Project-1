@@ -30,7 +30,7 @@ export default function page() {
           </div>
         </div>
         <div className="px-6">
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3 mt-5 sm:mt-0">
             {events && events.map((event: any) => <EventCard key={event.id} event={event} />)}
           </div>
         </div>

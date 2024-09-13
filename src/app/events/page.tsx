@@ -61,7 +61,7 @@ const Page = () => {
         />
       </div>
       <h1 className="mb-6 text-xl font-bold">Events</h1>
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
         {eventsToDisplay.map((event: any) => (
           <ClientEventCard key={event.id} event={event} />
         ))}

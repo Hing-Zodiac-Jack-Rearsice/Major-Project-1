@@ -1,75 +1,73 @@
 "use client";
-import { Button } from "@/components/ui/button";
-import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { Button } from "@/components/ui/button";
 import BuyButton from "@/components/events/BuyButton";
+import { CalendarDays, Clock, MapPin } from "lucide-react";
 
-const page = () => {
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+const EventPage = () => {
   const { data: session } = useSession();
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [event, setEvent] = useState<any>(null);
-  //   const [qrCodeUrl, setQrCodeUrl] = useState("");
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { id } = useParams();
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+
   useEffect(() => {
     const fetchEvent = async () => {
       const res = await fetch(`/api/events/${id}`);
       const data = await res.json();
-      //   console.log(data.event);
       setEvent(data.event);
     };
     fetchEvent();
-  }, []);
+  }, [id]);
 
-  if (!event) return <div className="pl-14">Loading...</div>;
-  // Create a Date object from the event.date string
-  const eventDate = new Date(event.date);
+  if (!event) return <div className="flex justify-center items-center h-screen">Loading...</div>;
 
-  // Format the date
+  const eventDate = new Date(event.startDate);
+  const eventEndDate = new Date(event.endDate);
+
   const formattedDate = eventDate.toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
   });
 
-  // If you want to separate the time as well, you can do that here
-  const formattedTime = eventDate.toLocaleTimeString("en-US", {
+  const formattedStartTime = eventDate.toLocaleTimeString("en-US", {
     hour: "2-digit",
     minute: "2-digit",
   });
+
+  const formattedEndTime = eventEndDate.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
   return (
-    event && (
-      <div className="">
-        <img src={event.imageUrl} alt="" className="w-full h-96 object-cover" />
-        <div className="px-6">
-          <div>
-            {/* this can be used for events details on client side*/}
-            {/* <h1 className="text-2xl">Event details</h1> */}
-            <div className="flex items-center justify-between">
-              <h1 className="text-2xl font-semibold my-4 sm:text-4xl">{event.eventName}</h1>
-              <div className="items-center gap-2 sm:flex">
-                <p className="underline-offset-4 bg-yellow-300 p-2 rounded-sm dark:text-black font-bold text-nowrap">
-                  working client
-                </p>
-                <Button className="font-bold">Update</Button>
-              </div>
+    <div className="w-full mx-auto">
+      <img src={event.imageUrl} alt={event.eventName} className="w-full h-64 object-cover" />
+      <div className="p-6">
+        <h1 className="text-3xl font-bold mb-6">{event.eventName}</h1>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <div className="flex items-center space-x-2">
+              <CalendarDays className="w-5 h-5 text-gray-500" />
+              <span>{formattedDate}</span>
             </div>
-            <div className="gap-10 items-center sm:flex">
-              <div className="my-2 sm:my-0">
-                <h1 className="text-xl font-semibold">Date and Time</h1>
-                <p>
-                  {formattedDate} - {formattedTime}
-                </p>
-              </div>
-              <div className="my-2 sm:my-0">
-                <h1 className="text-xl font-semibold">Location</h1>
-                <p>{event.location}</p>
-              </div>
+            <div className="flex items-center space-x-2">
+              <Clock className="w-5 h-5 text-gray-500" />
+              <span>
+                {formattedStartTime} to {formattedEndTime}
+              </span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <MapPin className="w-5 h-5 text-gray-500" />
+              <span>{event.location}</span>
+            </div>
+          </div>
+          <div className="flex flex-col justify-between">
+            <p className="text-gray-600">{event.description}</p>
+            <div className="mt-4">
               {session?.user.role === "admin" ? (
-                <Button>{event.ticketPrice} $ (admin)</Button>
+                <Button className="w-full">{event.ticketPrice} $ (admin)</Button>
               ) : (
                 <BuyButton
                   eventId={event.id}
@@ -78,16 +76,11 @@ const page = () => {
                 />
               )}
             </div>
-            <div className="my-4">
-              <h1 className="text-xl font-semibold">Event Description</h1>
-              <p>{event.description}</p>
-              {/* <p onClick={() => addUserToAttendace()}>ADD USER TO ATTENDANCE</p> */}
-            </div>
           </div>
         </div>
       </div>
-    )
+    </div>
   );
 };
 
-export default page;
+export default EventPage;
