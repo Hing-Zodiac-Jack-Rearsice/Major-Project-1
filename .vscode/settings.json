@@ -1,5 +1,5 @@
 {
-    "editor.acceptSuggestionOnEnter": "on",
-    "pieces.cloudCapabilities": "Blended",
-    "pieces.telemetry": true
+  "editor.acceptSuggestionOnEnter": "on",
+  "pieces.cloudCapabilities": "Blended",
+  "pieces.telemetry": true
 }

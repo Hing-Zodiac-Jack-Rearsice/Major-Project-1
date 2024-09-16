@@ -1,7 +1,12 @@
 import React from "react";
-import AnalyticsPage from "@/components/AnalyticsPage";
 
-const AnalyticPage = () => {
+import dynamic from "next/dynamic";
+
+const AnalyticsPage = dynamic(() => import("@/components/AnalyticsPage"), {
+  ssr: false,
+});
+
+const Analytic = () => {
   return (
     <div>
       <AnalyticsPage />
@@ -9,4 +14,4 @@ const AnalyticPage = () => {
   );
 };
 
-export default AnalyticPage;
+export default Analytic;
