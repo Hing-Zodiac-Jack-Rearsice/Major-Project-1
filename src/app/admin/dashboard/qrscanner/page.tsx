@@ -1,22 +1,28 @@
 "use client";
 import { useEffect, useState } from "react";
-import QrScanner from "react-qr-scanner";
 import crypto from "crypto";
+import { useZxing } from "react-zxing";
 
 const page = () => {
   const ENCRYPTION_KEY = Buffer.from(process.env.NEXT_PUBLIC_ENCRYPTION_KEY as string, "hex");
   const IV = Buffer.from(process.env.NEXT_PUBLIC_IV as string, "hex");
+  const [result, setResult] = useState("");
+  // in order to parse the data using JSON.parse and use properties such as eventId, userEmail, and so on
+  const [parsedResult, setParsedResult] = useState<any>(null);
 
+  // decryption function
   const decrypt = (encryptedText: string) => {
     const decipher = crypto.createDecipheriv("aes-256-cbc", ENCRYPTION_KEY as any, IV as any);
     let decrypted = decipher.update(encryptedText, "hex", "utf8");
     decrypted += decipher.final("utf8");
     return decrypted;
   };
-
-  const [result, setResult] = useState("");
-  // in order to parse the data using JSON.parse and use properties such as eventId, userEmail, and so on
-  const [parsedResult, setParsedResult] = useState<any>(null);
+  // handlescan
+  const { ref } = useZxing({
+    onDecodeResult(result) {
+      setResult(decrypt(result.getText()));
+    },
+  });
 
   useEffect(() => {
     if (result) {
@@ -24,7 +30,7 @@ const page = () => {
         // parsing the data event object from result (qr code)
         const parsedData = JSON.parse(result);
         setParsedResult(parsedData);
-        updateAttendace(parsedData);
+        // updateAttendace(parsedData);
       } catch (error) {
         console.error("Failed to parse result:", error);
       }
@@ -63,26 +69,14 @@ const page = () => {
     }
   };
 
-  const handleScan = (data: any) => {
-    if (data) {
-      const decryptedData = decrypt(data.text);
-      setResult(decryptedData);
-    }
-  };
-
-  const handleError = (err: any) => {
-    console.error(err);
-  };
-
   return (
     <div className="sm:py-4 sm:pl-14">
-      <QrScanner
-        delay={300}
-        onError={handleError}
-        onScan={handleScan}
-        className="h-screen w-screen"
-      />
-      <button onClick={() => console.log(parsedResult)}>Log parsed result</button>
+      <video ref={ref} className="w-full h-screen" />
+      {/* <p>
+        <span>Last result:</span>
+        <span>{result}</span>
+      </p> */}
+      <button onClick={() => console.log(result)}>CLICK TO log parsed result</button>
       {parsedResult && (
         <div>
           <h2>Parsed Result:</h2>

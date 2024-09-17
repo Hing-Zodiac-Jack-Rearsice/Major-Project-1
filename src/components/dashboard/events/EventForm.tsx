@@ -22,7 +22,10 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { TimePickerDemo } from "@/components/ui/time-picker-demo";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { app } from "@/lib/firebase";
+import Popup from "@/components/popup/Popup";
 const EventForm = () => {
+  const [showPopup, setShowPopup] = useState(false);
+  const [pStyle, setPStyle] = useState<"success" | "fail">("success");
   const [startDate, setStartDate] = React.useState<Date>();
   const [endDate, setEndDate] = React.useState<Date>();
   const [eventName, setEventName] = useState("");
@@ -132,191 +135,205 @@ const EventForm = () => {
         }),
       });
       if (response.ok) {
-        alert("Event created successfully");
+        setShowPopup(true);
+        setPStyle("success");
+        // alert("Event created successfully");
       }
     } else {
-      alert("Please select an image");
+      setShowPopup(true);
+      setPStyle("fail");
+      // alert("Please select an image");
     }
   };
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline">
-          <FontAwesomeIcon icon={faSquarePlus} className="w-5 h-5" />
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px] text-sm max-h-96 overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Create event</DialogTitle>
-          <DialogDescription>Fill the form below to create a new event.</DialogDescription>
-        </DialogHeader>
-        <div className="flex flex-col gap-2">
+    <div>
+      {" "}
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button variant="outline">
+            <FontAwesomeIcon icon={faSquarePlus} className="w-5 h-5" />
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[425px] text-sm max-h-96 overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Create event</DialogTitle>
+            <DialogDescription>Fill the form below to create a new event.</DialogDescription>
+          </DialogHeader>
           <div className="flex flex-col gap-2">
-            <Label htmlFor="name" className="text-left">
-              Event name
-            </Label>
-            <Input
-              id="name"
-              value={eventName}
-              onChange={(e) => {
-                setEventName(e.target.value);
-              }}
-            />
-          </div>
-          <div className="flex flex-col gap-2 md:gap-3">
-            <Label htmlFor="name" className="text-left">
-              Location
-            </Label>
-            <Input
-              id="name"
-              value={location}
-              onChange={(e) => {
-                setLocation(e.target.value);
-              }}
-            />
-          </div>
-          <div className="flex flex-col gap-2 md:gap-3">
-            <Label htmlFor="username" className="text-left">
-              Description
-            </Label>
-            <Textarea value={description} onChange={(e) => setDescription(e.target.value)} />
-          </div>
-          <div className="flex flex-col gap-2 md:gap-3">
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex-1">
-                <Label htmlFor="ticketAmount" className="text-left">
-                  Tickets amount
-                </Label>
-                <Input
-                  type="number"
-                  id="ticketAmount"
-                  defaultValue={100}
-                  max={1000}
-                  min={100}
-                  value={ticketAmount}
-                  onChange={(e) => {
-                    setTicketAmount(parseInt(e.target.value));
-                  }}
-                />
-              </div>
-              <div className="flex-1">
-                <Label htmlFor="ticketPrice" className="text-left">
-                  Tickets price
-                </Label>
-                <div className="flex items-center gap-2">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="name" className="text-left">
+                Event name
+              </Label>
+              <Input
+                id="name"
+                value={eventName}
+                onChange={(e) => {
+                  setEventName(e.target.value);
+                }}
+              />
+            </div>
+            <div className="flex flex-col gap-2 md:gap-3">
+              <Label htmlFor="name" className="text-left">
+                Location
+              </Label>
+              <Input
+                id="name"
+                value={location}
+                onChange={(e) => {
+                  setLocation(e.target.value);
+                }}
+              />
+            </div>
+            <div className="flex flex-col gap-2 md:gap-3">
+              <Label htmlFor="username" className="text-left">
+                Description
+              </Label>
+              <Textarea value={description} onChange={(e) => setDescription(e.target.value)} />
+            </div>
+            <div className="flex flex-col gap-2 md:gap-3">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex-1">
+                  <Label htmlFor="ticketAmount" className="text-left">
+                    Tickets amount
+                  </Label>
                   <Input
                     type="number"
-                    id="ticketPrice"
-                    defaultValue={1}
-                    max={100}
-                    min={1}
-                    value={ticketPrice}
-                    className="w-full"
+                    id="ticketAmount"
+                    defaultValue={100}
+                    max={1000}
+                    min={100}
+                    value={ticketAmount}
                     onChange={(e) => {
-                      setTicketPrice(parseInt(e.target.value));
+                      setTicketAmount(parseInt(e.target.value));
                     }}
                   />
-                  <span className="currency-symbol">$</span>
+                </div>
+                <div className="flex-1">
+                  <Label htmlFor="ticketPrice" className="text-left">
+                    Tickets price
+                  </Label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="number"
+                      id="ticketPrice"
+                      defaultValue={1}
+                      max={100}
+                      min={1}
+                      value={ticketPrice}
+                      className="w-full"
+                      onChange={(e) => {
+                        setTicketPrice(parseInt(e.target.value));
+                      }}
+                    />
+                    <span className="currency-symbol">$</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div className="flex flex-col gap-2 md:gap-3">
-            <Label htmlFor="username" className="text-left">
-              Start Date
-            </Label>
-            {/* Date Time picker content */}
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant={"outline"}
-                  className={cn(
-                    " justify-start text-left font-normal",
-                    !startDate && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {startDate ? format(startDate, "PPP HH:mm:ss") : <span>Pick a date</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={startDate}
-                  onSelect={(d) => handleSelect(d)}
-                  initialFocus
-                />
-                <div className="p-3 border-t border-border">
-                  <TimePickerDemo setDate={setStartDate} date={startDate} />
-                </div>
-              </PopoverContent>
-            </Popover>
+            <div className="flex flex-col gap-2 md:gap-3">
+              <Label htmlFor="username" className="text-left">
+                Start Date
+              </Label>
+              {/* Date Time picker content */}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      " justify-start text-left font-normal",
+                      !startDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {startDate ? format(startDate, "PPP HH:mm:ss") : <span>Pick a date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={startDate}
+                    onSelect={(d) => handleSelect(d)}
+                    initialFocus
+                  />
+                  <div className="p-3 border-t border-border">
+                    <TimePickerDemo setDate={setStartDate} date={startDate} />
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </div>
+            <div className="flex flex-col gap-2 md:gap-3">
+              <Label htmlFor="username" className="text-left">
+                End Date
+              </Label>
+              {/* Date Time picker content */}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      " justify-start text-left font-normal",
+                      !endDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {endDate ? format(endDate, "PPP HH:mm:ss") : <span>Pick a date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <div className="p-3 border-t border-border">
+                    <TimePickerDemo setDate={handleEndTimeChange} date={endDate} />
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </div>
+            <div className="flex flex-col gap-2 md:gap-3">
+              <Label htmlFor="picture" className="text-left">
+                Image
+              </Label>
+              <Input
+                type="file"
+                id="picture"
+                onChange={(e) => {
+                  if (e.target.files) {
+                    // console.log(e.target.files[0]);
+                    setFile(e.target.files[0]);
+                    // console.log(file);
+                  }
+                }}
+              />
+            </div>
           </div>
-          <div className="flex flex-col gap-2 md:gap-3">
-            <Label htmlFor="username" className="text-left">
-              End Date
-            </Label>
-            {/* Date Time picker content */}
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant={"outline"}
-                  className={cn(
-                    " justify-start text-left font-normal",
-                    !endDate && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {endDate ? format(endDate, "PPP HH:mm:ss") : <span>Pick a date</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <div className="p-3 border-t border-border">
-                  <TimePickerDemo setDate={handleEndTimeChange} date={endDate} />
-                </div>
-              </PopoverContent>
-            </Popover>
-          </div>
-          <div className="flex flex-col gap-2 md:gap-3">
-            <Label htmlFor="picture" className="text-left">
-              Image
-            </Label>
-            <Input
-              type="file"
-              id="picture"
-              onChange={(e) => {
-                if (e.target.files) {
-                  // console.log(e.target.files[0]);
-                  setFile(e.target.files[0]);
-                  // console.log(file);
-                }
-              }}
-            />
-          </div>
-        </div>
-        <DialogFooter>
-          <Button type="submit" onClick={() => handleUpload()}>
-            Create
-          </Button>
-          {/* BELOW: used to test firebase image upload function */}
-          {/* <Button
-            type="submit"
-            onClick={() => {
-              if (file) {
-                uploadImage(file);
-              }
-            }}
-          >
-            test img
-          </Button> */}
-          {/* BELOW: in order to log datetime */}
-          {/* <Button type="submit" onClick={() => console.log(date)}>
-            Log datetime
-          </Button> */}
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          <DialogFooter>
+            <Button type="submit" onClick={() => handleUpload()}>
+              Create
+            </Button>
+            {/* BELOW: used to test firebase image upload function */}
+            {/* <Button
+          type="submit"
+          onClick={() => {
+            if (file) {
+              uploadImage(file);
+            }
+          }}
+        >
+          test img
+        </Button> */}
+            {/* BELOW: in order to log datetime */}
+            {/* <Button type="submit" onClick={() => console.log(date)}>
+          Log datetime
+        </Button> */}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      {showPopup && (
+        <Popup
+          message="Event created successfully"
+          onClose={() => setShowPopup(false)}
+          style={pStyle}
+        />
+      )}
+    </div>
   );
 };
 
