@@ -1,10 +1,19 @@
 // app/api/analytics/route.ts
-import prisma from '@/lib/db';
 import { NextResponse } from 'next/server';
+import { auth } from '@/lib/auth';
+import prisma from '@/lib/db';
 
-export async function GET() {
+export async function GET(request: Request) {
+    const session = await auth();
+    if (!session) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     try {
         const events = await prisma.event.findMany({
+            where: {
+                userEmail: session.user.email as string,
+            },
             include: {
                 tickets: true,
                 attendances: true,
@@ -20,3 +29,4 @@ export async function GET() {
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
+
