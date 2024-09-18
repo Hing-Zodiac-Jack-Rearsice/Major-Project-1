@@ -2,8 +2,12 @@
 import { useEffect, useState } from "react";
 import crypto from "crypto";
 import { useZxing } from "react-zxing";
+import Popup from "@/components/popup/Popup";
 
 const page = () => {
+  const [showPopup, setShowPopup] = useState(false);
+  const [pStyle, setPStyle] = useState<"success" | "fail">("success");
+  const [msg, setMsg] = useState("");
   const ENCRYPTION_KEY = Buffer.from(process.env.NEXT_PUBLIC_ENCRYPTION_KEY as string, "hex");
   const IV = Buffer.from(process.env.NEXT_PUBLIC_IV as string, "hex");
   const [result, setResult] = useState("");
@@ -30,7 +34,7 @@ const page = () => {
         // parsing the data event object from result (qr code)
         const parsedData = JSON.parse(result);
         setParsedResult(parsedData);
-        // updateAttendace(parsedData);
+        updateAttendace(parsedData);
       } catch (error) {
         console.error("Failed to parse result:", error);
       }
@@ -58,11 +62,17 @@ const page = () => {
 
       if (res.status === 200) {
         // console.log(responseData);
-        console.log(responseData.msg);
-        alert(responseData.msg);
+        // console.log(responseData.msg);
+        // alert(responseData.msg);
+        setMsg(responseData.msg);
+        setShowPopup(true);
+        setPStyle("success");
       } else {
-        console.error("Failed to send data");
-        alert(responseData.msg);
+        // console.error("Failed to send data");
+        // alert(responseData.msg);
+        setMsg(responseData.msg);
+        setShowPopup(true);
+        setPStyle("fail");
       }
     } catch (error) {
       console.error("Error sending data:", error);
@@ -76,13 +86,14 @@ const page = () => {
         <span>Last result:</span>
         <span>{result}</span>
       </p> */}
-      <button onClick={() => console.log(result)}>CLICK TO log parsed result</button>
+      {/* <button onClick={() => console.log(result)}>CLICK TO log parsed result</button>
       {parsedResult && (
         <div>
           <h2>Parsed Result:</h2>
           <pre>{JSON.stringify(parsedResult, null, 2)}</pre>
         </div>
-      )}
+      )} */}
+      {showPopup && <Popup message={msg} onClose={() => setShowPopup(false)} style={pStyle} />}
     </div>
   );
 };

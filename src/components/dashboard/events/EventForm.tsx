@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlusSquare, faSquarePlus } from "@fortawesome/free-regular-svg-icons";
+import { faSquarePlus } from "@fortawesome/free-regular-svg-icons";
 import { Textarea } from "@/components/ui/textarea";
 import { add, format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
@@ -23,7 +23,7 @@ import { TimePickerDemo } from "@/components/ui/time-picker-demo";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { app } from "@/lib/firebase";
 import Popup from "@/components/popup/Popup";
-const EventForm = () => {
+const EventForm = ({ refreshCallback }: { refreshCallback: () => void }) => {
   const [showPopup, setShowPopup] = useState(false);
   const [pStyle, setPStyle] = useState<"success" | "fail">("success");
   const [startDate, setStartDate] = React.useState<Date>();
@@ -137,6 +137,7 @@ const EventForm = () => {
       if (response.ok) {
         setShowPopup(true);
         setPStyle("success");
+        refreshCallback();
         // alert("Event created successfully");
       }
     } else {
@@ -147,7 +148,6 @@ const EventForm = () => {
   };
   return (
     <div>
-      {" "}
       <Dialog>
         <DialogTrigger asChild>
           <Button variant="outline">

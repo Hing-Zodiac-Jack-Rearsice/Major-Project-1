@@ -19,19 +19,24 @@ const page = () => {
   const [event, setEvent] = useState<any>(null);
   const [attendance, setAttendance] = useState<any>(null);
   const { id } = useParams();
+  const fetchEvent = async () => {
+    const resEvent = await fetch(`/api/events/${id}`);
+    const data = await resEvent.json();
+    setEvent(data.event);
+  };
+
+  const fetchAttendance = async () => {
+    const resAttendance = await fetch(`/api/attendance/events/${id}`);
+    const attendanceData = await resAttendance.json();
+    setAttendance(attendanceData.attendance);
+  };
   useEffect(() => {
-    const fetchEvent = async () => {
-      const resEvent = await fetch(`/api/events/${id}`);
-      const data = await resEvent.json();
-      const resAttendance = await fetch(`/api/attendance/events/${id}`);
-      const attendanceData = await resAttendance.json();
-      //   console.log(data.event);
-      setEvent(data.event);
-      setAttendance(attendanceData.attendance);
-    };
     fetchEvent();
+    fetchAttendance();
   }, []);
-  if (!event) return <div className="pl-14">Loading...</div>;
+
+  if (!event)
+    return <div className="pl-14 flex w-full h-screen items-center justify-center">Loading...</div>;
   // Create a Date object from the event.date string
   const eventDate = new Date(event.date);
 
@@ -86,12 +91,12 @@ const page = () => {
           </div>
           <div className="flex gap-2 items-center">
             <h1 className="text-2xl">Attendees</h1>
-            <InviteForm eventId={id} />
+            <InviteForm eventId={id} onInviteSuccess={() => fetchAttendance()} />
           </div>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Customer</TableHead>
+                <TableHead>Attendees</TableHead>
                 <TableHead className="sm:table-cell text-right">Status</TableHead>
               </TableRow>
             </TableHeader>

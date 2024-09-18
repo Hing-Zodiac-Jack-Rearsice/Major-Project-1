@@ -6,14 +6,13 @@ import React, { useEffect, useState } from "react";
 
 export default function page() {
   const [events, setEvents] = useState([]);
-
+  const fetchEvents = async () => {
+    const res = await fetch("/api/events");
+    const data = await res.json();
+    setEvents(data.events);
+    console.log(data.events);
+  };
   useEffect(() => {
-    const fetchEvents = async () => {
-      const res = await fetch("/api/events");
-      const data = await res.json();
-      setEvents(data.events);
-      console.log(data.events);
-    };
     fetchEvents();
   }, []);
   return (
@@ -26,7 +25,7 @@ export default function page() {
           </div>
           <div className="flex items-center mt-5 gap-2">
             <h1 className="font-medium text-xl">Your Events</h1>
-            <EventForm />
+            <EventForm refreshCallback={() => fetchEvents()} />
           </div>
         </div>
         <div className="px-6">
