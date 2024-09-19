@@ -4,6 +4,26 @@ import prisma from "@/lib/db";
 import { stripe } from "@/lib/stripe";
 import { redirect } from "next/navigation";
 import { NextResponse } from "next/server";
+export async function checkForSoldOut(eventId: any) {
+  const eventTicketAmount = await prisma.event.findUnique({
+    where: {
+      id: eventId,
+    },
+    select: {
+      ticketAmount: true,
+    },
+  });
+  const ticketsSold = await prisma.ticket.count({
+    where: {
+      eventId: eventId,
+    },
+  });
+  if (eventTicketAmount === null) {
+    throw new Error("Event not found");
+  }
+  // true means sold out, if more than 0 means still ongoing sale
+  return eventTicketAmount?.ticketAmount - ticketsSold === 0;
+}
 export async function checkForPurchase(eventId: any, userEmail: any) {
   const existingTicket = await prisma.ticket.findFirst({
     where: {

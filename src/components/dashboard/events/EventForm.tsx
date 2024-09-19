@@ -201,7 +201,7 @@ const EventForm = ({ refreshCallback }: { refreshCallback: () => void }) => {
                     id="ticketAmount"
                     defaultValue={100}
                     max={1000}
-                    min={100}
+                    min={1}
                     value={ticketAmount}
                     onChange={(e) => {
                       setTicketAmount(parseInt(e.target.value));
