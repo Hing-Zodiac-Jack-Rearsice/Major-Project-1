@@ -39,7 +39,7 @@ export default function Navbar() {
             </Link> */}
             {session?.user.role === "admin" && (
               <Link
-                href="/admin/dashboard"
+                href="/admin/dashboard/events"
                 className="hover:underline underline-offset-4"
                 prefetch={false}
               >
@@ -85,7 +85,7 @@ export default function Navbar() {
                 </Link>
                 {session?.user.role === "admin" && (
                   <Link
-                    href="/admin/dashboard"
+                    href="/admin/dashboard/events"
                     className="flex items-center gap-2 py-2 text-lg font-medium hover:bg-muted/50 rounded-md"
                     prefetch={false}
                   >
