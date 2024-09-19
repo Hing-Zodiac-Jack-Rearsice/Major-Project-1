@@ -34,8 +34,8 @@ export async function POST(request: Request, { params }: { params: { id: string 
       const data = await res.json();
       const uniqueEvent = data.event;
       // Create a Date object from the event.date string
-      const eventDate = new Date(uniqueEvent?.date as Date);
-
+      const eventDate = new Date(uniqueEvent?.startDate as Date);
+      const eventEndDate = new Date(uniqueEvent?.endDate as Date);
       // Format the date
       const formattedDate = eventDate.toLocaleDateString("en-US", {
         year: "numeric",
@@ -48,7 +48,10 @@ export async function POST(request: Request, { params }: { params: { id: string 
         hour: "2-digit",
         minute: "2-digit",
       });
-
+      const formattedEndTime = eventEndDate.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
       const handleTicket = async () => {
         const existingTicket = await prisma.ticket.findFirst({
           where: {
@@ -180,7 +183,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
     <br>
     Event: ${uniqueEvent?.eventName}<br>
     Date: ${formattedDate}<br>
-    Time: ${formattedTime}<br>
+    Time: ${formattedTime} - ${formattedEndTime}<br>
     Location: ${uniqueEvent?.location}<br>
     <br>
     Important Information:<br>

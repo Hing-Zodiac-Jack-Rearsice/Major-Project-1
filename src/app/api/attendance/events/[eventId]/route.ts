@@ -39,13 +39,13 @@ export async function POST(request: Request, { params }: { params: { eventId: st
           status: "attended",
         },
       });
-      return new NextResponse(JSON.stringify({ msg: `attendance updated for ${body.userEmail}` }), {
+      return new NextResponse(JSON.stringify({ msg: `Attendance updated for ${body.userEmail}` }), {
         status: 200,
       });
     } else if (currentDate > endDate) {
-      return new NextResponse(JSON.stringify({ msg: "the event has ended" }), { status: 404 });
+      return new NextResponse(JSON.stringify({ msg: "The event has ended" }), { status: 404 });
     } else if (currentDate < startDate) {
-      return new NextResponse(JSON.stringify({ msg: "the event has not started" }), {
+      return new NextResponse(JSON.stringify({ msg: "The event has not started" }), {
         status: 404,
       });
     }

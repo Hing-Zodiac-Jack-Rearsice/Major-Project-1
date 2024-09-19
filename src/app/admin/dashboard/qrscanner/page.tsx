@@ -85,8 +85,8 @@ const page = () => {
       {/* <p>
         <span>Last result:</span>
         <span>{result}</span>
-      </p> */}
-      {/* <button onClick={() => console.log(result)}>CLICK TO log parsed result</button>
+      </p>
+      <button onClick={() => console.log(result)}>CLICK TO log parsed result</button>
       {parsedResult && (
         <div>
           <h2>Parsed Result:</h2>
