@@ -14,11 +14,13 @@ import { Badge } from "@/components/ui/badge";
 import InviteForm from "@/components/dashboard/events/InviteForm";
 import { AttendanceChart } from "@/components/dashboard/events/AttendanceChart";
 import { SalesCard } from "@/components/dashboard/events/SalesCard";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-const page = () => {
+const EventPage = () => {
   const [event, setEvent] = useState<any>(null);
   const [attendance, setAttendance] = useState<any>(null);
   const { id } = useParams();
+
   const fetchEvent = async () => {
     const resEvent = await fetch(`/api/events/${id}`);
     const data = await resEvent.json();
@@ -30,6 +32,7 @@ const page = () => {
     const attendanceData = await resAttendance.json();
     setAttendance(attendanceData.attendance);
   };
+
   useEffect(() => {
     fetchEvent();
     fetchAttendance();
@@ -37,104 +40,140 @@ const page = () => {
 
   if (!event)
     return <div className="pl-14 flex w-full h-screen items-center justify-center">Loading...</div>;
-  // Create a Date object from the event.date string
-  const eventDate = new Date(event.date);
 
-  // Format the date
+  const eventDate = new Date(event.startDate);
+  const eventEndDate = new Date(event.endDate);
+
   const formattedDate = eventDate.toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
   });
-
-  // If you want to separate the time as well, you can do that here
   const formattedTime = eventDate.toLocaleTimeString("en-US", {
     hour: "2-digit",
     minute: "2-digit",
   });
+  const formattedEndTime = eventEndDate.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
   return (
     event && (
       <div className="sm:pl-14">
-        <img src={event.imageUrl} alt="" className="w-full h-96 object-cover" />
-        <div className="px-6">
-          <div>
-            {/* this can be used for events details on client side*/}
-            {/* <h1 className="text-2xl">Event details</h1> */}
-            <div className="flex items-center justify-between">
-              <h1 className="text-2xl font-semibold my-4 sm:text-4xl">{event.eventName}</h1>
-              <div className="items-center gap-2 sm:flex">
-                <p className="underline-offset-4 bg-yellow-300 p-2 rounded-sm dark:text-black font-bold text-nowrap">
-                  ON CLIENT SIDE
-                </p>
-                <Button className="font-bold">Update</Button>
-              </div>
+        <div className="relative h-96 w-full">
+          <img src={event.imageUrl} alt="" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-end p-6">
+            <h1 className="text-3xl font-semibold text-white sm:text-5xl mb-2">
+              {event.eventName}
+            </h1>
+            <p className="text-xl text-white">{formattedDate}</p>
+          </div>
+        </div>
+
+        <div className="px-6 py-8">
+          <div className="flex items-center justify-between mb-4">
+            <div className="items-center gap-2 sm:flex">
+              <p className="underline-offset-4 bg-yellow-300 p-2 rounded-sm dark:text-black font-bold text-nowrap">
+                ON CLIENT SIDE
+              </p>
+              <Button className="font-bold">Update</Button>
             </div>
-            <div className="gap-10 items-center sm:flex">
-              <div className="my-2 sm:my-0">
-                <h1 className="text-xl font-semibold">Date and Time</h1>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <Card>
+              <CardHeader>
+                <CardTitle>Date and Time</CardTitle>
+              </CardHeader>
+              <CardContent>
                 <p>
-                  {formattedDate} - {formattedTime}
+                  {formattedTime} to {formattedEndTime}
                 </p>
-              </div>
-              <div className="my-2 sm:my-0">
-                <h1 className="text-xl font-semibold">Location</h1>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Location</CardTitle>
+              </CardHeader>
+              <CardContent>
                 <p>{event.location}</p>
-              </div>
-              <Button variant="outline" className="w-full sm:w-fit">
-                $ {event.ticketPrice}
-              </Button>
-            </div>
-            <div className="my-4">
-              <h1 className="text-xl font-semibold">Event Description</h1>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Ticket Price</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Button variant="outline">$ {event.ticketPrice}</Button>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="text-xl font-semibold">Event Description</CardTitle>
+            </CardHeader>
+            <CardContent>
               <p>{event.description}</p>
-            </div>
-          </div>
-          <div className="flex gap-2 items-center">
-            <h1 className="text-2xl">Attendees</h1>
-            <InviteForm eventId={id} onInviteSuccess={() => fetchAttendance()} />
-          </div>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Attendees</TableHead>
-                <TableHead className="sm:table-cell text-right">Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {attendance !== null ? (
-                attendance?.map((attendee: any) => (
-                  <TableRow key={attendee.userEmail}>
-                    <TableCell>
-                      <div className="font-medium">{attendee.userName}</div>
-                      <div className="hidden text-sm text-muted-foreground md:inline">
-                        {attendee.userEmail}
-                      </div>
-                    </TableCell>
-                    <TableCell className="sm:table-cell text-right">
-                      <Badge className="text-xs" variant="secondary">
-                        {attendee.status}
-                      </Badge>
-                    </TableCell>
+            </CardContent>
+          </Card>
+
+          <Card className="mb-8">
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <CardTitle className="text-2xl font-semibold">Attendees</CardTitle>
+                <InviteForm eventId={id} onInviteSuccess={() => fetchAttendance()} />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Attendance Table</TableHead>
+                    <TableHead className="text-right">Status</TableHead>
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell>
-                    <div className="font-medium text-left">No attendees yet.</div>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-          <h1 className="text-2xl">Analytics</h1>
-          <div>
-            <AttendanceChart eventId={id} />
-            <SalesCard eventId={id} />
-          </div>
+                </TableHeader>
+                <TableBody>
+                  {attendance !== null && attendance.length > 0 ? (
+                    attendance.map((attendee: any) => (
+                      <TableRow key={attendee.userEmail}>
+                        <TableCell>
+                          <div className="font-medium">{attendee.userName}</div>
+                          <div className="text-sm text-muted-foreground">{attendee.userEmail}</div>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Badge variant="secondary">{attendee.status}</Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={2} className="text-center">
+                        No attendees yet.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl font-semibold">Analytics</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col gap-4">
+                <AttendanceChart eventId={id} />
+                <SalesCard eventId={id} />
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     )
   );
 };
 
-export default page;
+export default EventPage;

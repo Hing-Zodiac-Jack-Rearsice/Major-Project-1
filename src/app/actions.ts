@@ -48,6 +48,7 @@ export async function BuyTicket(formData: FormData) {
     );
   }
   const session = await stripe.checkout.sessions.create({
+    customer_email: userSession?.user?.email as string,
     mode: "payment",
     line_items: [
       {
