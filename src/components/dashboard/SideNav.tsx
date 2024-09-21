@@ -6,12 +6,7 @@ import Link from "next/link";
 import Logo from "../ui/SombotLogo";
 import Image from "next/image";
 
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "../ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { Input } from "../ui/input";
 import {
   Breadcrumb,
@@ -199,14 +194,13 @@ const SideNav = () => {
                 </Link>
                 <ThemeToggle />
               </div>
-
               <Link
-                href="#"
-                className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                href="/"
+                className="flex items-center gap-4 px-2.5 text-foreground"
                 prefetch={false}
               >
-                <HomeIcon className="h-5 w-5" />
-                Dashboard
+                <FontAwesomeIcon icon={faHouse} className="w-5 h-5" />
+                Home
               </Link>
               <Link
                 href="/admin/dashboard/events"
@@ -217,29 +211,33 @@ const SideNav = () => {
                 Events
               </Link>
               <Link
-                href="#"
+                href="/admin/dashboard/analytic-page"
                 className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
                 prefetch={false}
               >
-                <PackageIcon className="h-5 w-5" />
-                Products
+                <LineChartIcon className="h-5 w-5" />
+                Analytics
               </Link>
               <Link
-                href="#"
+                href="/admin/dashboard/qrscanner"
                 className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
                 prefetch={false}
               >
-                <UsersIcon className="h-5 w-5" />
-                Customers
+                <FontAwesomeIcon icon={faQrcode} className="w-5 h-5" />
+                Qr Scanner
               </Link>
-              <Link
+              <div className="w-full flex items-center">
+                <Billing />
+                <p>Billing</p>
+              </div>
+              {/* <Link
                 href="#"
                 className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
                 prefetch={false}
               >
                 <LineChartIcon className="h-5 w-5" />
                 Settings
-              </Link>
+              </Link> */}
             </nav>
           </SheetContent>
         </Sheet>
@@ -284,11 +282,7 @@ const SideNav = () => {
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              variant="outline"
-              size="icon"
-              className="overflow-hidden rounded-full"
-            >
+            <Button variant="outline" size="icon" className="overflow-hidden rounded-full">
               {/* <img
                 src="https://images.dog.ceo/breeds/labrador/Toblerone_1.jpg"
                 width={36}

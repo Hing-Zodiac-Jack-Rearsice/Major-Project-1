@@ -4,12 +4,27 @@
 import { ClientEventCard } from "@/components/events/ClientEventCard";
 import { Input } from "@/components/ui/input";
 import React, { useEffect, useState } from "react";
-
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 const Page = () => {
   const [events, setEvents] = useState<any[]>([]);
   const [searchedEvents, setSearchedEvents] = useState<any[]>([]);
   const [search, setSearch] = useState("");
-
+  const [category, setCategory] = useState("");
+  const [categories, setCategories] = useState<any>([]);
+  const getCategories = async () => {
+    const response = await fetch("/api/category");
+    const data = await response.json();
+    console.log(data.categories);
+    setCategories(data.categories);
+  };
   useEffect(() => {
     const fetchEvents = async () => {
       try {
@@ -22,6 +37,7 @@ const Page = () => {
       }
     };
     fetchEvents();
+    getCategories();
   }, []);
 
   const requestSearchApi = async (query: string) => {
@@ -60,7 +76,25 @@ const Page = () => {
           onChange={handleSearch}
         />
       </div>
-      <h1 className="mb-6 text-xl font-bold">Events</h1>
+
+      <div className="mb-6 flex items-center gap-2">
+        <h1 className=" text-xl font-bold">Events</h1>
+        <Select onValueChange={setCategory} value={category}>
+          <SelectTrigger className="w-fit">
+            <SelectValue placeholder="Select a category" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              {categories.map((cat: any) => (
+                <SelectItem key={cat.id} value={cat.category}>
+                  {cat.category}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div>
+
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
         {eventsToDisplay.map((event: any) => (
           <ClientEventCard key={event.id} event={event} />
