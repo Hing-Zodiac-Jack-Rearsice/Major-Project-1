@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -57,6 +58,7 @@ export default function Popup({ message, onClose, style }: PopupProps) {
             {icon}
             {title}
           </DialogTitle>
+          {/* <DialogDescription></DialogDescription> */}
         </DialogHeader>
         <div className="py-4">
           <p className="text-center">{message}</p>

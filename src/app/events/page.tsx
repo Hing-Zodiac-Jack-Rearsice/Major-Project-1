@@ -87,7 +87,7 @@ const Page = () => {
             <SelectGroup>
               {categories.map((cat: any) => (
                 <SelectItem key={cat.id} value={cat.category}>
-                  {cat.category}
+                  {cat.category.charAt(0).toUpperCase() + cat.category.slice(1).toLowerCase()}
                 </SelectItem>
               ))}
             </SelectGroup>

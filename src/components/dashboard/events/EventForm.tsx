@@ -160,6 +160,18 @@ const EventForm = ({ refreshCallback }: { refreshCallback: () => void }) => {
         setShowPopup(true);
         setPStyle("success");
         refreshCallback();
+
+        // Reset form fields
+        // setEventName("");
+        // setTicketAmount(100);
+        // setTicketPrice(1);
+        // setLocation("");
+        // setStartDate(undefined);
+        // setEndDate(undefined);
+        // setDescription("");
+        // setCategory("");
+        // setFile(null);
+
         // alert("Event created successfully");
       }
     } else {
@@ -224,7 +236,8 @@ const EventForm = ({ refreshCallback }: { refreshCallback: () => void }) => {
                   <SelectGroup>
                     {categories.map((cat: any) => (
                       <SelectItem key={cat.id} value={cat.category}>
-                        {cat.category}
+                        {/* capitalization of category names */}
+                        {cat.category.charAt(0).toUpperCase() + cat.category.slice(1).toLowerCase()}
                       </SelectItem>
                     ))}
                   </SelectGroup>
