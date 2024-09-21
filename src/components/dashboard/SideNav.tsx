@@ -185,23 +185,27 @@ const SideNav = () => {
             <nav className="grid gap-6 text-lg font-medium">
               <div className="flex gap-3">
                 <Link
-                  href="#"
+                  href="/"
                   className="group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base"
                   prefetch={false}
                 >
-                  <Package2Icon className="h-5 w-5 transition-all group-hover:scale-110" />
+                  <FontAwesomeIcon
+                    icon={faHouse}
+                    className="h-5 w-5 transition-all group-hover:scale-110"
+                  />
+
                   <span className="sr-only">Acme Inc</span>
                 </Link>
                 <ThemeToggle />
               </div>
-              <Link
+              {/* <Link
                 href="/"
                 className="flex items-center gap-4 px-2.5 text-foreground"
                 prefetch={false}
               >
                 <FontAwesomeIcon icon={faHouse} className="w-5 h-5" />
                 Home
-              </Link>
+              </Link> */}
               <Link
                 href="/admin/dashboard/events"
                 className="flex items-center gap-4 px-2.5 text-foreground"
