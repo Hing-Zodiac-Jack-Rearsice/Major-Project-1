@@ -3,6 +3,21 @@ import prisma from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { saltAndHashPassword } from "@/utils/password";
 
+const MAX_RETRIES = 3;
+const RETRY_DELAY = 1000; // 1 second
+
+async function retryOperation<T>(operation: () => Promise<T>, retries: number = MAX_RETRIES): Promise<T> {
+  try {
+    return await operation();
+  } catch (error: any) {
+    if (retries > 0 && error.code === 'P5000') {
+      await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+      return retryOperation(operation, retries - 1);
+    }
+    throw error;
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const session = await auth();
@@ -22,10 +37,12 @@ export async function POST(request: Request) {
       updateData.password = hashedPassword;
     }
 
-    const updatedUser = await prisma.user.update({
-      where: { id: session.user.id },
-      data: updateData,
-    });
+    const updatedUser = await retryOperation(() =>
+      prisma.user.update({
+        where: { id: session.user.id },
+        data: updateData,
+      })
+    );
 
     return NextResponse.json({ user: updatedUser }, { status: 200 });
   } catch (error) {

@@ -1,17 +1,39 @@
 "use client";
 import React from "react";
+import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import { ThemeToggle } from "./ui/ThemeToggle";
 import Link from "next/link";
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { usePathname } from "next/navigation";
-import { signOut, useSession } from "next-auth/react";
+import { signOut } from "next-auth/react";
 import Logo from "./ui/SombotLogo";
 
 export default function Navbar() {
   const pathName = usePathname();
   const { data: session } = useSession();
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+    async function fetchUserData() {
+      if (session?.user) {
+        try {
+          const response = await fetch("/api/user/getUserInfo");
+          if (response.ok) {
+            const data = await response.json();
+            setUserData(data);
+          }
+        } catch (error) {
+          console.error("Failed to fetch user data:", error);
+        }
+      }
+    }
+
+    fetchUserData();
+  }, [session]);
 
   // comment below to stop showing the session in console
   // console.log(session);
@@ -74,9 +96,20 @@ export default function Navbar() {
                 {session.user.role === "user" && (
                   <Link
                     href="/profile"
-                    className="hover:underline underline-offset-4"
+                    className="hover:underline underline-offset-4 flex items-center gap-2"
                     prefetch={false}
                   >
+                    {session?.user && userData && (
+                      <Avatar className="w-8 h-8">
+                        <AvatarImage
+                          src={userData.image || ""}
+                          alt={userData.name || ""}
+                        />
+                        <AvatarFallback>
+                          {userData.name?.charAt(0) || "U"}
+                        </AvatarFallback>
+                      </Avatar>
+                    )}
                     Profile
                   </Link>
                 )}
