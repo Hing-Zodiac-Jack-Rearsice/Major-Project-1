@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -8,6 +8,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -34,6 +43,18 @@ const EventForm = ({ refreshCallback }: { refreshCallback: () => void }) => {
   const [ticketAmount, setTicketAmount] = useState(100);
   const [ticketPrice, setTicketPrice] = useState(1);
   const [file, setFile] = useState<File | null>(null);
+  const [category, setCategory] = useState("");
+  const [categories, setCategories] = useState<any>([]);
+  useEffect(() => {
+    const getCategories = async () => {
+      const response = await fetch("/api/category");
+      const data = await response.json();
+      console.log(data.categories);
+      setCategories(data.categories);
+    };
+    getCategories();
+    // console.log("categories: " + categories);
+  }, []);
   const handleSelect = (newDay: Date | undefined) => {
     if (!newDay) return;
     if (!startDate) {
@@ -132,12 +153,25 @@ const EventForm = ({ refreshCallback }: { refreshCallback: () => void }) => {
           endDate: endDate,
           description: description,
           imageUrl: imageUrl,
+          categoryName: category,
         }),
       });
       if (response.ok) {
         setShowPopup(true);
         setPStyle("success");
         refreshCallback();
+
+        // Reset form fields
+        // setEventName("");
+        // setTicketAmount(100);
+        // setTicketPrice(1);
+        // setLocation("");
+        // setStartDate(undefined);
+        // setEndDate(undefined);
+        // setDescription("");
+        // setCategory("");
+        // setFile(null);
+
         // alert("Event created successfully");
       }
     } else {
@@ -189,6 +223,26 @@ const EventForm = ({ refreshCallback }: { refreshCallback: () => void }) => {
                 Description
               </Label>
               <Textarea value={description} onChange={(e) => setDescription(e.target.value)} />
+            </div>
+            <div className="flex flex-col gap-2 md:gap-3">
+              <Label htmlFor="username" className="text-left">
+                Category
+              </Label>
+              <Select onValueChange={setCategory} value={category}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {categories.map((cat: any) => (
+                      <SelectItem key={cat.id} value={cat.category}>
+                        {/* capitalization of category names */}
+                        {cat.category.charAt(0).toUpperCase() + cat.category.slice(1).toLowerCase()}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </div>
             <div className="flex flex-col gap-2 md:gap-3">
               <div className="flex items-center justify-between gap-2">
@@ -323,6 +377,7 @@ const EventForm = ({ refreshCallback }: { refreshCallback: () => void }) => {
             {/* <Button type="submit" onClick={() => console.log(date)}>
           Log datetime
         </Button> */}
+            <Button onClick={() => console.log(category)}>Log out category</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

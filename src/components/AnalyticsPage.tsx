@@ -221,15 +221,11 @@ const AnalyticsPage: React.FC = () => {
   ];
 
   const ticketsSoldData = {
-    labels: analyticsData.ticketsSoldPerEvent.map(
-      (item: any) => item.eventName
-    ),
+    labels: analyticsData.ticketsSoldPerEvent.map((item: any) => item.eventName),
     datasets: [
       {
         label: "Tickets Sold",
-        data: analyticsData.ticketsSoldPerEvent.map(
-          (item: any) => item.ticketsSold
-        ),
+        data: analyticsData.ticketsSoldPerEvent.map((item: any) => item.ticketsSold),
         backgroundColor: "rgba(75, 192, 192, 0.8)",
         borderColor: "rgba(75, 192, 192, 1)",
         borderWidth: 2,
@@ -238,15 +234,11 @@ const AnalyticsPage: React.FC = () => {
   };
 
   const remainingTicketsData = {
-    labels: analyticsData.remainingTicketsPerEvent.map(
-      (item: any) => item.eventName
-    ),
+    labels: analyticsData.remainingTicketsPerEvent.map((item: any) => item.eventName),
     datasets: [
       {
         label: "Remaining Tickets",
-        data: analyticsData.remainingTicketsPerEvent.map(
-          (item: any) => item.remainingTickets
-        ),
+        data: analyticsData.remainingTicketsPerEvent.map((item: any) => item.remainingTickets),
         backgroundColor: "rgba(255, 99, 132, 0.8)",
         borderColor: "rgba(255, 99, 132, 1)",
         borderWidth: 2,
@@ -259,9 +251,7 @@ const AnalyticsPage: React.FC = () => {
     datasets: [
       {
         label: "Sales",
-        data: analyticsData.salesByEventStartTime.map(
-          (item: any) => item.count
-        ),
+        data: analyticsData.salesByEventStartTime.map((item: any) => item.count),
         backgroundColor: "rgba(54, 162, 235, 0.8)",
         borderColor: "rgba(54, 162, 235, 1)",
         borderWidth: 2,
@@ -315,15 +305,11 @@ const AnalyticsPage: React.FC = () => {
   };
 
   const topSellingEventsData = {
-    labels: analyticsData.ticketsSoldPerEvent.map(
-      (item: any) => item.eventName
-    ),
+    labels: analyticsData.ticketsSoldPerEvent.map((item: any) => item.eventName),
     datasets: [
       {
         label: "Tickets Sold",
-        data: analyticsData.ticketsSoldPerEvent.map(
-          (item: any) => item.ticketsSold
-        ),
+        data: analyticsData.ticketsSoldPerEvent.map((item: any) => item.ticketsSold),
         backgroundColor: "rgba(75, 192, 192, 0.8)",
         borderColor: "rgba(75, 192, 192, 1)",
         borderWidth: 2,
@@ -343,20 +329,11 @@ const AnalyticsPage: React.FC = () => {
       </motion.h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
         {cardData.map((item, index) => (
-          <StatCard
-            key={index}
-            title={item.title}
-            value={item.value}
-            index={index}
-          />
+          <StatCard key={index} title={item.title} value={item.value} index={index} />
         ))}
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ChartCard
-          title="Tickets Sold per Event"
-          ChartComponent={Bar}
-          data={ticketsSoldData}
-        />
+        <ChartCard title="Tickets Sold per Event" ChartComponent={Bar} data={ticketsSoldData} />
         <ChartCard
           title="Remaining Tickets per Event"
           ChartComponent={Bar}
@@ -367,29 +344,13 @@ const AnalyticsPage: React.FC = () => {
           ChartComponent={Line}
           data={salesByEventStartTimeData}
         />
-        <ChartCard
-          title="Sales by Event Date"
-          ChartComponent={Line}
-          data={salesByEventDateData}
-        />
-        <ChartCard
-          title="Sales and Revenue by Event"
-          ChartComponent={Bar}
-          data={barData}
-        />
-        <ChartCard
-          title="Ticket Sales vs Attendance"
-          ChartComponent={Scatter}
-          data={scatterData}
-        />
+        <ChartCard title="Sales by Event Date" ChartComponent={Line} data={salesByEventDateData} />
+        <ChartCard title="Sales and Revenue by Event" ChartComponent={Bar} data={barData} />
+        <ChartCard title="Ticket Sales vs Attendance" ChartComponent={Scatter} data={scatterData} />
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top-Selling Events Chart */}
-        <ChartCard
-          title="Top-Selling Events"
-          ChartComponent={Bar}
-          data={topSellingEventsData}
-        />
+        <ChartCard title="Top-Selling Events" ChartComponent={Bar} data={topSellingEventsData} />
       </div>
     </div>
   );

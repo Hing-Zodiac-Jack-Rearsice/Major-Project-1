@@ -24,7 +24,7 @@ const Billing = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="ghost">
+        <Button variant="ghost" className="pl-3 sm:px-2 sm:py-4">
           <FontAwesomeIcon icon={faWallet} className="w-4 h-4" />
         </Button>
       </DialogTrigger>
@@ -36,11 +36,15 @@ const Billing = () => {
         <DialogFooter>
           {stripeConnectedLinked === false ? (
             <form action={CreateStripeAccountLink}>
-              <Button type="submit">Link your account to stripe</Button>
+              <Button type="submit" className="w-full">
+                Link your account to stripe
+              </Button>
             </form>
           ) : (
             <form action={getStripeDashboardLink}>
-              <Button type="submit">View Dashboard</Button>
+              <Button type="submit" className="w-full">
+                View Stripe Connect Dashboard
+              </Button>
             </form>
           )}
         </DialogFooter>

@@ -51,6 +51,7 @@ export async function POST(request: Request) {
           endDate: body.endDate,
           description: body.description,
           imageUrl: body.imageUrl,
+          categoryName: body.categoryName,
         },
       });
       return new NextResponse(JSON.stringify({ data: uploadEvent }), { status: 200 });
