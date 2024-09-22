@@ -31,9 +31,6 @@ export async function POST(request: Request) {
 
         const imageUrl = `/uploads/${filename}`;
 
-        // Log the image URL to verify
-        console.log("Image uploaded successfully:", imageUrl);
-
         return NextResponse.json({ imageUrl }, { status: 200 });
     } catch (error) {
         if (error instanceof Error) {
