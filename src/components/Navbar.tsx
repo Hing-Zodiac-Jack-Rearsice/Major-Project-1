@@ -70,26 +70,28 @@ export default function Navbar() {
                 Login
               </Link>
             ) : (
-              <p
-                className="hover:underline underline-offset-4 cursor-pointer"
-                onClick={() => signOut()}
-              >
-                Sign out
-              </p>
+              <>
+                {session.user.role === "user" && (
+                  <Link
+                    href="/profile"
+                    className="hover:underline underline-offset-4"
+                    prefetch={false}
+                  >
+                    Profile
+                  </Link>
+                )}
+                <p
+                  className="hover:underline underline-offset-4 cursor-pointer"
+                  onClick={() => signOut()}
+                >
+                  Sign out
+                </p>
+              </>
             )}
             {session?.user?.role === "admin" && (
               <a className="underline-offset-4 bg-yellow-300 p-2 rounded-sm dark:text-black font-bold">
                 ADMIN
               </a>
-            )}
-            {session && (
-              <Link
-                href="/profile"
-                className="hover:underline underline-offset-4"
-                prefetch={false}
-              >
-                Profile
-              </Link>
             )}
           </nav>
           <Sheet>
