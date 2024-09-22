@@ -1,19 +1,26 @@
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/db";
 import { NextResponse } from "next/server";
+
 export async function GET(request: Request) {
   const session = await auth();
+  console.log("Session in /api/events:", session); // Add this line
+
+  if (!session) {
+    return new NextResponse(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
+  }
+
   if (session?.user.role === "admin") {
     try {
       const events = await prisma.event.findMany({
         where: {
-          // created by that email user
           userEmail: session.user.email as string,
         },
       });
       return new NextResponse(JSON.stringify({ events }), { status: 200 });
     } catch (error) {
       console.log(error, "fetching all events error");
+      return new NextResponse(JSON.stringify({ error: "Internal Server Error" }), { status: 500 });
     }
   } else if (session?.user.role === "user") {
     try {
@@ -21,6 +28,7 @@ export async function GET(request: Request) {
       return new NextResponse(JSON.stringify({ events }), { status: 200 });
     } catch (error) {
       console.log(error, "fetching all events error");
+      return new NextResponse(JSON.stringify({ error: "Internal Server Error" }), { status: 500 });
     }
   } else {
     return new NextResponse(JSON.stringify({ error: "Unauthorized" }), { status: 401 });

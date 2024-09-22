@@ -16,8 +16,9 @@ declare module "next-auth" {
   }
   interface Session {
     user: {
-      role?: string;
-      stripeConnectedLinked?: boolean;
+      id: string
+      role: string
+      stripeConnectedLinked: boolean
     } & DefaultSession["user"];
   }
 }
