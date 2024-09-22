@@ -52,6 +52,7 @@
     "@types/qrcode": "^1.5.5",
     "@zxing/library": "^0.21.3",
     "app": "file:",
+    "axios": "^1.7.7",
     "chart.js": "^4.4.4",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
