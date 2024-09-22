@@ -82,6 +82,15 @@ export default function Navbar() {
                 ADMIN
               </a>
             )}
+            {session && (
+              <Link
+                href="/profile"
+                className="hover:underline underline-offset-4"
+                prefetch={false}
+              >
+                Profile
+              </Link>
+            )}
           </nav>
           <Sheet>
             <SheetTrigger asChild>
