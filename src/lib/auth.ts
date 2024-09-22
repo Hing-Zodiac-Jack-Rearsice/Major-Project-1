@@ -82,18 +82,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
     jwt({ token, user }) {
       if (user) {
-        console.log("JWT callback - user:", user);
         token.id = user.id;
         token.email = user.email;
         token.name = user.name;
         token.role = user.role;
         token.stripeConnectedLinked = user.stripeConnectedLinked;
+        token.image = user.image;
       }
-      console.log("JWT callback - token:", token);
       return token;
     },
     session({ session, token }) {
-      console.log("Session callback - token:", token);
       if (token) {
         session.user = session.user || {};
         session.user.id = token.id as string;
@@ -101,8 +99,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.name = token.name as string;
         session.user.role = token.role as string;
         session.user.stripeConnectedLinked = token.stripeConnectedLinked as boolean;
+        session.user.image = token.image as string;
       }
-      console.log("Session callback - session:", session);
       return session;
     },
   },
