@@ -1,23 +1,14 @@
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import { PrismaClient } from "@prisma/client/edge";
-import { withAccelerate } from "@prisma/extension-accelerate";
-
-// new added import for Credentials nextAuth i used for login
-
-import { ZodError } from "zod"
-import Credentials from "next-auth/providers/credentials"
-import { signInSchema } from "@/lib/zod"
-
-import { saltAndHashPassword } from "@/utils/password"
+import Credentials from "next-auth/providers/credentials";
+import { ZodError } from "zod";
+import { signInSchema } from "@/lib/zod";
+import { saltAndHashPassword } from "@/utils/password";
 import { getUserFromDb } from "@/utils/db";
+import prisma from "@/lib/db";
 
 // This can be used for next time or other projects
-const prisma = new PrismaClient().$extends(withAccelerate());
-
-// import prisma from "./db";
-// const prisma = new PrismaClient();
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
   providers: [
@@ -33,7 +24,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           type: "password"
         },
       },
-      authorize: async (credentials, request) => {
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          return null;
+        }
+
         try {
           const { email, password } = await signInSchema.parseAsync(credentials);
           console.log("Attempting to authenticate user:", email);

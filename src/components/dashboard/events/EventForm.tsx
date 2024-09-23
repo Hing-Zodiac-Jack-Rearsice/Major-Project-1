@@ -27,9 +27,18 @@ import { add, format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { TimePickerDemo } from "@/components/ui/time-picker-demo";
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import {
+  getStorage,
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+} from "firebase/storage";
 import { app } from "@/lib/firebase";
 import Popup from "@/components/popup/Popup";
 const EventForm = ({ refreshCallback }: { refreshCallback: () => void }) => {
@@ -45,6 +54,9 @@ const EventForm = ({ refreshCallback }: { refreshCallback: () => void }) => {
   const [file, setFile] = useState<File | null>(null);
   const [category, setCategory] = useState("");
   const [categories, setCategories] = useState<any>([]);
+  const [emailSubject, setEmailSubject] = useState("");
+  const [emailBody, setEmailBody] = useState("");
+  const [emailTheme, setEmailTheme] = useState("");
   useEffect(() => {
     const getCategories = async () => {
       const response = await fetch("/api/category");
@@ -99,7 +111,8 @@ const EventForm = ({ refreshCallback }: { refreshCallback: () => void }) => {
       uploadTask.on(
         "state_changed",
         (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           console.log("Upload is " + progress + "% done");
           switch (snapshot.state) {
             case "paused":
@@ -113,13 +126,19 @@ const EventForm = ({ refreshCallback }: { refreshCallback: () => void }) => {
         (error) => {
           switch (error.code) {
             case "storage/unauthorized":
-              reject(new Error("User doesn't have permission to access the object"));
+              reject(
+                new Error("User doesn't have permission to access the object")
+              );
               break;
             case "storage/canceled":
               reject(new Error("User canceled the upload"));
               break;
             case "storage/unknown":
-              reject(new Error("Unknown error occurred, inspect error.serverResponse"));
+              reject(
+                new Error(
+                  "Unknown error occurred, inspect error.serverResponse"
+                )
+              );
               break;
           }
         },
@@ -154,6 +173,11 @@ const EventForm = ({ refreshCallback }: { refreshCallback: () => void }) => {
           description: description,
           imageUrl: imageUrl,
           categoryName: category,
+          emailTemplate: {
+            subject: emailSubject,
+            body: emailBody,
+            theme: emailTheme,
+          },
         }),
       });
       if (response.ok) {
@@ -191,7 +215,9 @@ const EventForm = ({ refreshCallback }: { refreshCallback: () => void }) => {
         <DialogContent className="sm:max-w-[425px] text-sm max-h-96 overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Create event</DialogTitle>
-            <DialogDescription>Fill the form below to create a new event.</DialogDescription>
+            <DialogDescription>
+              Fill the form below to create a new event.
+            </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-2">
             <div className="flex flex-col gap-2">
@@ -222,7 +248,10 @@ const EventForm = ({ refreshCallback }: { refreshCallback: () => void }) => {
               <Label htmlFor="username" className="text-left">
                 Description
               </Label>
-              <Textarea value={description} onChange={(e) => setDescription(e.target.value)} />
+              <Textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
             </div>
             <div className="flex flex-col gap-2 md:gap-3">
               <Label htmlFor="username" className="text-left">
@@ -237,7 +266,8 @@ const EventForm = ({ refreshCallback }: { refreshCallback: () => void }) => {
                     {categories.map((cat: any) => (
                       <SelectItem key={cat.id} value={cat.category}>
                         {/* capitalization of category names */}
-                        {cat.category.charAt(0).toUpperCase() + cat.category.slice(1).toLowerCase()}
+                        {cat.category.charAt(0).toUpperCase() +
+                          cat.category.slice(1).toLowerCase()}
                       </SelectItem>
                     ))}
                   </SelectGroup>
@@ -300,7 +330,11 @@ const EventForm = ({ refreshCallback }: { refreshCallback: () => void }) => {
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {startDate ? format(startDate, "PPP HH:mm:ss") : <span>Pick a date</span>}
+                    {startDate ? (
+                      format(startDate, "PPP HH:mm:ss")
+                    ) : (
+                      <span>Pick a date</span>
+                    )}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0">
@@ -331,12 +365,19 @@ const EventForm = ({ refreshCallback }: { refreshCallback: () => void }) => {
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {endDate ? format(endDate, "PPP HH:mm:ss") : <span>Pick a date</span>}
+                    {endDate ? (
+                      format(endDate, "PPP HH:mm:ss")
+                    ) : (
+                      <span>Pick a date</span>
+                    )}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0">
                   <div className="p-3 border-t border-border">
-                    <TimePickerDemo setDate={handleEndTimeChange} date={endDate} />
+                    <TimePickerDemo
+                      setDate={handleEndTimeChange}
+                      date={endDate}
+                    />
                   </div>
                 </PopoverContent>
               </Popover>
@@ -356,6 +397,42 @@ const EventForm = ({ refreshCallback }: { refreshCallback: () => void }) => {
                   }
                 }}
               />
+            </div>
+            <div className="flex flex-col gap-2 md:gap-3">
+              <Label htmlFor="emailSubject" className="text-left">
+                Email Subject
+              </Label>
+              <Input
+                id="emailSubject"
+                value={emailSubject}
+                onChange={(e) => setEmailSubject(e.target.value)}
+              />
+            </div>
+            <div className="flex flex-col gap-2 md:gap-3">
+              <Label htmlFor="emailBody" className="text-left">
+                Email Body
+              </Label>
+              <Textarea
+                id="emailBody"
+                value={emailBody}
+                onChange={(e) => setEmailBody(e.target.value)}
+              />
+            </div>
+            <div className="flex flex-col gap-2 md:gap-3">
+              <Label htmlFor="emailTheme" className="text-left">
+                Email Theme
+              </Label>
+              <Select onValueChange={setEmailTheme} defaultValue={emailTheme}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a theme" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="default">Default</SelectItem>
+                  <SelectItem value="dark">Dark</SelectItem>
+                  <SelectItem value="light">Light</SelectItem>
+                  <SelectItem value="colorful">Colorful</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <DialogFooter>
@@ -377,7 +454,9 @@ const EventForm = ({ refreshCallback }: { refreshCallback: () => void }) => {
             {/* <Button type="submit" onClick={() => console.log(date)}>
           Log datetime
         </Button> */}
-            <Button onClick={() => console.log(category)}>Log out category</Button>
+            <Button onClick={() => console.log(category)}>
+              Log out category
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -25,26 +25,18 @@ export function SignupFormDemo() {
     setError("");
 
     if (isLogin) {
-      // Handle login
       const result = await signIn("credentials", {
         email,
         password,
         redirect: false,
       });
       if (result?.error) {
-        setError(result.error);
+        setError("Invalid email or password. Please try again.");
       } else if (result?.ok) {
         console.log("Login successful");
-        // Log the session after successful login
         const session = await getSession();
         console.log("Session after login:", session);
         window.location.href = "/events";
-        // console.log("Login successful");
-        // const user = await prisma.user.findUnique({ where: { email } });
-        // if (user) {
-        //   await createSession(user);
-        // }
-        // router.push("/events");
       }
     } else {
       // Handle registration
@@ -105,7 +97,7 @@ export function SignupFormDemo() {
         <p className="text-neutral-600 text-sm max-w-sm mt-2 dark:text-neutral-300">
           {isLogin ? "Sign in to your account" : "Sign up for a new account"}
         </p>
-        {error && <p className="text-red-500 mt-2">{error}</p>}
+        {/* {error && <p className="text-red-500 mt-2">{error}</p>} */}
         <form className="my-8" onSubmit={handleSubmit}>
           {/* Form Fields */}
           <div className="flex flex-col space-y-2 mb-4">

@@ -97,29 +97,43 @@ model Authenticator {
   @@unique([userId, credentialID])
 }
 
-model Event{
-  id String @id @default(cuid()) @map("_id")
-  eventName String
-  userEmail String
-  categoryName String @default("")
-  ticketAmount Int @default(100)
-  ticketPrice Int
-  location String
-  startDate DateTime
-  endDate DateTime
-  description String
-  imageUrl String?  
-  // user datatype referencing User model above by connecting userEmail from [Event] to email from [User]
-  user User? @relation(fields: [userEmail], references: [email])
-  tickets Ticket[]
-  attendances Attendance[]
-  sales Sale[]
-  category Category? @relation(fields: [categoryName], references: [category])
+// a new database table to store email templates and themes for each event.
+model EmailTemplate {
+  id        String   @id @default(cuid()) @map("_id")
+  eventId   String
+  event     Event    @relation(fields: [eventId], references: [id])
+  subject   String
+  body      String
+  theme     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
-model Category{
-    id String @id @default(cuid()) @map("_id")
-    category String @unique
-    events Event[]
+
+model Event {
+  id            String          @id @default(cuid()) @map("_id")
+  eventName     String
+  userEmail     String
+  categoryName  String          @default("")
+  ticketAmount  Int             @default(100)
+  ticketPrice   Int
+  location      String
+  startDate     DateTime
+  endDate       DateTime
+  description   String
+  imageUrl      String?
+  // user datatype referencing User model above by connecting userEmail from [Event] to email from [User]
+  user          User?           @relation(fields: [userEmail], references: [email])
+  tickets       Ticket[]
+  attendances   Attendance[]
+  sales         Sale[]
+  category      Category?       @relation(fields: [categoryName], references: [category])
+  EmailTemplate EmailTemplate[]
+}
+
+model Category {
+  id       String  @id @default(cuid()) @map("_id")
+  category String  @unique
+  events   Event[]
 }
 
 model Ticket {
