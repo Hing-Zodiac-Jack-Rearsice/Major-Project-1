@@ -119,7 +119,8 @@ model Event {
   category     Category?    @relation(fields: [categoryName], references: [category])
 
   // qrcode color
-  qrCodeColor String? @default("#000000")
+  // qrCodeColor String? @default("#000000")
+  qrCodeTheme String? @default("classic")
 }
 
 model Category {

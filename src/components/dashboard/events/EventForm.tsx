@@ -54,7 +54,7 @@ const EventForm = ({ refreshCallback }: { refreshCallback: () => void }) => {
   const [file, setFile] = useState<File | null>(null);
   const [category, setCategory] = useState("");
   const [categories, setCategories] = useState<any>([]);
-  const [qrCodeColor, setQrCodeColor] = useState("#000000");
+  const [qrCodeTheme, setQrCodeTheme] = useState("classic");
   useEffect(() => {
     const getCategories = async () => {
       const response = await fetch("/api/category");
@@ -171,7 +171,7 @@ const EventForm = ({ refreshCallback }: { refreshCallback: () => void }) => {
           description: description,
           imageUrl: imageUrl,
           categoryName: category,
-          qrCodeColor: qrCodeColor,
+          qrCodeTheme: qrCodeTheme,
         }),
       });
       if (response.ok) {
@@ -393,15 +393,23 @@ const EventForm = ({ refreshCallback }: { refreshCallback: () => void }) => {
               />
             </div>
             <div className="flex flex-col gap-2 md:gap-3">
-              <Label htmlFor="qrCodeColor" className="text-left">
-                QR Code Color
+              <Label htmlFor="qrCodeTheme" className="text-left">
+                QR Code Theme
               </Label>
-              <Input
-                type="color"
-                id="qrCodeColor"
-                value={qrCodeColor}
-                onChange={(e) => setQrCodeColor(e.target.value)}
-              />
+              <Select onValueChange={setQrCodeTheme} value={qrCodeTheme}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a QR code theme" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="classic">Classic Black</SelectItem>
+                    <SelectItem value="neon">Neon Blue</SelectItem>
+                    <SelectItem value="sunset">Sunset Gradient</SelectItem>
+                    <SelectItem value="forest">Forest Green</SelectItem>
+                    <SelectItem value="ocean">Ocean Blue</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <DialogFooter>

@@ -73,15 +73,8 @@ export async function POST(request: Request, { params }: { params: { id: string 
             userEmail: emailFromBody,
           })
         );
-        const qrUri = await QRCode.toDataURL(
-          encryptedData,
-          {
-            color: {
-              dark: uniqueEvent.qrCodeColor,  // QR Code color
-              light: '#ffffff'  // Background color
-            }
-          }
-        );
+        const qrOptions = getQRCodeOptions(uniqueEvent.qrCodeTheme);
+        const qrUri = await QRCode.toDataURL(encryptedData, qrOptions);
         const qrBuffer = Buffer.from(qrUri.split(",")[1], "base64");
         const qrUrl = await uploadQr(qrBuffer);
         const res = await fetch("http://localhost:3000/api/events/tickets", {
@@ -220,3 +213,22 @@ export async function POST(request: Request, { params }: { params: { id: string 
     return NextResponse.json({ error: "No user found" }, { status: 401 });
   }
 }
+
+const getQRCodeOptions = (theme: string) => {
+  switch (theme) {
+    case 'neon':
+      return { color: { dark: '#00FFFF', light: '#000000' } };
+    case 'sunset':
+      return {
+        color: { dark: '#FF0000', light: '#FFFF00' },
+        gradientType: 'radial',
+        gradientOnLight: true
+      };
+    case 'forest':
+      return { color: { dark: '#006400', light: '#90EE90' } };
+    case 'ocean':
+      return { color: { dark: '#000080', light: '#E0FFFF' } };
+    default: // classic
+      return { color: { dark: '#000000', light: '#FFFFFF' } };
+  }
+};
