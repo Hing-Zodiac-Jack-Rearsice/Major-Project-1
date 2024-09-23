@@ -217,18 +217,64 @@ export async function POST(request: Request, { params }: { params: { id: string 
 const getQRCodeOptions = (theme: string) => {
   switch (theme) {
     case 'neon':
-      return { color: { dark: '#00FFFF', light: '#000000' } };
+      return {
+        color: {
+          dark: '#00FFFF',
+          light: '#000000'
+        },
+        gradientType: 'radial',
+        gradientOnLight: false,
+        gradientColors: ['#00FFFF', '#FF00FF', '#0000FF']
+      };
     case 'sunset':
       return {
-        color: { dark: '#FF0000', light: '#FFFF00' },
-        gradientType: 'radial',
-        gradientOnLight: true
+        color: {
+          dark: '#FF6B6B',
+          light: '#FFD93D'
+        },
+        gradientType: 'linear',
+        gradientOnLight: true,
+        gradientColors: ['#FF6B6B', '#FFA06B', '#FFD93D']
       };
     case 'forest':
-      return { color: { dark: '#006400', light: '#90EE90' } };
+      return {
+        color: {
+          dark: '#2ECC71',
+          light: '#E8F6EF'
+        },
+        gradientType: 'linear',
+        gradientOnLight: false,
+        gradientColors: ['#2ECC71', '#27AE60', '#1E8449']
+      };
     case 'ocean':
-      return { color: { dark: '#000080', light: '#E0FFFF' } };
-    default: // classic
-      return { color: { dark: '#000000', light: '#FFFFFF' } };
+      return {
+        color: {
+          dark: '#3498DB',
+          light: '#E0F7FA'
+        },
+        gradientType: 'radial',
+        gradientOnLight: false,
+        gradientColors: ['#3498DB', '#2980B9', '#1ABC9C']
+      };
+    case 'galaxy':
+      return {
+        color: {
+          dark: '#8E44AD',
+          light: '#F3E5F5'
+        },
+        gradientType: 'radial',
+        gradientOnLight: true,
+        gradientColors: ['#8E44AD', '#9B59B6', '#3498DB']
+      };
+    default: // modern
+      return {
+        color: {
+          dark: '#34495E',
+          light: '#ECF0F1'
+        },
+        gradientType: 'linear',
+        gradientOnLight: false,
+        gradientColors: ['#34495E', '#2C3E50', '#1ABC9C']
+      };
   }
 };
