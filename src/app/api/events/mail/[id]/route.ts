@@ -74,8 +74,13 @@ export async function POST(request: Request, { params }: { params: { id: string 
           })
         );
         const qrUri = await QRCode.toDataURL(
-          // encrypt qr code Data
-          encryptedData
+          encryptedData,
+          {
+            color: {
+              dark: uniqueEvent.qrCodeColor,  // QR Code color
+              light: '#ffffff'  // Background color
+            }
+          }
         );
         const qrBuffer = Buffer.from(qrUri.split(",")[1], "base64");
         const qrUrl = await uploadQr(qrBuffer);
@@ -94,7 +99,6 @@ export async function POST(request: Request, { params }: { params: { id: string 
         if (res.ok) {
           await sendMail(qrUrl);
           await addUserToAttendace();
-          // alert("Ticket created & mailed successfully");
         }
       };
 

@@ -52,6 +52,7 @@ export async function POST(request: Request) {
           description: body.description,
           imageUrl: body.imageUrl,
           categoryName: body.categoryName,
+          qrCodeColor: body.qrCodeColor, // Add this line
         },
       });
       return new NextResponse(JSON.stringify({ data: uploadEvent }), { status: 200 });

@@ -54,6 +54,7 @@ const EventForm = ({ refreshCallback }: { refreshCallback: () => void }) => {
   const [file, setFile] = useState<File | null>(null);
   const [category, setCategory] = useState("");
   const [categories, setCategories] = useState<any>([]);
+  const [qrCodeColor, setQrCodeColor] = useState("#000000");
   useEffect(() => {
     const getCategories = async () => {
       const response = await fetch("/api/category");
@@ -170,6 +171,7 @@ const EventForm = ({ refreshCallback }: { refreshCallback: () => void }) => {
           description: description,
           imageUrl: imageUrl,
           categoryName: category,
+          qrCodeColor: qrCodeColor,
         }),
       });
       if (response.ok) {
@@ -388,6 +390,17 @@ const EventForm = ({ refreshCallback }: { refreshCallback: () => void }) => {
                     // console.log(file);
                   }
                 }}
+              />
+            </div>
+            <div className="flex flex-col gap-2 md:gap-3">
+              <Label htmlFor="qrCodeColor" className="text-left">
+                QR Code Color
+              </Label>
+              <Input
+                type="color"
+                id="qrCodeColor"
+                value={qrCodeColor}
+                onChange={(e) => setQrCodeColor(e.target.value)}
               />
             </div>
           </div>
