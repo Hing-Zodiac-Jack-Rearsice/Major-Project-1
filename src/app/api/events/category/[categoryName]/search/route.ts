@@ -1,0 +1,44 @@
+// app/api/search/events/route.ts
+import { NextResponse } from "next/server";
+import prisma from "@/lib/db";
+
+export async function GET(request: Request, { params }: { params: { categoryName: string } }) {
+  const { searchParams } = new URL(request.url);
+  const { categoryName } = params;
+  const query = searchParams.get("query");
+
+  if (!query) {
+    return NextResponse.json({ error: "Query parameter is required" }, { status: 400 });
+  }
+  if (categoryName === "all") {
+    const allEvents = await prisma.event.findMany({
+      where: {
+        eventName: {
+          contains: query,
+          mode: "insensitive", // This makes the search case-insensitive
+        },
+      },
+    });
+    return new NextResponse(JSON.stringify({ data: allEvents }), { status: 200 });
+  }
+  // Perform the search using the query parameter
+  try {
+    const events = await prisma.event.findMany({
+      where: {
+        categoryName: categoryName,
+        eventName: {
+          contains: query,
+          mode: "insensitive", // This makes the search case-insensitive
+        },
+      },
+    });
+
+    return new NextResponse(JSON.stringify({ data: events }), { status: 200 });
+  } catch (error) {
+    console.error("Error searching events:", error);
+    return NextResponse.json(
+      { error: "An error occurred while searching for events" },
+      { status: 500 }
+    );
+  }
+}

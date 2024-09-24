@@ -17,7 +17,7 @@ const Page = () => {
   const [events, setEvents] = useState<any[]>([]);
   const [searchedEvents, setSearchedEvents] = useState<any[]>([]);
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState("all");
   const [categories, setCategories] = useState<any>([]);
   const getCategories = async () => {
     const response = await fetch("/api/category");
@@ -25,27 +25,34 @@ const Page = () => {
     console.log(data.categories);
     setCategories(data.categories);
   };
+  const fetchEvents = async () => {
+    try {
+      const res = await fetch(`/api/events/category/${category}`);
+      const data = await res.json();
+      setEvents(data.data || []);
+    } catch (error) {
+      console.error("Error fetching events:", error);
+      setEvents([]);
+    }
+  };
   useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const res = await fetch("/api/events");
-        const data = await res.json();
-        setEvents(data.events || []);
-      } catch (error) {
-        console.error("Error fetching events:", error);
-        setEvents([]);
-      }
-    };
-    fetchEvents();
     getCategories();
+    fetchEvents();
   }, []);
-
+  console.log(events);
+  useEffect(() => {
+    fetchEvents();
+    setSearch("");
+    setSearchedEvents([]);
+  }, [category]);
   const requestSearchApi = async (query: string) => {
     try {
-      const res = await fetch(`/api/events/search?query=${encodeURIComponent(query)}`);
+      const res = await fetch(
+        `/api/events/category/${category}/search?query=${encodeURIComponent(query)}`
+      );
       const data = await res.json();
-      setSearchedEvents(data.events || []);
-      console.log(data.events);
+      setSearchedEvents(data.data || []);
+      // console.log(data.data);
     } catch (error) {
       console.error("Error searching events:", error);
       setSearchedEvents([]);
@@ -85,6 +92,7 @@ const Page = () => {
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
+              <SelectItem value="all">All</SelectItem>
               {categories.map((cat: any) => (
                 <SelectItem key={cat.id} value={cat.category}>
                   {cat.category.charAt(0).toUpperCase() + cat.category.slice(1).toLowerCase()}
