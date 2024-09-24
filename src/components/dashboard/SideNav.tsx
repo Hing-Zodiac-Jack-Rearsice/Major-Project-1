@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -33,10 +33,31 @@ import { ThemeToggle } from "../ui/ThemeToggle";
 import Billing from "./Billing";
 import { faHouse, faQrcode } from "@fortawesome/free-solid-svg-icons";
 import Home from "@/app/page";
+import { useSession } from "next-auth/react";
 
 const SideNav = () => {
   // const pathName = usePathname();
   // console.log(String(pathName.split("/").length - 1));
+  const [userData, setUserData] = useState<any>(null);
+  const { data: session } = useSession();
+
+  useEffect(() => {
+    async function fetchUserData() {
+      if (session?.user) {
+        try {
+          const response = await fetch("/api/user/getUserInfo");
+          if (response.ok) {
+            const data = await response.json();
+            setUserData(data);
+          }
+        } catch (error) {
+          console.error("Failed to fetch user data:", error);
+        }
+      }
+    }
+
+    fetchUserData();
+  }, [session]);
 
   return (
     <div>
