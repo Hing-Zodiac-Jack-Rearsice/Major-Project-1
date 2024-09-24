@@ -2,19 +2,26 @@
 
 import { EventCard } from "@/components/dashboard/events/EventCard";
 import EventForm from "@/components/dashboard/events/EventForm";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import React, { useEffect, useState } from "react";
 
 export default function page() {
   const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
   const fetchEvents = async () => {
-    const res = await fetch("/api/events");
-    const data = await res.json();
-    setEvents(data.events);
-    console.log(data.events);
+    try {
+      const res = await fetch("/api/events");
+      const data = await res.json();
+      setEvents(data.events); // console.log(data.events);
+    } catch (error) {
+    } finally {
+      setLoading(false);
+    }
   };
   useEffect(() => {
     fetchEvents();
   }, []);
+  if (loading) return <LoadingSpinner />;
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
       <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">

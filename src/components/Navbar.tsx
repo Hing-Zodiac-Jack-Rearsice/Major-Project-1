@@ -1,21 +1,30 @@
 "use client";
-import React from "react";
-import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-import { ThemeToggle } from "./ui/ThemeToggle";
+import React, { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
-import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ThemeToggle } from "./ui/ThemeToggle";
 import Logo from "./ui/SombotLogo";
+import { Menu, Ticket, User, LogOut } from "lucide-react";
 
 export default function Navbar() {
   const pathName = usePathname();
+  const router = useRouter();
   const { data: session } = useSession();
-  const [userData, setUserData] = useState(null);
+  const [userData, setUserData] = useState<any>(null);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     async function fetchUserData() {
@@ -35,174 +44,164 @@ export default function Navbar() {
     fetchUserData();
   }, [session]);
 
-  // comment below to stop showing the session in console
-  // console.log(session);
   if (pathName.startsWith("/admin")) {
-    // dont render the navbar from home page when in dashboard route
     return null;
-  } else {
-    return (
-      <header className="fixed top-0 w-full flex items-center justify-between h-16 px-4 dark:bg-black bg-background border-b md:px-6 z-10">
+  }
+
+  const handleNavigation = (href: string) => {
+    setIsOpen(false);
+    router.push(href);
+  };
+
+  const NavLinks = ({ mobile = false }) => (
+    <>
+      <Link
+        href="/events"
+        className="text-sm font-medium hover:text-primary"
+        prefetch={false}
+        onClick={() => mobile && handleNavigation("/events")}
+      >
+        Events
+      </Link>
+      <Link
+        href="/plans"
+        className="text-sm font-medium hover:text-primary"
+        prefetch={false}
+        onClick={() => mobile && handleNavigation("/plans")}
+      >
+        Plans
+      </Link>
+      {session?.user.role === "admin" && (
         <Link
-          href="/"
-          className="flex items-center gap-2 text-lg font-semibold"
+          href="/admin/dashboard/events"
+          className="text-sm font-medium hover:text-primary"
           prefetch={false}
+          onClick={() => mobile && handleNavigation("/admin/dashboard/events")}
         >
-          <Logo width={32} height={32} />
-          <h1 className="text-xl font-bold italic">SOMBOT</h1>
+          Dashboard
         </Link>
-        <div className="flex">
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium mr-4">
-            <Link
-              href="/events"
-              className="hover:underline underline-offset-4"
-              prefetch={false}
-            >
-              Events
-            </Link>
-            {/* <Link
-              href="/events/clzaz65is0001oolazxmiw08p"
-              className="hover:underline underline-offset-4"
-              prefetch={false}
-            >
-              TEST PG
-            </Link> */}
-            {session?.user.role === "admin" && (
-              <Link
-                href="/admin/dashboard/events"
-                className="hover:underline underline-offset-4"
-                prefetch={false}
-              >
-                Dashboard
+      )}
+    </>
+  );
+
+  return (
+    <header className="fixed top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 md:px-6">
+      <div className="container flex h-14 items-center justify-between px-0">
+        <Link href="/" className="flex items-center gap-2 flex-shrink-0" prefetch={false}>
+          <Logo width={32} height={32} />
+          <h1 className="text-xl font-bold italic whitespace-nowrap">SOMBOT</h1>
+        </Link>
+        <div className="flex items-center ">
+          <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
+            <NavLinks />
+          </nav>
+
+          <div className="hidden md:block mx-4">
+            {session?.user.role === "user" && (
+              <Link href="/tickets" prefetch={false}>
+                <Button variant="outline" size="icon">
+                  <Ticket className="h-5 w-5" />
+                  <span className="sr-only">My Tickets</span>
+                </Button>
               </Link>
             )}
-            <Link
-              href="/plans"
-              className="hover:underline underline-offset-4"
-              prefetch={false}
-            >
-              Plans
-            </Link>
-            {!session ? (
-              <Link
-                href="/login"
-                className="hover:underline underline-offset-4"
-                prefetch={false}
-              >
+            <ThemeToggle />
+          </div>
+          {!session ? (
+            <Button asChild className="hidden md:inline-flex">
+              <Link href="/login" prefetch={false}>
                 Login
               </Link>
-            ) : (
-              <>
-                {session.user.role === "user" && (
-                  <Link
-                    href="/profile"
-                    className="hover:underline underline-offset-4 flex items-center gap-2"
-                    prefetch={false}
-                  >
-                    {session?.user && userData && (
-                      <Avatar className="w-8 h-8">
-                        <AvatarImage
-                          src={userData.image || ""}
-                          alt={userData.name || ""}
-                        />
-                        <AvatarFallback>
-                          {userData.name?.charAt(0) || "U"}
-                        </AvatarFallback>
-                      </Avatar>
-                    )}
-                    Profile
-                  </Link>
-                )}
-                <p
-                  className="hover:underline underline-offset-4 cursor-pointer"
-                  onClick={() => signOut()}
-                >
-                  Sign out
-                </p>
-              </>
-            )}
-            {session?.user?.role === "admin" && (
-              <a className="underline-offset-4 bg-yellow-300 p-2 rounded-sm dark:text-black font-bold">
-                ADMIN
-              </a>
-            )}
-          </nav>
-          <Sheet>
+            </Button>
+          ) : (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild className="hidden md:inline-flex">
+                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={userData?.image || ""} alt={userData?.name || ""} />
+                    <AvatarFallback>{userData?.name?.charAt(0) || "U"}</AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                {session.user.role !== "admin" ? (
+                  <>
+                    <DropdownMenuItem asChild>
+                      <Link href="/profile" className="flex items-center" prefetch={false}>
+                        <User className="mr-2 h-4 w-4" />
+                        <span>Profile</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                  </>
+                ) : null}
+
+                <DropdownMenuItem onClick={() => signOut()}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
-              <Button variant="outline" size="icon" className="md:hidden">
-                <MenuIcon className="h-6 w-6" />
+              <Button variant="outline" size="sm" className="h-10 w-10 p-0 md:hidden">
+                <Menu className="h-5 w-5" />
                 <span className="sr-only">Toggle navigation menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="md:hidden ">
-              <div className="grid gap-4 p-4">
-                <Link
-                  href="/events"
-                  className="flex items-center gap-2 py-2 text-lg font-medium hover:bg-muted/50 rounded-md"
-                  prefetch={false}
-                >
-                  Events
-                </Link>
-                {session?.user.role === "admin" && (
-                  <Link
-                    href="/admin/dashboard/events"
-                    className="flex items-center gap-2 py-2 text-lg font-medium hover:bg-muted/50 rounded-md"
-                    prefetch={false}
-                  >
-                    Dashboard
-                  </Link>
+            <SheetContent side="right">
+              <div className="flex flex-col space-y-4">
+                {session && userData && (
+                  <div className="flex items-center space-x-4 mb-4">
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage src={userData.image || ""} alt={userData.name || ""} />
+                      <AvatarFallback>{userData.name?.charAt(0) || "U"}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="text-sm font-medium">{userData.name}</p>
+                      <p className="text-xs text-muted-foreground">{userData.email}</p>
+                    </div>
+                  </div>
                 )}
-
-                <Link
-                  href="/plans"
-                  className="flex items-center gap-2 py-2 text-lg font-medium hover:bg-muted/50 rounded-md"
-                  prefetch={false}
-                >
-                  Plans
-                </Link>
-                {!session ? (
-                  <Link
-                    href="/login"
-                    className="flex items-center gap-2 py-2 text-lg font-medium hover:bg-muted/50 rounded-md"
-                    prefetch={false}
-                  >
-                    Login
-                  </Link>
-                ) : (
-                  <p
-                    className="flex items-center gap-2 py-2 text-lg font-medium hover:bg-muted/50 rounded-md cursor-pointer"
-                    onClick={() => signOut()}
-                  >
-                    Sign out
-                  </p>
-                )}
+                <nav className="flex flex-col space-y-4">
+                  <NavLinks />
+                  {session?.user.role === "user" && (
+                    <Link href="/tickets" className="flex items-center" prefetch={false}>
+                      <Ticket className="mr-2 h-4 w-4" />
+                      <span>My Tickets</span>
+                    </Link>
+                  )}
+                  {!session ? (
+                    <Link href="/login" className="flex items-center" prefetch={false}>
+                      Login
+                    </Link>
+                  ) : (
+                    <>
+                      {session.user.role !== "admin" ? (
+                        <Link href="/profile" className="flex items-center" prefetch={false}>
+                          <User className="mr-2 h-4 w-4" />
+                          <span>Profile</span>
+                        </Link>
+                      ) : null}
+                      <button onClick={() => signOut()} className="flex items-center text-left">
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>Log out</span>
+                      </button>
+                    </>
+                  )}
+                </nav>
+                <div className="pt-4 border-t">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">Theme</span>
+                    <ThemeToggle />
+                  </div>
+                </div>
               </div>
             </SheetContent>
           </Sheet>
-          <ThemeToggle />
         </div>
-      </header>
-    );
-  }
-}
-
-function MenuIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <line x1="4" x2="20" y1="12" y2="12" />
-      <line x1="4" x2="20" y1="6" y2="6" />
-      <line x1="4" x2="20" y1="18" y2="18" />
-    </svg>
+      </div>
+    </header>
   );
 }

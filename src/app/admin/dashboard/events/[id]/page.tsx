@@ -15,6 +15,7 @@ import InviteForm from "@/components/dashboard/events/InviteForm";
 import { AttendanceChart } from "@/components/dashboard/events/AttendanceChart";
 import { SalesCard } from "@/components/dashboard/events/SalesCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 const EventPage = () => {
   const [event, setEvent] = useState<any>(null);
@@ -39,7 +40,11 @@ const EventPage = () => {
   }, []);
 
   if (!event)
-    return <div className="pl-14 flex w-full h-screen items-center justify-center">Loading...</div>;
+    return (
+      <div className="pl-14 flex w-full h-screen items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
 
   const eventDate = new Date(event.startDate);
   const eventEndDate = new Date(event.endDate);

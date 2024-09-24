@@ -171,6 +171,7 @@ import {
   Legend,
   ArcElement,
 } from "chart.js";
+import { Loader2 } from "lucide-react";
 
 ChartJS.register(
   CategoryScale,
@@ -198,7 +199,12 @@ const AnalyticsPage: React.FC = () => {
     fetchData();
   }, []);
 
-  if (!analyticsData) return <div>Loading...</div>;
+  if (!analyticsData)
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
 
   const cardData = [
     { title: "Tickets Sold", value: analyticsData.totalTicketsSold },

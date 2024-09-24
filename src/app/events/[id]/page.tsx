@@ -72,7 +72,7 @@ const EventPage = () => {
             <p className="text-gray-600">{event.description}</p>
             <div className="mt-4">
               {session?.user.role === "admin" ? (
-                <Button className="w-full">{event.ticketPrice} $ (admin)</Button>
+                <Button className="w-full">Admins are permitted from purchase. View only</Button>
               ) : (
                 <BuyButton
                   eventId={event.id}
