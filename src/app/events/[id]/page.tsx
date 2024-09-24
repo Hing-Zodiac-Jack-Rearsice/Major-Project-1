@@ -4,7 +4,7 @@ import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import BuyButton from "@/components/events/BuyButton";
-import { CalendarDays, Clock, MapPin } from "lucide-react";
+import { CalendarDays, Clock, Loader2, MapPin } from "lucide-react";
 
 const EventPage = () => {
   const { data: session } = useSession();
@@ -20,7 +20,12 @@ const EventPage = () => {
     fetchEvent();
   }, [id]);
 
-  if (!event) return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  if (!event)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
 
   const eventDate = new Date(event.startDate);
   const eventEndDate = new Date(event.endDate);

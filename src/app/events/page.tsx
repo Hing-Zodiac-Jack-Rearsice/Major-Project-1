@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Calendar } from "lucide-react";
+import { Search, Calendar, Loader2 } from "lucide-react";
 
 const Page = () => {
   const [events, setEvents] = useState<any>([]);
@@ -113,9 +113,8 @@ const Page = () => {
         </div>
 
         {loading ? (
-          <div className="text-center py-12">
-            <div className="spinner"></div>
-            <p className="mt-4 text-muted-foreground">Loading events...</p>
+          <div className="text-center py-12 flex items-center justify-center h-screen">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
         ) : eventsToDisplay.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
