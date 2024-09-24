@@ -1,66 +1,65 @@
 "use client";
 
-import Image from "next/image";
 import React from "react";
-import { CardBody, CardContainer, CardItem } from "../ui/3d-card";
+import Image from "next/image";
 import Link from "next/link";
+import { Calendar, Clock, MapPin } from "lucide-react";
+import { motion } from "framer-motion";
 
 export function ClientEventCard({ event }: any) {
   const eventDate = new Date(event.startDate);
   const eventEndDate = new Date(event.endDate);
-  // Format the date
+
   const formattedDate = eventDate.toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
   });
 
-  // If you want to separate the time as well, you can do that here
   const formattedTime = eventDate.toLocaleTimeString("en-US", {
     hour: "2-digit",
     minute: "2-digit",
   });
-  // If you want to separate the time as well, you can do that here
+
   const formattedEndTime = eventEndDate.toLocaleTimeString("en-US", {
     hour: "2-digit",
     minute: "2-digit",
   });
-  return (
-    <CardContainer className="inter-var">
-      <CardBody className="bg-gray-50 relative group/card  dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-black dark:border-white/[0.2] border-black/[0.1] w-auto  h-auto rounded p-6 border  ">
-        <CardItem translateZ="50" className="text-xl font-bold text-neutral-600 dark:text-white">
-          {event.eventName}
-        </CardItem>
 
-        <CardItem translateZ="100" className="w-full mt-4">
-          <img
-            src={event.imageUrl}
-            className="h-60 w-full object-cover rounded group-hover/card:shadow-xl"
-            alt="thumbnail"
-          />
-        </CardItem>
-        <CardItem
-          as="p"
-          translateZ="60"
-          className="text-neutral-500 text-sm max-w-sm mt-4 dark:text-neutral-300 w-full justify-between flex "
-        >
-          <p> {formattedDate}</p>
-          <p>
-            {formattedTime} - {formattedEndTime}
-          </p>
-        </CardItem>
-        <div className="flex justify-between items-center mt-5">
-          <Link href={`/events/${event.id}`} className="w-full">
-            <CardItem
-              translateZ={20}
-              as="button"
-              className="w-full px-4 py-2 rounded bg-black dark:bg-white dark:text-black text-white text-xs font-bold"
-            >
-              Learn more
-            </CardItem>
-          </Link>
+  return (
+    <motion.div
+      whileHover={{ scale: 1.05 }}
+      transition={{ type: "spring", stiffness: 300 }}
+      className="bg-white dark:bg-gray-950 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out"
+    >
+      <div className="relative h-48 w-full">
+        <Image src={event.imageUrl} alt={event.eventName} layout="fill" objectFit="cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+        <div className="absolute bottom-4 left-4 right-4">
+          <h3 className="text-white text-xl font-bold truncate">{event.eventName}</h3>
         </div>
-      </CardBody>
-    </CardContainer>
+      </div>
+      <div className="p-4">
+        <div className="flex items-center text-sm text-gray-600 dark:text-gray-300 mb-2">
+          <Calendar className="w-4 h-4 mr-2" />
+          <span>{formattedDate}</span>
+        </div>
+        <div className="flex items-center text-sm text-gray-600 dark:text-gray-300 mb-2">
+          <Clock className="w-4 h-4 mr-2" />
+          <span>
+            {formattedTime} - {formattedEndTime}
+          </span>
+        </div>
+        <div className="flex items-center text-sm text-gray-600 dark:text-gray-300 mb-4">
+          <MapPin className="w-4 h-4 mr-2" />
+          <span className="truncate">{event.location || "Location TBA"}</span>
+        </div>
+        <Link href={`/events/${event.id}`} className="block">
+          <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition duration-300 ease-in-out">
+            Learn More
+          </button>
+        </Link>
+      </div>
+    </motion.div>
   );
 }
