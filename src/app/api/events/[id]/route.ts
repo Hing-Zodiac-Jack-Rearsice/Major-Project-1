@@ -30,7 +30,9 @@ export async function PATCH(request: Request, { params }: { params: { id: string
         ticketPrice: parseFloat(body.ticketPrice),
         location: body.location,
         description: body.description,
-        // Add any other fields you want to update
+        imageUrl: body.imageUrl,
+        startDate: new Date(body.startDate),
+        endDate: new Date(body.endDate),
       },
     });
 
