@@ -1,415 +1,199 @@
 "use client";
 
+import React, { useEffect, useState } from "react";
 import { EventCard } from "@/components/dashboard/events/EventCard";
 import EventForm from "@/components/dashboard/events/EventForm";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import React, { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Calendar, Search, Plus, Filter, RefreshCw } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-export default function page() {
+export default function AdminDashboard() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredEvents, setFilteredEvents] = useState([]);
+  const [category, setCategory] = useState("all");
+  const [categories, setCategories] = useState([]);
+  const [timeFilter, setTimeFilter] = useState("all");
+
   const fetchEvents = async () => {
     try {
-      const res = await fetch("/api/events");
+      setLoading(true);
+      const res = await fetch(`/api/events/category/${category}`);
       const data = await res.json();
-      setEvents(data.events); // console.log(data.events);
+      setEvents(data.data || []);
+      filterEvents(data.data || [], searchTerm, category, timeFilter);
     } catch (error) {
+      console.error("Error fetching events:", error);
+      setEvents([]);
     } finally {
       setLoading(false);
     }
   };
+
+  const getCategories = async () => {
+    const response = await fetch("/api/category");
+    const data = await response.json();
+    setCategories(data.categories);
+  };
+
   useEffect(() => {
+    getCategories();
     fetchEvents();
-  }, []);
+    console.log(categories);
+  }, [category]);
+
+  const filterEvents = (eventList: any, search: any, cat: any, time: any) => {
+    let filtered = eventList;
+
+    // Filter by search term
+    if (search) {
+      filtered = filtered.filter((event: any) =>
+        event.eventName.toLowerCase().includes(search.toLowerCase())
+      );
+    }
+
+    // Filter by category (if not 'all')
+    if (cat !== "all") {
+      filtered = filtered.filter((event: any) => event.categoryName === cat);
+    }
+
+    // Filter by time
+    const now = new Date();
+    if (time === "upcoming") {
+      filtered = filtered.filter((event: any) => new Date(event.startDate) > now);
+    } else if (time === "past") {
+      filtered = filtered.filter((event: any) => new Date(event.startDate) <= now);
+    }
+
+    setFilteredEvents(filtered);
+  };
+
+  useEffect(() => {
+    filterEvents(events, searchTerm, category, timeFilter);
+  }, [searchTerm, category, timeFilter, events]);
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const handleCategoryChange = (value: string) => {
+    setCategory(value);
+  };
+
+  const handleTimeFilterChange = (value: string) => {
+    setTimeFilter(value);
+  };
+
   if (loading) return <LoadingSpinner />;
+
   return (
-    <div className="flex min-h-screen w-full flex-col bg-muted/40">
-      <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
-        <div className="px-6">
-          <div>
-            <h1 className="font-medium text-xl">Hello there, Admin</h1>
-            <p className="text-sm text-zinc-500">Ready to manage your ticket sales?</p>
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto p-6 sm:pl-20">
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="text-3xl font-bold">Welcome, Admin</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground">
+              Manage your events and ticket sales efficiently.
+            </p>
+          </CardContent>
+        </Card>
+
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+          <div className="flex items-center gap-2">
+            <Calendar className="h-6 w-6" />
+            <h2 className="text-2xl font-semibold">Your Events</h2>
           </div>
-          <div className="flex items-center mt-5 gap-2">
-            <h1 className="font-medium text-xl">Your Events</h1>
-            <EventForm refreshCallback={() => fetchEvents()} />
+          <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+            <div className="relative w-full sm:w-64">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search events..."
+                className="pl-8"
+                value={searchTerm}
+                onChange={handleSearch}
+              />
+            </div>
+            <Select onValueChange={handleCategoryChange} value={category}>
+              <SelectTrigger className="w-full md:w-auto">
+                <SelectValue placeholder="Select a category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  {categories.map((cat: any) => (
+                    <SelectItem key={cat.id} value={cat.category}>
+                      {cat.category.charAt(0).toUpperCase() + cat.category.slice(1).toLowerCase()}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+            <EventForm refreshCallback={fetchEvents}>
+              <Button>
+                <Plus className="mr-2 h-4 w-4" /> Add Event
+              </Button>
+            </EventForm>
           </div>
         </div>
-        <div className="px-6">
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3 mt-5 sm:mt-0">
-            {events && events.map((event: any) => <EventCard key={event.id} event={event} />)}
-          </div>
-        </div>
+
+        <Tabs defaultValue="all" className="mb-8" onValueChange={handleTimeFilterChange}>
+          <TabsList>
+            <TabsTrigger value="all">All Events</TabsTrigger>
+            <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
+            <TabsTrigger value="past">Past</TabsTrigger>
+          </TabsList>
+          <TabsContent value="all">
+            <EventGrid events={filteredEvents} />
+          </TabsContent>
+          <TabsContent value="upcoming">
+            <EventGrid events={filteredEvents} />
+          </TabsContent>
+          <TabsContent value="past">
+            <EventGrid events={filteredEvents} />
+          </TabsContent>
+        </Tabs>
+
+        {filteredEvents.length === 0 && (
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-10">
+              <Calendar className="h-16 w-16 text-muted-foreground mb-4" />
+              <p className="text-xl font-semibold mb-2">No events found</p>
+              <p className="text-muted-foreground mb-4">
+                Try adjusting your search or add a new event.
+              </p>
+              <EventForm refreshCallback={fetchEvents}>
+                <Button>
+                  <Plus className="mr-2 h-4 w-4" /> Add Your First Event
+                </Button>
+              </EventForm>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );
 }
 
-function ChevronLeftIcon(props: any) {
+function EventGrid({ events }: { events: any[] }) {
   return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="m15 18-6-6 6-6" />
-    </svg>
-  );
-}
-
-function ChevronRightIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="m9 18 6-6-6-6" />
-    </svg>
-  );
-}
-
-function CopyIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
-      <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
-    </svg>
-  );
-}
-
-function CreditCardIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <rect width="20" height="14" x="2" y="5" rx="2" />
-      <line x1="2" x2="22" y1="10" y2="10" />
-    </svg>
-  );
-}
-
-function FileIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
-      <path d="M14 2v4a2 2 0 0 0 2 2h4" />
-    </svg>
-  );
-}
-
-function HomeIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-      <polyline points="9 22 9 12 15 12 15 22" />
-    </svg>
-  );
-}
-
-function LineChartIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M3 3v18h18" />
-      <path d="m19 9-5 5-4-4-3 3" />
-    </svg>
-  );
-}
-
-function ListFilterIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M3 6h18" />
-      <path d="M7 12h10" />
-      <path d="M10 18h4" />
-    </svg>
-  );
-}
-
-function MoveVerticalIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <polyline points="8 18 12 22 16 18" />
-      <polyline points="8 6 12 2 16 6" />
-      <line x1="12" x2="12" y1="2" y2="22" />
-    </svg>
-  );
-}
-
-function Package2Icon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z" />
-      <path d="m3 9 2.45-4.9A2 2 0 0 1 7.24 3h9.52a2 2 0 0 1 1.8 1.1L21 9" />
-      <path d="M12 3v6" />
-    </svg>
-  );
-}
-
-function PackageIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="m7.5 4.27 9 5.15" />
-      <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
-      <path d="m3.3 7 8.7 5 8.7-5" />
-      <path d="M12 22V12" />
-    </svg>
-  );
-}
-
-function PanelLeftIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <rect width="18" height="18" x="3" y="3" rx="2" />
-      <path d="M9 3v18" />
-    </svg>
-  );
-}
-
-function SearchIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <circle cx="11" cy="11" r="8" />
-      <path d="m21 21-4.3-4.3" />
-    </svg>
-  );
-}
-
-function SettingsIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
-      <circle cx="12" cy="12" r="3" />
-    </svg>
-  );
-}
-
-function ShoppingCartIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <circle cx="8" cy="21" r="1" />
-      <circle cx="19" cy="21" r="1" />
-      <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
-    </svg>
-  );
-}
-
-function TruckIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2" />
-      <path d="M15 18H9" />
-      <path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14" />
-      <circle cx="17" cy="18" r="2" />
-      <circle cx="7" cy="18" r="2" />
-    </svg>
-  );
-}
-
-function UsersIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-      <circle cx="9" cy="7" r="4" />
-      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-    </svg>
-  );
-}
-
-function XIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M18 6 6 18" />
-      <path d="m6 6 12 12" />
-    </svg>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {events.map((event: any) => (
+        <EventCard key={event.id} event={event} />
+      ))}
+    </div>
   );
 }

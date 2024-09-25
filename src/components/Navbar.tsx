@@ -90,31 +90,37 @@ export default function Navbar() {
       <div className="container flex h-14 items-center justify-between px-0">
         <div className="flex gap-4">
           <Link href="/" className="flex items-center gap-2 flex-shrink-0" prefetch={false}>
-            <Logo width={32} height={32} />
+            <div className="hidden md:block">
+              <Logo width={32} height={32} />
+            </div>
+            <div className="md:hidden">
+              <Logo width={28} height={28} />
+            </div>
             <h1 className="text-xl font-bold italic whitespace-nowrap">SOMBOT</h1>
           </Link>
           {session?.user.role === "admin" && (
             <HoverCard>
               <HoverCardTrigger asChild>
-                <Button variant="default" className="bg-yellow-300 font-bold p-2">
+                <Button
+                  variant="default"
+                  className="bg-blue-500 hover:bg-blue-600 text-white font-bold p-2"
+                >
                   ADMIN
                 </Button>
               </HoverCardTrigger>
-              <HoverCardContent className="w-80">
+              <HoverCardContent className="w-fit">
                 <div className="flex justify-between space-x-4">
-                  <Avatar>
+                  {/* <Avatar>
                     <AvatarImage src="https://github.com/vercel.png" />
                     <AvatarFallback>VC</AvatarFallback>
-                  </Avatar>
+                  </Avatar> */}
                   <div className="space-y-1">
-                    <h4 className="text-sm font-semibold">@nextjs</h4>
-                    <p className="text-sm">
-                      The React Framework – created and maintained by @vercel.
-                    </p>
-                    <div className="flex items-center pt-2">
-                      <CalendarDays className="mr-2 h-4 w-4 opacity-70" />{" "}
+                    {/* <h4 className="text-sm font-semibold">@nextjs</h4> */}
+                    <p className="text-sm">You are viewing as admin.</p>
+                    {/* <div className="flex items-center pt-2">
+                      <CalendarDays className="mr-2 h-4 w-4 opacity-70" />
                       <span className="text-xs text-muted-foreground">Joined December 2021</span>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </HoverCardContent>

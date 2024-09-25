@@ -8,11 +8,11 @@ import Link from "next/link";
 export default function Home() {
   return (
     <div>
-      <div className="w-full mx-auto h-screen overflow-hidden mt-16">
+      <div className="w-full mx-auto h-screen overflow-hidden mt-14">
         <Vortex
           backgroundColor="black"
           rangeY={500}
-          particleCount={500}
+          particleCount={350}
           baseHue={150}
           className="flex items-center flex-col justify-center px-2 md:px-10  py-4 w-full h-full text-white z-0"
         >
