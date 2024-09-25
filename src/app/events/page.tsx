@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Search, Calendar, Loader2 } from "lucide-react";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 const Page = () => {
   const [events, setEvents] = useState<any>([]);
@@ -114,7 +115,7 @@ const Page = () => {
 
         {loading ? (
           <div className="text-center py-12 flex items-center justify-center h-screen">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <LoadingSpinner />
           </div>
         ) : eventsToDisplay.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">

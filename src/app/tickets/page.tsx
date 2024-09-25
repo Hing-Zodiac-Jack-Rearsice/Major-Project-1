@@ -15,6 +15,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, Loader2, MapPin, Ticket } from "lucide-react";
 import { set } from "date-fns";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 const EventTicketsPage = () => {
   const { data: session } = useSession();
@@ -60,7 +61,7 @@ const EventTicketsPage = () => {
   if (loading)
     return (
       <div className="flex h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <LoadingSpinner />
       </div>
     );
   const handleTicketClick = (ticket: any) => {
@@ -164,12 +165,12 @@ const EventTicketsPage = () => {
           <DialogTrigger asChild>
             <span className="sr-only">Open ticket details</span>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[90vw] md:max-w-[600px] lg:max-w-[800px]">
+          <DialogContent className="sm:max-w-[90vw] md:max-w-[500px] lg:max-w-[700px]">
             <div className="flex flex-col items-center justify-center">
               <img
                 src={selectedTicket.qrCodeUrl}
                 alt="QR Code"
-                className="w-full max-w-[500px] h-auto mb-6"
+                className="w-full max-w-[400px] h-auto mb-6"
               />
               <h2 className="text-2xl font-bold text-center">{selectedTicket.eventName}</h2>
               <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">

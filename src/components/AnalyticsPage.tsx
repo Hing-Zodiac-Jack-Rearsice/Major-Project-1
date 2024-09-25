@@ -172,6 +172,7 @@ import {
   ArcElement,
 } from "chart.js";
 import { Loader2 } from "lucide-react";
+import LoadingSpinner from "./ui/LoadingSpinner";
 
 ChartJS.register(
   CategoryScale,
@@ -202,7 +203,7 @@ const AnalyticsPage: React.FC = () => {
   if (!analyticsData)
     return (
       <div className="flex items-center justify-center h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <LoadingSpinner />
       </div>
     );
 
