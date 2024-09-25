@@ -1,4 +1,4 @@
-import QRCode from "qrcode";
+import QRCode, { QRCodeErrorCorrectionLevel } from "qrcode";
 
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/storage";
 import { app } from "@/lib/firebase";
@@ -74,7 +74,10 @@ export async function POST(request: Request, { params }: { params: { id: string 
           })
         );
         const qrOptions = getQRCodeOptions(uniqueEvent.qrCodeTheme);
-        const qrUri = await QRCode.toDataURL(encryptedData, qrOptions);
+        const qrUri = await QRCode.toDataURL(encryptedData, {
+          ...qrOptions,
+          errorCorrectionLevel: qrOptions.errorCorrectionLevel as QRCodeErrorCorrectionLevel
+        });
         const qrBuffer = Buffer.from(qrUri.split(",")[1], "base64");
         const qrUrl = await uploadQr(qrBuffer);
         const res = await fetch("http://localhost:3000/api/events/tickets", {
@@ -215,48 +218,36 @@ export async function POST(request: Request, { params }: { params: { id: string 
 }
 
 const getQRCodeOptions = (theme: string) => {
-  switch (theme) {
-    case 'neon':
-      return {
-        color: {
-          dark: '#00FFFF',
-          light: '#000000'
-        }
-      };
-    case 'sunset':
-      return {
-        color: {
-          dark: '#FF6B6B',
-          light: '#FFFFFF'
-        }
-      };
-    case 'forest':
-      return {
-        color: {
-          dark: '#2ECC71',
-          light: '#FFFFFF'
-        }
-      };
-    case 'ocean':
-      return {
-        color: {
-          dark: '#3498DB',
-          light: '#FFFFFF'
-        }
-      };
-    case 'galaxy':
-      return {
-        color: {
-          dark: '#8E44AD',
-          light: '#FFFFFF'
-        }
-      };
-    default: // default theme (black and white)
-      return {
-        color: {
-          dark: '#000000',
-          light: '#FFFFFF'
-        }
-      };
-  }
+  const baseOptions = {
+    errorCorrectionLevel: 'H',
+    margin: 4,
+    width: 300,
+    height: 300,
+  };
+
+  const themeOptions = {
+    neon: {
+      color: { dark: '#00FFFF', light: '#000000' },
+    },
+    sunset: {
+      color: { dark: '#FF6B6B', light: '#FFFFFF' },
+    },
+    forest: {
+      color: { dark: '#2ECC71', light: '#FFFFFF' },
+    },
+    ocean: {
+      color: { dark: '#3498DB', light: '#FFFFFF' },
+    },
+    galaxy: {
+      color: { dark: '#8E44AD', light: '#FFFFFF' },
+    },
+    default: {
+      color: { dark: '#000000', light: '#FFFFFF' },
+    },
+  };
+
+  return {
+    ...baseOptions,
+    ...(themeOptions[theme as keyof typeof themeOptions] || themeOptions.default),
+  };
 };
