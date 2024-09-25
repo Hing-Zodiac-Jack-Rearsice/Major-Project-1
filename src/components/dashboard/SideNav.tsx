@@ -314,7 +314,7 @@ const SideNav = () => {
               /> */}
 
               {/* <Image
-                src={userData.image}
+                src={userData.image}clear
                 width={36}
                 height={36}
                 alt={userData.name}

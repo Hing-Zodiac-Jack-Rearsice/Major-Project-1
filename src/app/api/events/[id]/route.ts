@@ -1,16 +1,45 @@
+import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/db";
-import { NextResponse } from "next/server";
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
-  // const session = await auth();
   const { id } = params;
-  // if (session?.user.role === "admin") {
   const event = await prisma.event.findUnique({
     where: {
       id: id as string,
     },
   });
-  return new NextResponse(JSON.stringify({ event }), { status: 200 });
-  // }
+  return NextResponse.json({ event }, { status: 200 });
+}
+
+export async function PATCH(request: Request, { params }: { params: { id: string } }) {
+  try {
+    const session = await auth();
+    if (!session || !session.user) {
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    }
+
+    const { id } = params;
+    const body = await request.json();
+
+    const updatedEvent = await prisma.event.update({
+      where: { id: id as string },
+      data: {
+        eventName: body.eventName,
+        ticketAmount: parseInt(body.ticketAmount),
+        ticketPrice: parseFloat(body.ticketPrice),
+        location: body.location,
+        description: body.description,
+        // Add any other fields you want to update
+      },
+    });
+
+    return NextResponse.json({ data: updatedEvent }, { status: 200 });
+  } catch (error) {
+    console.error("Error updating event:", error);
+    return NextResponse.json(
+      { error: `Failed to update event: ${error instanceof Error ? error.message : 'Unknown error'}` },
+      { status: 500 }
+    );
+  }
 }

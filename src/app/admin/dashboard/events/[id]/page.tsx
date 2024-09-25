@@ -17,10 +17,14 @@ import { AttendanceChart } from "@/components/dashboard/events/AttendanceChart";
 import { SalesCard } from "@/components/dashboard/events/SalesCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+<<<<<<< Updated upstream
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar, Clock, MapPin, Ticket, Users, ChevronLeft, Edit } from "lucide-react";
 import Link from "next/link";
+=======
+import UpdateEventModal from "@/components/UpdateEventModal";
+>>>>>>> Stashed changes
 
 const EventPage = () => {
   const [event, setEvent] = useState<any>(null);
@@ -37,6 +41,22 @@ const EventPage = () => {
     const resAttendance = await fetch(`/api/attendance/events/${id}`);
     const attendanceData = await resAttendance.json();
     setAttendance(attendanceData.attendance);
+  };
+
+  // const updateEvent = async () => {
+  //   const resUpdate = await fetch(`/api/events/${id}`, {
+  //     method: "PUT",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify(event),
+  //   });
+  //   const data = await resUpdate.json();
+  //   setEvent(data.event);
+  // };
+
+  const handleUpdateEvent = (updatedEvent: any) => {
+    setEvent(updatedEvent); // Update the state with the new event info
   };
 
   useEffect(() => {
@@ -69,6 +89,7 @@ const EventPage = () => {
   });
 
   return (
+<<<<<<< Updated upstream
     <div className="min-h-screen bg-background sm:pl-14">
       <div className="relative h-64 md:h-96 w-full">
         <img src={event.imageUrl} alt={event.eventName} className="w-full h-full object-cover" />
@@ -81,6 +102,134 @@ const EventPage = () => {
 
           <h1 className="text-3xl font-semibold text-white sm:text-5xl mb-2">{event.eventName}</h1>
           <p className="text-xl text-white">{formattedDate}</p>
+=======
+    event && (
+      <div className="sm:pl-14">
+        <div className="relative h-96 w-full">
+          <img
+            src={event.imageUrl}
+            alt=""
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-end p-6">
+            <h1 className="text-3xl font-semibold text-white sm:text-5xl mb-2">
+              {event.eventName}
+            </h1>
+            <p className="text-xl text-white">{formattedDate}</p>
+          </div>
+        </div>
+
+        <div className="px-6 py-8">
+          <div className="flex items-center justify-between mb-4">
+            <div className="items-center gap-2 sm:flex">
+              <p className="underline-offset-4 bg-yellow-300 p-2 rounded-sm dark:text-black font-bold text-nowrap">
+                ON CLIENT SIDE
+              </p>
+              <UpdateEventModal event={event} onUpdate={handleUpdateEvent} />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <Card>
+              <CardHeader>
+                <CardTitle>Date and Time</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p>
+                  {formattedTime} to {formattedEndTime}
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Location</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p>{event.location}</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Ticket Price</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Button variant="outline">$ {event.ticketPrice}</Button>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="text-xl font-semibold">
+                Event Description
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>{event.description}</p>
+            </CardContent>
+          </Card>
+
+          <Card className="mb-8">
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <CardTitle className="text-2xl font-semibold">
+                  Attendees
+                </CardTitle>
+                <InviteForm
+                  eventId={id}
+                  onInviteSuccess={() => fetchAttendance()}
+                />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Attendance Table</TableHead>
+                    <TableHead className="text-right">Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {attendance !== null && attendance.length > 0 ? (
+                    attendance.map((attendee: any) => (
+                      <TableRow key={attendee.userEmail}>
+                        <TableCell>
+                          <div className="font-medium">{attendee.userName}</div>
+                          <div className="text-sm text-muted-foreground">
+                            {attendee.userEmail}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Badge variant="secondary">{attendee.status}</Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={2} className="text-center">
+                        No attendees yet.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl font-semibold">
+                Analytics
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col gap-4">
+                <AttendanceChart eventId={id} />
+                <SalesCard eventId={id} />
+              </div>
+            </CardContent>
+          </Card>
+>>>>>>> Stashed changes
         </div>
       </div>
 

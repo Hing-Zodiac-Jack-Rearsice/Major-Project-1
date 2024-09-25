@@ -34,6 +34,7 @@ export async function GET(request: Request) {
     return new NextResponse(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
   }
 }
+
 export async function POST(request: Request) {
   const session = await auth();
 
@@ -52,7 +53,6 @@ export async function POST(request: Request) {
           description: body.description,
           imageUrl: body.imageUrl,
           categoryName: body.categoryName,
-          // qrCodeColor: body.qrCodeColor, // Add this line
           qrCodeTheme: body.qrCodeTheme,
         },
       });
@@ -65,3 +65,37 @@ export async function POST(request: Request) {
     return new NextResponse(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
   }
 }
+
+export async function PATCH(request: Request) {
+  const session = await auth();
+  const body = await request.json();
+
+  if (session?.user.role === "admin") {
+    try {
+      const updateEvent = await prisma.event.update({
+        where: {
+          id: body.id,
+        },
+        data: {
+          eventName: body.eventName,
+          ticketAmount: body.ticketAmount,
+          ticketPrice: body.ticketPrice,
+          location: body.location,
+          startDate: body.startDate,
+          endDate: body.endDate,
+          description: body.description,
+          imageUrl: body.imageUrl,
+          categoryName: body.categoryName,
+          qrCodeTheme: body.qrCodeTheme,
+        },
+      });
+      return new NextResponse(JSON.stringify({ data: updateEvent }), { status: 200 });
+    } catch (error) {
+      console.log(error);
+      return new NextResponse(JSON.stringify({ error: error }), { status: 500 });
+    }
+  } else {
+    return new NextResponse(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
+  }
+}
+

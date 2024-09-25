@@ -18,7 +18,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+<<<<<<< Updated upstream
 export default function AdminDashboard() {
+=======
+export default function Page() {
+>>>>>>> Stashed changes
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -99,6 +103,7 @@ export default function AdminDashboard() {
   if (loading) return <LoadingSpinner />;
 
   return (
+<<<<<<< Updated upstream
     <div className="min-h-screen bg-background bg-gray-50 dark:bg-zinc-950">
       <div className="container mx-auto p-6 sm:pl-20">
         <Card className="mb-8">
@@ -147,6 +152,28 @@ export default function AdminDashboard() {
                 <Plus className="mr-2 h-4 w-4" /> Add Event
               </Button>
             </EventForm>
+=======
+    <div className="flex min-h-screen w-full flex-col bg-muted/40">
+      <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
+        <div className="px-6">
+          <div>
+            <h1 className="font-medium text-xl">Hello there, Admin</h1>
+            <p className="text-sm text-zinc-500">
+              Ready to manage your ticket sales?
+            </p>
+          </div>
+          <div className="flex items-center mt-5 gap-2">
+            <h1 className="font-medium text-xl">Your Events</h1>
+            <EventForm refreshCallback={() => fetchEvents()} />
+          </div>
+        </div>
+        <div className="px-6">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3 mt-5 sm:mt-0">
+            {events &&
+              events.map((event: any) => (
+                <EventCard key={event.id} event={event} />
+              ))}
+>>>>>>> Stashed changes
           </div>
         </div>
 
