@@ -7,43 +7,31 @@ const getQRCodeOptions = (theme: string) => {
       return {
         fgColor: "#00FFFF",
         bgColor: "#000000",
-        gradientType: "radial",
-        gradientColors: ["#00FFFF", "#FF00FF", "#0000FF"],
       };
     case "sunset":
       return {
         fgColor: "#FF6B6B",
-        bgColor: "#FFD93D",
-        gradientType: "linear",
-        gradientColors: ["#FF6B6B", "#FFA06B", "#FFD93D"],
+        bgColor: "#FFFFFF",
       };
     case "forest":
       return {
         fgColor: "#2ECC71",
-        bgColor: "#E8F6EF",
-        gradientType: "linear",
-        gradientColors: ["#2ECC71", "#27AE60", "#1E8449"],
+        bgColor: "#FFFFFF",
       };
     case "ocean":
       return {
         fgColor: "#3498DB",
-        bgColor: "#E0F7FA",
-        gradientType: "radial",
-        gradientColors: ["#3498DB", "#2980B9", "#1ABC9C"],
+        bgColor: "#FFFFFF",
       };
     case "galaxy":
       return {
         fgColor: "#8E44AD",
-        bgColor: "#F3E5F5",
-        gradientType: "radial",
-        gradientColors: ["#8E44AD", "#9B59B6", "#3498DB"],
+        bgColor: "#FFFFFF",
       };
-    default: // modern
+    default: // default theme (black and white)
       return {
-        fgColor: "#34495E",
-        bgColor: "#ECF0F1",
-        gradientType: "linear",
-        gradientColors: ["#34495E", "#2C3E50", "#1ABC9C"],
+        fgColor: "#000000",
+        bgColor: "#FFFFFF",
       };
   }
 };
