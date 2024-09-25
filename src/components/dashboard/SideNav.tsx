@@ -6,12 +6,7 @@ import Link from "next/link";
 import Logo from "../ui/SombotLogo";
 import Image from "next/image";
 
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "../ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { Input } from "../ui/input";
 import {
   Breadcrumb,
@@ -200,7 +195,8 @@ const SideNav = () => {
           <ThemeToggle />
         </nav>
       </aside>
-      <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6 sm:p-2 sm:ml-14">
+      {/* top nav is here */}
+      <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b dark:bg-black px-4 sm:static sm:h-auto sm:border-0 sm:px-6 sm:p-2 sm:ml-14 ">
         <Sheet>
           <SheetTrigger asChild>
             <Button size="icon" variant="outline" className="sm:hidden">
@@ -285,7 +281,7 @@ const SideNav = () => {
                   prefetch={false}
                 >
                   <Logo width={32} height={32} />
-                  <h1 className="text-xl font-bold italic">SOMBOT</h1>
+                  <h1 className="text-xl font-bold italic text-black dark:text-white">SOMBOT</h1>
                 </Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
@@ -303,21 +299,12 @@ const SideNav = () => {
             </BreadcrumbItem> */}
           </BreadcrumbList>
         </Breadcrumb>
-        <div className="relative ml-auto flex-1 md:grow-0">
-          <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search..."
-            className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[336px]"
-          />
+        <div className="relative ml-auto ">
+          <p className="w-full font-medium text-sm">{userData?.name}</p>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              variant="outline"
-              size="icon"
-              className="overflow-hidden rounded-full"
-            >
+            <Button variant="outline" size="icon" className="overflow-hidden rounded-full">
               {/* <img
                 src="https://images.dog.ceo/breeds/labrador/Toblerone_1.jpg"
                 width={36}
@@ -334,13 +321,8 @@ const SideNav = () => {
                 className="overflow-hidden rounded-full"
               /> */}
               <Avatar className="h-10 w-10">
-                <AvatarImage
-                  src={userData?.image || ""}
-                  alt={userData?.name || ""}
-                />
-                <AvatarFallback>
-                  {userData?.name?.charAt(0) || "U"}
-                </AvatarFallback>
+                <AvatarImage src={userData?.image || ""} alt={userData?.name || ""} />
+                <AvatarFallback>{userData?.name?.charAt(0) || "U"}</AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>

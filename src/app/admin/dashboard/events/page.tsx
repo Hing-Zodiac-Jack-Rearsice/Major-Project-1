@@ -99,7 +99,7 @@ export default function AdminDashboard() {
   if (loading) return <LoadingSpinner />;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background bg-gray-50 dark:bg-zinc-950">
       <div className="container mx-auto p-6 sm:pl-20">
         <Card className="mb-8">
           <CardHeader>
@@ -190,7 +190,7 @@ export default function AdminDashboard() {
 
 function EventGrid({ events }: { events: any[] }) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
       {events.map((event: any) => (
         <EventCard key={event.id} event={event} />
       ))}

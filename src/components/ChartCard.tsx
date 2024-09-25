@@ -1,46 +1,25 @@
-// @/components/ChartCard.tsx
-
 import React from "react";
-import { motion } from "framer-motion";
-import { Card, CardHeader, CardContent } from "./ui/card";
-import { ChartComponentProps } from "../custom/ChartComponentProps";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface ChartCardProps {
   title: string;
-  ChartComponent: React.ComponentType<ChartComponentProps>;
+  ChartComponent: React.ComponentType<any>;
   data: any;
-  className?: string; // Add className to the props
+  icon?: React.ReactNode;
 }
 
-const ChartCard: React.FC<ChartCardProps> = ({
-  title,
-  ChartComponent,
-  data,
-}) => (
-  <motion.div
-    initial={{
-      opacity: 0,
-      x: title.includes("Sales") || title.includes("Revenue") ? -50 : 50,
-    }}
-    animate={{ opacity: 1, x: 0 }}
-    transition={{ duration: 0.5 }}
-  >
+const ChartCard: React.FC<ChartCardProps> = ({ title, ChartComponent, data, icon }) => {
+  return (
     <Card>
-      <CardHeader>
-        <h2 className="text-xl font-semibold">{title}</h2>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+        {icon}
       </CardHeader>
       <CardContent>
-        <ChartComponent
-          data={data}
-          options={{
-            animation: {
-              duration: 2000,
-            },
-          }}
-        />
+        <ChartComponent data={data} options={{ responsive: true, maintainAspectRatio: false }} />
       </CardContent>
     </Card>
-  </motion.div>
-);
+  );
+};
 
 export default ChartCard;

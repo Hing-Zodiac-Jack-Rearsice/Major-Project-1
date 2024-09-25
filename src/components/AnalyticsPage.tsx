@@ -222,7 +222,7 @@ const AnalyticsPage: React.FC = () => {
       value: analyticsData.topSellingEvent.ticketsSold,
     },
     {
-      title: "Average Attendance Rate",
+      title: "Avg Attendance",
       value: `${analyticsData.averageAttendanceRate.toFixed(2)}%`,
     },
   ];
@@ -325,7 +325,7 @@ const AnalyticsPage: React.FC = () => {
   };
 
   return (
-    <div className="p-6 pl-20">
+    <div className="sm:pl-20 py-4 px-6">
       <motion.h1
         className="text-3xl font-bold mb-6"
         initial={{ opacity: 0, y: -50 }}
@@ -334,7 +334,7 @@ const AnalyticsPage: React.FC = () => {
       >
         Analytics Dashboard
       </motion.h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6 items-stretch">
         {cardData.map((item, index) => (
           <StatCard key={index} title={item.title} value={item.value} index={index} />
         ))}
@@ -354,8 +354,6 @@ const AnalyticsPage: React.FC = () => {
         <ChartCard title="Sales by Event Date" ChartComponent={Line} data={salesByEventDateData} />
         <ChartCard title="Sales and Revenue by Event" ChartComponent={Bar} data={barData} />
         <ChartCard title="Ticket Sales vs Attendance" ChartComponent={Scatter} data={scatterData} />
-      </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top-Selling Events Chart */}
         <ChartCard title="Top-Selling Events" ChartComponent={Bar} data={topSellingEventsData} />
       </div>
