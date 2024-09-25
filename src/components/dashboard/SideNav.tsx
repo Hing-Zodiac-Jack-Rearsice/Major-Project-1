@@ -6,7 +6,12 @@ import Link from "next/link";
 import Logo from "../ui/SombotLogo";
 import Image from "next/image";
 
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip";
 import { Input } from "../ui/input";
 import {
   Breadcrumb,
@@ -34,6 +39,7 @@ import Billing from "./Billing";
 import { faHouse, faQrcode } from "@fortawesome/free-solid-svg-icons";
 import Home from "@/app/page";
 import { useSession } from "next-auth/react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const SideNav = () => {
   // const pathName = usePathname();
@@ -307,7 +313,11 @@ const SideNav = () => {
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="icon" className="overflow-hidden rounded-full">
+            <Button
+              variant="outline"
+              size="icon"
+              className="overflow-hidden rounded-full"
+            >
               {/* <img
                 src="https://images.dog.ceo/breeds/labrador/Toblerone_1.jpg"
                 width={36}
@@ -316,13 +326,22 @@ const SideNav = () => {
                 className="overflow-hidden rounded-full"
               /> */}
 
-              <Image
-                src="/professional-photo.jpg"
+              {/* <Image
+                src={userData.image}
                 width={36}
                 height={36}
-                alt="Avatar"
+                alt={userData.name}
                 className="overflow-hidden rounded-full"
-              />
+              /> */}
+              <Avatar className="h-10 w-10">
+                <AvatarImage
+                  src={userData?.image || ""}
+                  alt={userData?.name || ""}
+                />
+                <AvatarFallback>
+                  {userData?.name?.charAt(0) || "U"}
+                </AvatarFallback>
+              </Avatar>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
