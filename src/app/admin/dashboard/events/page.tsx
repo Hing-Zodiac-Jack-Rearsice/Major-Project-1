@@ -18,11 +18,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-<<<<<<< Updated upstream
+
 export default function AdminDashboard() {
-=======
-export default function Page() {
->>>>>>> Stashed changes
+
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
