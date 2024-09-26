@@ -42,7 +42,7 @@ const Page = () => {
 
   useEffect(() => {
     getCategories();
-    fetchEvents();
+    // fetchEvents();
   }, []);
 
   useEffect(() => {
