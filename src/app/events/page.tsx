@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { Search, Calendar, Loader2 } from "lucide-react";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { AnyNaptrRecord } from "dns";
 
 const Page = () => {
   const [events, setEvents] = useState<any>([]);
@@ -26,7 +27,12 @@ const Page = () => {
     const data = await response.json();
     setCategories(data.categories);
   };
-
+  // filter events to show only upcoming events for clients to see so that they cant purchase past events lol
+  const filterUpcomingEvents = (events: any) => {
+    const today = new Date();
+    // return only events that are in the future by comparing the start date to the current date which is today lol
+    return events.filter((event: any) => new Date(event.startDate) > today);
+  };
   const fetchEvents = async () => {
     setLoading(true);
     try {
@@ -74,7 +80,8 @@ const Page = () => {
     }
   };
 
-  const eventsToDisplay = search === "" ? events : searchedEvents;
+  const eventsToDisplay =
+    search === "" ? filterUpcomingEvents(events) : filterUpcomingEvents(searchedEvents);
 
   return (
     <div className="min-h-screen bg-background mt-16">

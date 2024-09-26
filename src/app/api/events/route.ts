@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
   const session = await auth();
-  console.log("Session in /api/events:", session); // Add this line
+  // console.log("Session in /api/events:", session); // Add this line
 
   if (!session) {
     return new NextResponse(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
@@ -98,4 +98,3 @@ export async function PATCH(request: Request) {
     return new NextResponse(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
   }
 }
-

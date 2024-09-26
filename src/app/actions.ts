@@ -4,6 +4,24 @@ import prisma from "@/lib/db";
 import { stripe } from "@/lib/stripe";
 import { redirect } from "next/navigation";
 import { NextResponse } from "next/server";
+export async function checkForDelete(eventId: any) {
+  const canDelete = await prisma.event.findUnique({
+    where: {
+      id: eventId,
+      attendances: {
+        none: {},
+      },
+      tickets: {
+        none: {},
+      },
+      sales: {
+        none: {},
+      },
+    },
+  });
+  // if the event can be deleted which is not equal to null
+  return canDelete !== null;
+}
 export async function checkForSoldOut(eventId: any) {
   const eventTicketAmount = await prisma.event.findUnique({
     where: {

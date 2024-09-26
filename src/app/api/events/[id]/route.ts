@@ -40,8 +40,45 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   } catch (error) {
     console.error("Error updating event:", error);
     return NextResponse.json(
-      { error: `Failed to update event: ${error instanceof Error ? error.message : 'Unknown error'}` },
+      {
+        error: `Failed to update event: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`,
+      },
       { status: 500 }
     );
+  }
+}
+
+export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+  const { id } = params;
+  const eventNoRelated = await prisma.event.findUnique({
+    where: {
+      id: id,
+      attendances: {
+        none: {},
+      },
+      tickets: {
+        none: {},
+      },
+      sales: {
+        none: {},
+      },
+    },
+  });
+  if (eventNoRelated) {
+    const eventName = eventNoRelated.eventName;
+    const deleteEvent = await prisma.event.delete({
+      where: {
+        id: id,
+      },
+    });
+    return new NextResponse(JSON.stringify({ msg: `${eventName} deleted` }), {
+      status: 200,
+    });
+  } else {
+    return new NextResponse(JSON.stringify({ msg: "This event cannot be deleted" }), {
+      status: 400,
+    });
   }
 }

@@ -72,13 +72,9 @@ export default function AdminDashboard() {
     // Filter by time
     const now = new Date();
     if (time === "upcoming") {
-      filtered = filtered.filter(
-        (event: any) => new Date(event.startDate) > now
-      );
+      filtered = filtered.filter((event: any) => new Date(event.startDate) > now);
     } else if (time === "past") {
-      filtered = filtered.filter(
-        (event: any) => new Date(event.startDate) <= now
-      );
+      filtered = filtered.filter((event: any) => new Date(event.startDate) <= now);
     }
 
     setFilteredEvents(filtered);
@@ -99,8 +95,6 @@ export default function AdminDashboard() {
   const handleTimeFilterChange = (value: string) => {
     setTimeFilter(value);
   };
-
-  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="min-h-screen bg-background bg-gray-50 dark:bg-zinc-950">
@@ -140,8 +134,7 @@ export default function AdminDashboard() {
                   <SelectItem value="all">All Categories</SelectItem>
                   {categories.map((cat: any) => (
                     <SelectItem key={cat.id} value={cat.category}>
-                      {cat.category.charAt(0).toUpperCase() +
-                        cat.category.slice(1).toLowerCase()}
+                      {cat.category.charAt(0).toUpperCase() + cat.category.slice(1).toLowerCase()}
                     </SelectItem>
                   ))}
                 </SelectGroup>
@@ -155,28 +148,36 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        <Tabs
-          defaultValue="all"
-          className="mb-8"
-          onValueChange={handleTimeFilterChange}
-        >
+        <Tabs defaultValue="all" className="mb-8" onValueChange={handleTimeFilterChange}>
           <TabsList>
             <TabsTrigger value="all">All Events</TabsTrigger>
             <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
             <TabsTrigger value="past">Past</TabsTrigger>
           </TabsList>
           <TabsContent value="all">
-            <EventGrid events={filteredEvents} />
+            {loading ? (
+              <LoadingSpinner />
+            ) : (
+              <EventGrid events={filteredEvents} callBack={fetchEvents} />
+            )}
           </TabsContent>
           <TabsContent value="upcoming">
-            <EventGrid events={filteredEvents} />
+            {loading ? (
+              <LoadingSpinner />
+            ) : (
+              <EventGrid events={filteredEvents} callBack={fetchEvents} />
+            )}
           </TabsContent>
           <TabsContent value="past">
-            <EventGrid events={filteredEvents} />
+            {loading ? (
+              <LoadingSpinner />
+            ) : (
+              <EventGrid events={filteredEvents} callBack={fetchEvents} />
+            )}
           </TabsContent>
         </Tabs>
 
-        {filteredEvents.length === 0 && (
+        {filteredEvents.length === 0 && !loading && (
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-10">
               <Calendar className="h-16 w-16 text-muted-foreground mb-4" />
@@ -184,11 +185,6 @@ export default function AdminDashboard() {
               <p className="text-muted-foreground mb-4">
                 Try adjusting your search or add a new event.
               </p>
-              <EventForm refreshCallback={fetchEvents}>
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" /> Add Your First Event
-                </Button>
-              </EventForm>
             </CardContent>
           </Card>
         )}
@@ -197,11 +193,11 @@ export default function AdminDashboard() {
   );
 }
 
-function EventGrid({ events }: { events: any[] }) {
+function EventGrid({ events, callBack }: any) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
       {events.map((event: any) => (
-        <EventCard key={event.id} event={event} />
+        <EventCard key={event.id} event={event} requestRefresh={callBack} />
       ))}
     </div>
   );
