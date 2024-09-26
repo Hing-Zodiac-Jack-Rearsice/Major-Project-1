@@ -31,7 +31,7 @@ const Page = () => {
   const filterUpcomingEvents = (events: any) => {
     const today = new Date();
     // return only events that are in the future by comparing the start date to the current date which is today lol
-    return events.filter((event: any) => new Date(event.startDate) > today);
+    return events.filter((event: any) => new Date(event.startDate) >= today);
   };
   const fetchEvents = async () => {
     setLoading(true);

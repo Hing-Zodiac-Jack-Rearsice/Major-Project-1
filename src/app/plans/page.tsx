@@ -1,109 +1,85 @@
 "use client";
-import React from "react";
 
-/**
- * v0 by Vercel.
- * @see https://v0.dev/t/QHqMqwhICOk
- * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
- */
+import React from "react";
+import { useSession } from "next-auth/react";
 import {
   Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useSession } from "next-auth/react";
+import { CheckCircle2 } from "lucide-react";
 
-export default function Component() {
+export default function PricingPage() {
   const { data: session } = useSession();
   const paymentLink = "https://buy.stripe.com/test_8wM6r52FXemJg4EaEE";
 
+  const features = [
+    "Unlimited events",
+    "Facilitate online ticket sales easily",
+    "Deliver and generate QRCode tickets",
+    "Analytics for event performance",
+  ];
+
   return (
     <div className="container mx-auto py-12 px-4 md:px-6 mt-16">
-      <h1 className="text-4xl font-bold text-center">Affordable plans for any situation</h1>
-      <p className="my-4 text-center">
-        Choose a plan and effortlessly streamline your ticket sales without limits. Use Sombot on
-        your computer, tablet, and other devices. Enjoy flexible payment options and the freedom to
-        cancel anytime.
+      <h1 className="text-4xl font-bold text-center">
+        Simple pricing for powerful event management
+      </h1>
+      <p className="my-4 text-center text-muted-foreground">
+        Get started with our comprehensive plan and streamline your ticket sales without limits. Use
+        Sombot on your computer, tablet, and other devices.
       </p>
-      <div className="flex-row items-center my-12 gap-10 justify-center sm:flex">
-        <h1 className="text-3xl font-bold my-4">All plans include</h1>
-        <div className="flex flex-col items-start max-w-md">
-          <p className="flex items-center mb-2">
-            <CheckIcon className="mr-2 block h-4 w-4" />
-            Unlimited events
-          </p>
-          <p className="flex items-center mb-2">
-            <CheckIcon className="mr-2 block h-4 w-4" />
-            Facilitate online ticket sales easily
-          </p>
-          <p className="flex items-center mb-2">
-            <CheckIcon className="mr-2 block h-4 w-4" />
-            Deliver and generate QRCode tickets
-          </p>
-          <p className="flex items-center">
-            <CheckIcon className="mr-2 block h-4 w-4" />
-            Analytics for event performance
-          </p>
-        </div>
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="mt-12 max-w-md mx-auto">
         <Card className="bg-card text-card-foreground shadow-md">
           <CardHeader>
-            <CardTitle>Free Plan</CardTitle>
-            <CardDescription>Get started for free</CardDescription>
+            <CardTitle>Sombot Pro</CardTitle>
+            <CardDescription>Everything you need for successful events</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4">
             <div className="text-4xl font-bold">Free for 7 days</div>
-            <p className="text-muted-foreground">Free for 7 days, then $9.99 per month after.</p>
+            <p className="text-muted-foreground">Then $9.99 per month after the trial period.</p>
+            <ul className="space-y-2">
+              {features.map((feature, index) => (
+                <li key={index} className="flex items-center">
+                  <CheckCircle2 className="h-5 w-5 text-primary mr-2" />
+                  <span>{feature}</span>
+                </li>
+              ))}
+            </ul>
           </CardContent>
           <CardFooter>
-            {/* starts the sombot subscription link */}
-            <a
-              className="w-full"
-              target="_blank"
-              href={paymentLink + "?prefilled_email=" + session?.user?.email}
-            >
-              <Button className="w-full"> Try now </Button>
-            </a>
-          </CardFooter>
-        </Card>
-        <Card className="bg-card text-card-foreground shadow-md">
-          <CardHeader>
-            <CardTitle>Paid Plan</CardTitle>
-            <CardDescription>After trying us out</CardDescription>
-          </CardHeader>
-          <CardContent className="grid gap-4">
-            <div className="text-4xl font-bold">9.99$ / month</div>
-            <p className="text-muted-foreground">Once you've used Sombot, you can't go back!</p>
-          </CardContent>
-          <CardFooter>
-            <Button className="w-full">Subscribe</Button>
+            {session?.user.role === "admin" ? (
+              <Button className="w-full">Subscribed</Button>
+            ) : (
+              <a
+                className="w-full"
+                target="_blank"
+                href={`${paymentLink}?prefilled_email=${session?.user?.email}`}
+                rel="noopener noreferrer"
+              >
+                <Button className="w-full">Start Free Trial</Button>
+              </a>
+            )}
           </CardFooter>
         </Card>
       </div>
+
+      <div className="mt-16">
+        <h2 className="text-2xl font-bold text-center mb-6">Why choose Sombot?</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl mx-auto">
+          {features.map((feature, index) => (
+            <div key={index} className="flex items-start">
+              <CheckCircle2 className="h-6 w-6 text-primary mr-2 flex-shrink-0" />
+              <p>{feature}</p>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
-  );
-}
-function CheckIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M20 6 9 17l-5-5" />
-    </svg>
   );
 }

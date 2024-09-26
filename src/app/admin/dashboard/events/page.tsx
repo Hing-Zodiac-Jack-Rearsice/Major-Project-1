@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, Search, Plus, Filter, RefreshCw } from "lucide-react";
+import { Calendar, Search, Plus } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -17,15 +17,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { AnyTxtRecord } from "dns";
+import { checkForDelete } from "@/app/actions";
 
 export default function AdminDashboard() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredEvents, setFilteredEvents] = useState([]);
-  const [category, setCategory] = useState("all");
-  const [categories, setCategories] = useState([]);
+  const [category, setCategory] = useState<any>("all");
+  const [categories, setCategories] = useState<any>([]);
   const [timeFilter, setTimeFilter] = useState("all");
+  const [deletionStatus, setDeletionStatus] = useState({});
 
   const fetchEvents = async () => {
     try {
@@ -34,12 +37,24 @@ export default function AdminDashboard() {
       const data = await res.json();
       setEvents(data.data || []);
       filterEvents(data.data || [], searchTerm, category, timeFilter);
+      checkDeletionStatus(data.data || []);
     } catch (error) {
       console.error("Error fetching events:", error);
       setEvents([]);
     } finally {
       setLoading(false);
     }
+  };
+
+  const checkDeletionStatus = async (eventList: any) => {
+    const statusPromises = eventList.map(async (event: any) => {
+      const result = await checkForDelete(event.id);
+      return { [event.id]: result };
+    });
+
+    const statusResults = await Promise.all(statusPromises);
+    const newDeletionStatus = Object.assign({}, ...statusResults);
+    setDeletionStatus(newDeletionStatus);
   };
 
   const getCategories = async () => {
@@ -51,25 +66,21 @@ export default function AdminDashboard() {
   useEffect(() => {
     getCategories();
     fetchEvents();
-    console.log(categories);
   }, [category]);
 
   const filterEvents = (eventList: any, search: any, cat: any, time: any) => {
     let filtered = eventList;
 
-    // Filter by search term
     if (search) {
       filtered = filtered.filter((event: any) =>
         event.eventName.toLowerCase().includes(search.toLowerCase())
       );
     }
 
-    // Filter by category (if not 'all')
     if (cat !== "all") {
       filtered = filtered.filter((event: any) => event.categoryName === cat);
     }
 
-    // Filter by time
     const now = new Date();
     if (time === "upcoming") {
       filtered = filtered.filter((event: any) => new Date(event.startDate) > now);
@@ -84,16 +95,29 @@ export default function AdminDashboard() {
     filterEvents(events, searchTerm, category, timeFilter);
   }, [searchTerm, category, timeFilter, events]);
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearch = (e: any) => {
     setSearchTerm(e.target.value);
   };
 
-  const handleCategoryChange = (value: string) => {
+  const handleCategoryChange = (value: any) => {
     setCategory(value);
   };
 
-  const handleTimeFilterChange = (value: string) => {
+  const handleTimeFilterChange = (value: any) => {
     setTimeFilter(value);
+  };
+
+  const handleDelete = async (eventId: any) => {
+    try {
+      const deleteFetch = await fetch(`/api/events/${eventId}`, {
+        method: "DELETE",
+      });
+      if (deleteFetch.status === 200) {
+        fetchEvents();
+      }
+    } catch (error) {
+      console.error("Error deleting event:", error);
+    }
   };
 
   return (
@@ -158,21 +182,36 @@ export default function AdminDashboard() {
             {loading ? (
               <LoadingSpinner />
             ) : (
-              <EventGrid events={filteredEvents} callBack={fetchEvents} />
+              <EventGrid
+                events={filteredEvents}
+                deletionStatus={deletionStatus}
+                onDelete={handleDelete}
+                callBack={fetchEvents}
+              />
             )}
           </TabsContent>
           <TabsContent value="upcoming">
             {loading ? (
               <LoadingSpinner />
             ) : (
-              <EventGrid events={filteredEvents} callBack={fetchEvents} />
+              <EventGrid
+                events={filteredEvents}
+                deletionStatus={deletionStatus}
+                onDelete={handleDelete}
+                callBack={fetchEvents}
+              />
             )}
           </TabsContent>
           <TabsContent value="past">
             {loading ? (
               <LoadingSpinner />
             ) : (
-              <EventGrid events={filteredEvents} callBack={fetchEvents} />
+              <EventGrid
+                events={filteredEvents}
+                deletionStatus={deletionStatus}
+                onDelete={handleDelete}
+                callBack={fetchEvents}
+              />
             )}
           </TabsContent>
         </Tabs>
@@ -193,11 +232,17 @@ export default function AdminDashboard() {
   );
 }
 
-function EventGrid({ events, callBack }: any) {
+function EventGrid({ events, deletionStatus, onDelete, callBack }: any) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
       {events.map((event: any) => (
-        <EventCard key={event.id} event={event} requestRefresh={callBack} />
+        <EventCard
+          key={event.id}
+          event={event}
+          canDelete={deletionStatus[event.id]}
+          onDelete={onDelete}
+          requestRefresh={callBack}
+        />
       ))}
     </div>
   );

@@ -1,14 +1,23 @@
 "use client";
+
 import React, { useState } from "react";
-import { getSession, signIn, signOut, useSession } from "next-auth/react";
-import { Label } from "./label";
-import { Input } from "./input";
-import { cn } from "@/lib/utils";
-import { IconBrandGoogle } from "@tabler/icons-react";
-import Logo from "./SombotLogo";
-import axios from "axios";
-import { randomUUID } from "crypto";
+import { getSession, signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { IconBrandGoogle } from "@tabler/icons-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 export function SignupFormDemo() {
   const router = useRouter();
@@ -36,10 +45,9 @@ export function SignupFormDemo() {
         console.log("Login successful");
         const session = await getSession();
         console.log("Session after login:", session);
-        window.location.href = "/events";
+        router.push("/events");
       }
     } else {
-      // Handle registration
       if (password !== confirmPassword) {
         setError("Passwords do not match");
         return;
@@ -54,7 +62,6 @@ export function SignupFormDemo() {
         if (response.ok) {
           const result = await response.json();
           console.log("User registered:", result.user);
-          // Sign in the user after successful registration
           const signInResult = await signIn("credentials", {
             email,
             password,
@@ -62,11 +69,9 @@ export function SignupFormDemo() {
           });
           if (signInResult?.ok) {
             console.log("Login successful after registration");
-            window.location.href = "/events";
+            router.push("/events");
           } else {
-            setError(
-              "Registration successful, but login failed. Please try logging in."
-            );
+            setError("Registration successful, but login failed. Please try logging in.");
           }
         } else {
           const error = await response.json();
@@ -84,142 +89,136 @@ export function SignupFormDemo() {
   };
 
   return (
-    <div className="flex items-center">
-      {/* Image/Logo Section */}
-      <div className="flex-1 hidden sm:block">
-        <Logo />
+    <div className="flex flex-col md:flex-row items-stretch justify-center min-h-screen bg-gray-100 dark:bg-black sm:px-6 px-4 sm:mt-24 sm:mb-10 mb-5 mt-20">
+      <div className="hidden md:flex md:w-1/2 p-8 items-center justify-center">
+        <div className="w-full h-full max-w-md max-h-[600px] relative">
+          <img
+            src="/iphoneQR.png"
+            alt="QR Code"
+            className="w-full h-full object-contain rounded-lg shadow-lg"
+          />
+        </div>
       </div>
-      {/* Form Section */}
-      <div className="flex-1 w-full mx-auto rounded-none p-4 md:p-8 border-l bg-white dark:bg-black">
-        <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
-          {isLogin ? "Welcome back" : "Create an account"}
-        </h2>
-        <p className="text-neutral-600 text-sm max-w-sm mt-2 dark:text-neutral-300">
-          {isLogin ? "Sign in to your account" : "Sign up for a new account"}
-        </p>
-        {/* {error && <p className="text-red-500 mt-2">{error}</p>} */}
-        <form className="my-8" onSubmit={handleSubmit}>
-          {/* Form Fields */}
-          <div className="flex flex-col space-y-2 mb-4">
-            {!isLogin && (
-              <LabelInputContainer>
-                <Label htmlFor="name">Name</Label>
-                <Input
-                  id="name"
-                  placeholder="John Doe"
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-              </LabelInputContainer>
-            )}
-            <LabelInputContainer>
-              <Label htmlFor="email">Email Address</Label>
-              <Input
-                id="email"
-                placeholder="johndoe@example.com"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </LabelInputContainer>
-            <LabelInputContainer>
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                placeholder="••••••••"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </LabelInputContainer>
-            {!isLogin && (
-              <LabelInputContainer>
-                <Label htmlFor="confirm-password">Confirm your password</Label>
-                <Input
-                  id="confirm-password"
-                  placeholder="••••••••"
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                />
-              </LabelInputContainer>
-            )}
-          </div>
 
-          {/* Submit Button */}
-          <button
-            className="bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
-            type="submit"
+      <Card className="w-full md:w-1/2 rounded-none md:rounded-lg shadow-none md:shadow-lg flex flex-col">
+        <CardHeader className="p-4 md:p-8">
+          <CardTitle>{isLogin ? "Welcome back" : "Create an account"}</CardTitle>
+          <CardDescription>
+            {isLogin ? "Sign in to your account" : "Sign up for a new account"}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-4 md:p-8 flex-grow">
+          <Tabs
+            defaultValue={isLogin ? "login" : "register"}
+            onValueChange={(value) => setIsLogin(value === "login")}
+            className="h-full flex flex-col"
           >
-            {isLogin ? "Sign in" : "Sign up"} &rarr;
-            <BottomGradient />
-          </button>
-
-          {/* Divider */}
-          <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
-
-          {/* Google Sign In Button */}
-          <div className="flex flex-col space-y-4">
-            <button
-              className="relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
-              onClick={handleGoogleSignIn}
-            >
-              <IconBrandGoogle className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
-              <span className="text-neutral-700 dark:text-neutral-300 text-sm">
-                Sign in with Google
-              </span>
-              <BottomGradient />
-            </button>
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="login">Login</TabsTrigger>
+              <TabsTrigger value="register">Register</TabsTrigger>
+            </TabsList>
+            <TabsContent value="login" className="flex-grow flex flex-col">
+              <form onSubmit={handleSubmit} className="flex flex-col flex-grow">
+                <div className="space-y-4 flex-grow">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      placeholder="johndoe@example.com"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Password</Label>
+                    <Input
+                      id="password"
+                      placeholder="••••••••"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <Button className="w-full mt-4" type="submit">
+                  Sign in
+                </Button>
+              </form>
+            </TabsContent>
+            <TabsContent value="register" className="flex-grow flex flex-col">
+              <form onSubmit={handleSubmit} className="flex flex-col flex-grow">
+                <div className="space-y-4 flex-grow">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Name</Label>
+                    <Input
+                      id="name"
+                      placeholder="John Doe"
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      placeholder="johndoe@example.com"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Password</Label>
+                    <Input
+                      id="password"
+                      placeholder="••••••••"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="confirm-password">Confirm Password</Label>
+                    <Input
+                      id="confirm-password"
+                      placeholder="••••••••"
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <Button className="w-full mt-4" type="submit">
+                  Sign up
+                </Button>
+              </form>
+            </TabsContent>
+          </Tabs>
+          {error && (
+            <Alert variant="destructive" className="mt-4">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+        </CardContent>
+        <CardFooter className="flex flex-col space-y-4 p-4 md:p-8">
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+            </div>
           </div>
-
-          {/* Toggle Login/Register */}
-          <p className="text-center mt-4">
-            {isLogin ? "Don't have an account?" : "Already have an account?"}
-            <button
-              type="button"
-              className="text-blue-500 hover:underline ml-1"
-              onClick={() => setIsLogin(!isLogin)}
-            >
-              {isLogin ? "Register now" : "Sign in"}
-            </button>
-          </p>
-        </form>
-      </div>
+          <Button variant="outline" className="w-full" onClick={handleGoogleSignIn}>
+            <IconBrandGoogle className="mr-2 h-4 w-4" />
+            Sign in with Google
+          </Button>
+        </CardFooter>
+      </Card>
     </div>
   );
-}
-
-const BottomGradient = () => {
-  return (
-    <>
-      <span className="group-hover/btn:opacity-100 block transition duration-500 opacity-0 absolute h-px w-full -bottom-px inset-x-0 bg-gradient-to-r from-transparent via-cyan-500 to-transparent" />
-      <span className="group-hover/btn:opacity-100 blur-sm block transition duration-500 opacity-0 absolute h-px w-1/2 mx-auto -bottom-px inset-x-10 bg-gradient-to-r from-transparent via-indigo-500 to-transparent" />
-    </>
-  );
-};
-
-const LabelInputContainer = ({
-  children,
-  className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) => {
-  return (
-    <div className={cn("flex flex-col space-y-2 w-full", className)}>
-      {children}
-    </div>
-  );
-};
-
-async function createSession(user: any) {
-  const session = await prisma.session.create({
-    data: {
-      sessionToken: randomUUID(),
-      userId: user.id,
-      expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
-    },
-  });
-  return session;
 }

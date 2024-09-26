@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar, Clock, Loader2, MapPin } from "lucide-react";
@@ -13,55 +13,33 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import Link from "next/link";
-import { checkForDelete } from "@/app/actions";
-import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
-export function EventCard({ event, requestRefresh }: any) {
+export function EventCard({ event, requestRefresh, canDelete, onDelete }: any) {
   const eventDate = new Date(event.startDate);
   const eventEndDate = new Date(event.endDate);
-  const [canDelete, setCanDelete] = useState<any>(false);
-  const [loading, setLoading] = useState(false);
-  const formatDate = (date: any) => {
+
+  const formatDate = (date: Date) => {
     return date.toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
     });
   };
-  useEffect(() => {
-    const checkDeletion = async () => {
-      const result = await checkForDelete(event.id);
-      setCanDelete(result);
-    };
-    checkDeletion();
-  }, [event.id]);
-  const formatTime = (date: any) => {
+
+  const formatTime = (date: Date) => {
     return date.toLocaleTimeString("en-US", {
       hour: "2-digit",
       minute: "2-digit",
     });
   };
+
   const handleDelete = async () => {
-    setLoading(true);
-    try {
-      const deleteFetch = await fetch(`/api/events/${event.id}`, {
-        method: "DELETE",
-      });
-      if (deleteFetch.status === 200) {
-        requestRefresh();
-      }
-    } catch (error) {
-    } finally {
-      setLoading(false);
-    }
+    await onDelete(event.id);
+    requestRefresh();
   };
-  if (loading)
-    return (
-      <div className="flex justify-center items-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+
   return (
     <Card className="w-full overflow-hidden transition-all duration-300 hover:shadow-lg">
       <div className="relative h-48 overflow-hidden">
@@ -76,23 +54,28 @@ export function EventCard({ event, requestRefresh }: any) {
         </CardHeader>
       </div>
       <CardContent className="mt-4 space-y-2">
-        <div className="flex items-center space-x-2 text-sm dark:text-gray-400 light:text-gray-600">
+        <div className="flex items-center space-x-2 text-sm text-muted-foreground">
           <Calendar className="h-4 w-4" />
           <span>{formatDate(eventDate)}</span>
         </div>
-        <div className="flex items-center space-x-2 text-sm dark:text-gray-400 light:text-gray-600">
+        <div className="flex items-center space-x-2 text-sm text-muted-foreground">
           <Clock className="h-4 w-4" />
           <span>{`${formatTime(eventDate)} - ${formatTime(eventEndDate)}`}</span>
         </div>
         {event.location && (
-          <div className="flex items-center space-x-2 text-sm dark:text-gray-400 light:text-gray-600">
+          <div className="flex items-center space-x-2 text-sm text-muted-foreground">
             <MapPin className="h-4 w-4" />
             <span>{event.location}</span>
           </div>
         )}
       </CardContent>
       <CardFooter className="flex justify-between">
-        {canDelete ? (
+        {canDelete === undefined ? (
+          <Button disabled variant="outline">
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Loading
+          </Button>
+        ) : canDelete ? (
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="destructive">Cancel</Button>
@@ -107,19 +90,24 @@ export function EventCard({ event, requestRefresh }: any) {
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Go back</AlertDialogCancel>
-                <AlertDialogAction className="bg-blue-600 text-white" onClick={handleDelete}>
-                  Confirm
-                </AlertDialogAction>
+                <AlertDialogAction onClick={handleDelete}>Confirm</AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
         ) : (
-          <Button disabled variant="default">
-            Disabled
-          </Button>
+          <HoverCard>
+            <HoverCardTrigger asChild>
+              <Button variant="outline" className="cursor-not-allowed opacity-50">
+                Cancel
+              </Button>
+            </HoverCardTrigger>
+            <HoverCardContent className="w-80">
+              <p>This event has sold tickets and cannot be canceled.</p>
+            </HoverCardContent>
+          </HoverCard>
         )}
         <Link href={`/admin/dashboard/events/${event.id}`}>
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white">Manage</Button>
+          <Button>Manage</Button>
         </Link>
       </CardFooter>
     </Card>
