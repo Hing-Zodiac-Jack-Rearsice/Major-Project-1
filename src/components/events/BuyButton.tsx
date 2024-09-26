@@ -23,7 +23,7 @@ const BuyButton = ({ eventId, ticketPrice, userEmail }: any) => {
     return <Button type="submit">Sold out.</Button>;
   }
   return hasBought ? (
-    <Button type="submit">You have already bought this ticket.</Button>
+    <Button type="submit">You have already own this ticket.</Button>
   ) : (
     <form action={BuyTicket}>
       <input type="hidden" name="id" value={eventId} />
