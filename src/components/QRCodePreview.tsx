@@ -49,7 +49,7 @@ const QRCodePreview = ({ theme }: { theme: string }) => {
         level="L"
       />
       <p className="mt-2 text-sm text-gray-500">
-        {theme.charAt(0).toUpperCase() + theme.slice(1)} Theme
+        {theme?.charAt(0).toUpperCase() + theme?.slice(1)} Theme
       </p>
     </div>
   );
