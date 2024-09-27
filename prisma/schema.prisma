@@ -117,7 +117,7 @@ model Event {
   attendances  Attendance[]
   sales        Sale[]
   category     Category?    @relation(fields: [categoryName], references: [category])
-
+  status String @default("pending")
   // qrcode color
   // qrCodeColor String? @default("#000000")
   qrCodeTheme String? @default("classic")

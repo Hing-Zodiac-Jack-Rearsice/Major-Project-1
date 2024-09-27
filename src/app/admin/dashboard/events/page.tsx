@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/select";
 import { AnyTxtRecord } from "dns";
 import { checkForDelete } from "@/app/actions";
+import { useSession } from "next-auth/react";
 
 export default function AdminDashboard() {
   const [events, setEvents] = useState([]);
@@ -29,7 +30,7 @@ export default function AdminDashboard() {
   const [categories, setCategories] = useState<any>([]);
   const [timeFilter, setTimeFilter] = useState("all");
   const [deletionStatus, setDeletionStatus] = useState({});
-
+  const { data: session } = useSession();
   const fetchEvents = async () => {
     try {
       setLoading(true);
@@ -69,7 +70,8 @@ export default function AdminDashboard() {
   }, [category]);
 
   const filterEvents = (eventList: any, search: any, cat: any, time: any) => {
-    let filtered = eventList;
+    let byAdmin = eventList.filter((event: any) => event.userEmail === session?.user?.email);
+    let filtered = byAdmin;
 
     if (search) {
       filtered = filtered.filter((event: any) =>
