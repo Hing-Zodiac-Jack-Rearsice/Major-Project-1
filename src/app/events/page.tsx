@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/select";
 import { Search, Calendar, Loader2 } from "lucide-react";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import { AnyNaptrRecord } from "dns";
 
 const Page = () => {
   const [events, setEvents] = useState<any>([]);
@@ -25,7 +24,9 @@ const Page = () => {
   const getCategories = async () => {
     const response = await fetch("/api/category");
     const data = await response.json();
-    setCategories(data.categories);
+    if (response.ok) {
+      setCategories(data.categories);
+    }
   };
   // filter events to show only upcoming events for clients to see so that they cant purchase past events lol
   const filterUpcomingEvents = (events: any) => {

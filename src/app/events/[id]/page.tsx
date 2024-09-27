@@ -1,13 +1,15 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import BuyButton from "@/components/events/BuyButton";
-import { CalendarDays, Clock, Loader2, MapPin } from "lucide-react";
+import { CalendarDays, Clock, MapPin } from "lucide-react";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
-const EventPage = () => {
+export default function EventPage() {
   const { data: session } = useSession();
   const [event, setEvent] = useState<any>(null);
   const { id } = useParams();
@@ -21,12 +23,13 @@ const EventPage = () => {
     fetchEvent();
   }, [id]);
 
-  if (!event)
+  if (!event) {
     return (
       <div className="flex justify-center items-center h-screen">
         <LoadingSpinner />
       </div>
     );
+  }
 
   const eventDate = new Date(event.startDate);
   const eventEndDate = new Date(event.endDate);
@@ -48,45 +51,58 @@ const EventPage = () => {
   });
 
   return (
-    <div className="w-full mx-auto">
-      <img src={event.imageUrl} alt={event.eventName} className="w-full h-64 object-cover" />
-      <div className="p-6">
-        <h1 className="text-3xl font-bold mb-6">{event.eventName}</h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="container mx-auto px-4 py-8">
+      <Card className="overflow-hidden">
+        <div className="relative h-96">
+          <img src={event.imageUrl} alt={event.eventName} className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />
+          <h1 className="absolute bottom-4 left-4 text-4xl font-bold ">{event.eventName}</h1>
+        </div>
+        <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-6">
           <div className="space-y-4">
-            <div className="flex items-center space-x-2">
-              <CalendarDays className="w-5 h-5 text-gray-500" />
-              <span>{formattedDate}</span>
+            <div className="flex items-center space-x-3">
+              <CalendarDays className="w-5 h-5" />
+              <span className="text-lg">{formattedDate}</span>
             </div>
-            <div className="flex items-center space-x-2">
-              <Clock className="w-5 h-5 text-gray-500" />
-              <span>
+            <div className="flex items-center space-x-3">
+              <Clock className="w-5 h-5" />
+              <span className="text-lg">
                 {formattedStartTime} to {formattedEndTime}
               </span>
             </div>
-            <div className="flex items-center space-x-2">
-              <MapPin className="w-5 h-5 text-gray-500" />
-              <span>{event.location}</span>
+            <div className="flex items-center space-x-3">
+              <MapPin className="w-5 h-5" />
+              <span className="text-lg">{event.location}</span>
             </div>
           </div>
-          <div className="flex flex-col justify-between">
-            <p className="text-gray-600">{event.description}</p>
-            <div className="mt-4">
-              {session?.user.role === "admin" ? (
-                <Button className="w-full">Admins are permitted from purchase. View only</Button>
-              ) : (
-                <BuyButton
-                  eventId={event.id}
-                  ticketPrice={event.ticketPrice}
-                  userEmail={session?.user.email}
-                />
-              )}
-            </div>
+          <div className="md:col-span-2 space-y-4">
+            <h2 className="text-2xl font-semibold">About This Event</h2>
+            <p className="text-muted-foreground leading-relaxed">{event.description}</p>
+            {/* <div className="pt-4">
+              <h3 className="text-xl font-semibold mb-2">What to Expect</h3>
+              <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                <li>Engaging presentations from industry experts</li>
+                <li>Networking opportunities with like-minded professionals</li>
+                <li>Interactive workshops and hands-on sessions</li>
+                <li>Delicious refreshments and meals provided</li>
+              </ul>
+            </div> */}
           </div>
-        </div>
-      </div>
+        </CardContent>
+        <CardFooter className="flex justify-end pt-6">
+          {session?.user.role === "admin" ? (
+            <Button variant="secondary" className="w-full md:w-auto">
+              Admins are permitted from purchase. View only
+            </Button>
+          ) : (
+            <BuyButton
+              eventId={event.id}
+              ticketPrice={event.ticketPrice}
+              userEmail={session?.user.email}
+            />
+          )}
+        </CardFooter>
+      </Card>
     </div>
   );
-};
-
-export default EventPage;
+}
