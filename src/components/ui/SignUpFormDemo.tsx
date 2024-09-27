@@ -71,7 +71,9 @@ export function SignupFormDemo() {
             console.log("Login successful after registration");
             router.push("/events");
           } else {
-            setError("Registration successful, but login failed. Please try logging in.");
+            setError(
+              "Registration successful, but login failed. Please try logging in."
+            );
           }
         } else {
           const error = await response.json();
@@ -93,7 +95,7 @@ export function SignupFormDemo() {
       <div className="hidden md:flex md:w-1/2 p-8 items-center justify-center">
         <div className="w-full h-full max-w-md max-h-[600px] relative">
           <img
-            src="/iphoneQR.png"
+            src="/iphoneQR.jpg"
             alt="QR Code"
             className="w-full h-full object-contain rounded-lg shadow-lg"
           />
@@ -102,7 +104,9 @@ export function SignupFormDemo() {
 
       <Card className="w-full md:w-1/2 rounded-none md:rounded-lg shadow-none md:shadow-lg flex flex-col">
         <CardHeader className="p-4 md:p-8">
-          <CardTitle>{isLogin ? "Welcome back" : "Create an account"}</CardTitle>
+          <CardTitle>
+            {isLogin ? "Welcome back" : "Create an account"}
+          </CardTitle>
           <CardDescription>
             {isLogin ? "Sign in to your account" : "Sign up for a new account"}
           </CardDescription>
@@ -210,10 +214,16 @@ export function SignupFormDemo() {
               <span className="w-full border-t" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+              <span className="bg-background px-2 text-muted-foreground">
+                Or continue with
+              </span>
             </div>
           </div>
-          <Button variant="outline" className="w-full" onClick={handleGoogleSignIn}>
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={handleGoogleSignIn}
+          >
             <IconBrandGoogle className="mr-2 h-4 w-4" />
             Sign in with Google
           </Button>
