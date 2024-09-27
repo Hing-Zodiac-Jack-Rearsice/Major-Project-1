@@ -60,8 +60,10 @@ export default function AdminDashboard() {
 
   const getCategories = async () => {
     const response = await fetch("/api/category");
-    const data = await response.json();
-    setCategories(data.categories);
+    if (response.ok) {
+      const data = await response.json();
+      setCategories(data.categories);
+    }
   };
 
   useEffect(() => {

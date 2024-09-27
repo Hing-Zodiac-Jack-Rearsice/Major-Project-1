@@ -39,7 +39,9 @@ export function EventCard({ event, requestRefresh, canDelete, onDelete }: any) {
     await onDelete(event.id);
     requestRefresh();
   };
-
+  // if (event.status === "pending") {
+  //   return <p>Pending</p>;
+  // }
   return (
     <Card className="w-full overflow-hidden transition-all duration-300 hover:shadow-lg">
       <div className="relative h-48 overflow-hidden">

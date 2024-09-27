@@ -17,23 +17,11 @@ import { AttendanceChart } from "@/components/dashboard/events/AttendanceChart";
 import { SalesCard } from "@/components/dashboard/events/SalesCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Calendar,
-  Clock,
-  MapPin,
-  Ticket,
-  Users,
-  ChevronLeft,
-  Edit,
-} from "lucide-react";
+import { Calendar, Clock, MapPin, Ticket, Users, ChevronLeft, Edit } from "lucide-react";
 import Link from "next/link";
-import UpdateEventModal from "@/components/UpdateEventModal";
+import EventUpdateForm from "@/components/dashboard/events/EventUpdateForm";
 
 const EventPage = () => {
   const [event, setEvent] = useState<any>(null);
@@ -88,20 +76,14 @@ const EventPage = () => {
   return (
     <div className="min-h-screen bg-background sm:pl-14">
       <div className="relative h-64 md:h-96 w-full">
-        <img
-          src={event.imageUrl}
-          alt={event.eventName}
-          className="w-full h-full object-cover"
-        />
+        <img src={event.imageUrl} alt={event.eventName} className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-end p-6">
           <Link href="/admin/dashboard/events">
             <Button variant="outline" className="self-start mb-4">
               <ChevronLeft className="mr-2 h-4 w-4" /> Back to Events
             </Button>
           </Link>
-          <h1 className="text-3xl font-semibold text-white sm:text-5xl mb-2">
-            {event.eventName}
-          </h1>
+          <h1 className="text-3xl font-semibold text-white sm:text-5xl mb-2">{event.eventName}</h1>
           <p className="text-xl text-white">{formattedDate}</p>
         </div>
       </div>
@@ -118,12 +100,10 @@ const EventPage = () => {
               </Button>
             </HoverCardTrigger>
             <HoverCardContent className="w-64">
-              <p className="text-sm">
-                These details will be visible to the client side
-              </p>
+              <p className="text-sm">These details will be visible to the client side</p>
             </HoverCardContent>
           </HoverCard>
-          <UpdateEventModal event={event} onUpdate={handleUpdateEvent} />
+          <EventUpdateForm event={event} refreshCallback={fetchEvent} />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -170,9 +150,7 @@ const EventPage = () => {
           <TabsContent value="details">
             <Card>
               <CardHeader>
-                <CardTitle className="text-xl font-semibold">
-                  Event Description
-                </CardTitle>
+                <CardTitle className="text-xl font-semibold">Event Description</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">{event.description}</p>
@@ -186,10 +164,7 @@ const EventPage = () => {
                   <CardTitle className="text-2xl font-semibold flex items-center">
                     <Users className="mr-2 h-6 w-6" /> Attendees
                   </CardTitle>
-                  <InviteForm
-                    eventId={id}
-                    onInviteSuccess={() => fetchAttendance()}
-                  />
+                  <InviteForm eventId={id} onInviteSuccess={() => fetchAttendance()} />
                 </div>
               </CardHeader>
               <CardContent>
@@ -205,9 +180,7 @@ const EventPage = () => {
                       attendance.map((attendee: any) => (
                         <TableRow key={attendee.userEmail}>
                           <TableCell>
-                            <div className="font-medium">
-                              {attendee.userName}
-                            </div>
+                            <div className="font-medium">{attendee.userName}</div>
                             <div className="text-sm text-muted-foreground">
                               {attendee.userEmail}
                             </div>
@@ -232,9 +205,7 @@ const EventPage = () => {
           <TabsContent value="analytics">
             <Card>
               <CardHeader>
-                <CardTitle className="text-2xl font-semibold">
-                  Analytics
-                </CardTitle>
+                <CardTitle className="text-2xl font-semibold">Analytics</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

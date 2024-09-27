@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import {
   Dialog,
   DialogContent,
@@ -21,7 +22,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSquarePlus } from "@fortawesome/free-regular-svg-icons";
+import { faEdit, faSquarePlus } from "@fortawesome/free-regular-svg-icons";
 import { Textarea } from "@/components/ui/textarea";
 import { add, format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
@@ -34,7 +35,8 @@ import { app } from "@/lib/firebase";
 import Popup from "@/components/popup/Popup";
 import QRCodePreview from "@/components/QRCodePreview";
 
-const EventForm = ({ refreshCallback }: any) => {
+const EventUpdateForm = ({ event, refreshCallback }: any) => {
+  //   const router = useRouter();
   const [showPopup, setShowPopup] = useState(false);
   const [pStyle, setPStyle] = useState<"success" | "fail">("success");
   const [startDate, setStartDate] = React.useState<Date>();
@@ -49,30 +51,31 @@ const EventForm = ({ refreshCallback }: any) => {
   const [categories, setCategories] = useState<any>([]);
   const [qrCodeTheme, setQrCodeTheme] = useState("modern");
   const [isOpen, setIsOpen] = useState(false);
-
-  useEffect(() => {
-    const getCategories = async () => {
-      const response = await fetch("/api/category");
-      if (response.ok) {
-        const data = await response.json();
-        setCategories(data.categories);
-      }
-    };
-    getCategories();
-  }, []);
-
-  const handleSelect = (newDay: Date | undefined) => {
-    if (!newDay) return;
-    if (!startDate) {
-      setStartDate(newDay);
-      return;
+  const getCategories = async () => {
+    const response = await fetch("/api/category");
+    if (response.ok) {
+      const data = await response.json();
+      setCategories(data.categories);
     }
-    const diff = newDay.getTime() - startDate.getTime();
-    const diffInDays = diff / (1000 * 60 * 60 * 24);
-    const newDateFull = add(startDate, { days: Math.ceil(diffInDays) });
-    setStartDate(newDateFull);
-    setEndDate(newDateFull);
   };
+  useEffect(() => {
+    const fetchEventDetails = async () => {
+      setCategory(event.categoryName);
+      setEventName(event.eventName);
+      setDescription(event.description);
+      setLocation(event.location);
+      setTicketAmount(event.ticketAmount);
+      setTicketPrice(event.ticketPrice);
+      setCategory(event.categoryName);
+      setStartDate(new Date(event.startDate));
+      setEndDate(new Date(event.endDate));
+      setQrCodeTheme(event.qrCodeTheme);
+    };
+    if (event) {
+      getCategories();
+      fetchEventDetails();
+    }
+  }, [event]);
 
   const handleEndTimeChange = (newTime: Date | undefined) => {
     if (!newTime || !startDate) return;
@@ -85,6 +88,18 @@ const EventForm = ({ refreshCallback }: any) => {
       newTime.getSeconds()
     );
     setEndDate(updatedEndDate);
+  };
+  const handleSelect = (newDay: Date | undefined) => {
+    if (!newDay) return;
+    if (!startDate) {
+      setStartDate(newDay);
+      return;
+    }
+    const diff = newDay.getTime() - startDate.getTime();
+    const diffInDays = diff / (1000 * 60 * 60 * 24);
+    const newDateFull = add(startDate, { days: Math.ceil(diffInDays) });
+    setStartDate(newDateFull);
+    setEndDate(newDateFull);
   };
 
   const uploadImage = async (file: File): Promise<string> => {
@@ -117,41 +132,49 @@ const EventForm = ({ refreshCallback }: any) => {
       );
     });
   };
-
-  const handleUpload = async () => {
+  const handleUpdate = async () => {
+    let imageUrl = "";
     if (file) {
       try {
-        const imageUrl = await uploadImage(file);
-        const response = await fetch("/api/events", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            eventName,
-            ticketAmount,
-            ticketPrice,
-            location,
-            startDate,
-            endDate,
-            description,
-            imageUrl,
-            categoryName: category,
-            qrCodeTheme,
-          }),
-        });
-        if (response.ok) {
-          setShowPopup(true);
-          setPStyle("success");
-          refreshCallback();
-          setIsOpen(false);
-        }
+        imageUrl = await uploadImage(file);
       } catch (error) {
-        console.error("Error creating event:", error);
+        console.error("Error uploading image:", error);
         setShowPopup(true);
         setPStyle("fail");
+        return;
       }
-    } else {
+    }
+
+    try {
+      const response = await fetch(`/api/events/${event.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          eventName,
+          ticketAmount,
+          ticketPrice,
+          location,
+          startDate,
+          endDate,
+          description,
+          imageUrl: imageUrl || undefined,
+          categoryName: category,
+          qrCodeTheme,
+        }),
+      });
+
+      if (response.ok) {
+        setShowPopup(true);
+        setPStyle("success");
+        refreshCallback();
+        setIsOpen(false);
+      } else {
+        throw new Error("Failed to update event");
+      }
+    } catch (error) {
+      console.error("Error updating event:", error);
       setShowPopup(true);
       setPStyle("fail");
     }
@@ -162,14 +185,14 @@ const EventForm = ({ refreshCallback }: any) => {
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
           <Button variant="outline" className="flex gap-2">
-            <span>Create Event</span>
-            <FontAwesomeIcon icon={faSquarePlus} className="w-4 h-4" />
+            <span>Edit Event</span>
+            <FontAwesomeIcon icon={faEdit} className="w-4 h-4" />
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Create Event</DialogTitle>
-            <DialogDescription>Fill in the details to create a new event.</DialogDescription>
+            <DialogTitle>Edit Event</DialogTitle>
+            <DialogDescription>Update the details of the event.</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="flex flex-col gap-2">
@@ -334,15 +357,15 @@ const EventForm = ({ refreshCallback }: any) => {
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit" onClick={handleUpload}>
-              Create
+            <Button type="submit" onClick={handleUpdate}>
+              Update
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
       {showPopup && (
         <Popup
-          message={pStyle === "success" ? "Event created successfully" : "Failed to create event"}
+          message={pStyle === "success" ? "Event updated successfully" : "Failed to update event"}
           onClose={() => setShowPopup(false)}
           style={pStyle}
         />
@@ -351,4 +374,4 @@ const EventForm = ({ refreshCallback }: any) => {
   );
 };
 
-export default EventForm;
+export default EventUpdateForm;

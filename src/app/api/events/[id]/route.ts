@@ -26,13 +26,15 @@ export async function PATCH(request: Request, { params }: { params: { id: string
       where: { id: id as string },
       data: {
         eventName: body.eventName,
-        ticketAmount: parseInt(body.ticketAmount),
-        ticketPrice: parseFloat(body.ticketPrice),
+        ticketAmount: body.ticketAmount,
+        ticketPrice: body.ticketPrice,
         location: body.location,
+        startDate: body.startDate,
+        endDate: body.endDate,
         description: body.description,
         imageUrl: body.imageUrl,
-        startDate: new Date(body.startDate),
-        endDate: new Date(body.endDate),
+        categoryName: body.categoryName,
+        qrCodeTheme: body.qrCodeTheme,
       },
     });
 

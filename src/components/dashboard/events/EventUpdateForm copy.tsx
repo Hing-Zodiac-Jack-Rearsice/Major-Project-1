@@ -34,7 +34,7 @@ import { app } from "@/lib/firebase";
 import Popup from "@/components/popup/Popup";
 import QRCodePreview from "@/components/QRCodePreview";
 
-const EventForm = ({ refreshCallback }: any) => {
+const EventUpdateForm = ({ refreshCallback }: any) => {
   const [showPopup, setShowPopup] = useState(false);
   const [pStyle, setPStyle] = useState<"success" | "fail">("success");
   const [startDate, setStartDate] = React.useState<Date>();
@@ -351,4 +351,4 @@ const EventForm = ({ refreshCallback }: any) => {
   );
 };
 
-export default EventForm;
+export default EventUpdateForm;
