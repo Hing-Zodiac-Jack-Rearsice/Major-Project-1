@@ -44,8 +44,8 @@ export async function POST(request: Request) {
       const msg = await res.json();
       const salesMsg = await generateSale.json();
 
-      console.log(salesMsg);
-      console.log(msg);
+      // console.log(salesMsg);
+      // console.log(msg);
       //   }
       break;
     }
