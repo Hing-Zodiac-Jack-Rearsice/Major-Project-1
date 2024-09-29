@@ -29,7 +29,12 @@ const BuyButton = ({ eventId, ticketPrice, userEmail }: any) => {
   ) : (
     <form action={BuyTicket}>
       <input type="hidden" name="id" value={eventId} />
-      <Button type="submit">{ticketPrice} $</Button>
+      <Button
+        type="submit"
+        className=" bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition duration-300 ease-in-out"
+      >
+        {ticketPrice} $
+      </Button>
     </form>
   );
 };

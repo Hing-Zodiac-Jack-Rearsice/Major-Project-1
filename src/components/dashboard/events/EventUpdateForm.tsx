@@ -1,3 +1,4 @@
+"use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import {
@@ -34,6 +35,9 @@ import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/
 import { app } from "@/lib/firebase";
 import Popup from "@/components/popup/Popup";
 import QRCodePreview from "@/components/QRCodePreview";
+import prisma from "@/lib/db";
+import { set } from "lodash";
+import { ticketsSold } from "@/app/actions";
 
 const EventUpdateForm = ({ event, refreshCallback }: any) => {
   //   const router = useRouter();
@@ -51,6 +55,25 @@ const EventUpdateForm = ({ event, refreshCallback }: any) => {
   const [categories, setCategories] = useState<any>([]);
   const [qrCodeTheme, setQrCodeTheme] = useState("modern");
   const [isOpen, setIsOpen] = useState(false);
+  const [minTicketAmount, setMinticketAmount] = useState(0);
+  //   const getTicketAmount = async () => {
+  //     const ticketsFromEvent = await prisma.event.findUnique({
+  //       where: {
+  //         id: event.id,
+  //       },
+  //       select: {
+  //         ticketAmount: true,
+  //       },
+  //     });
+  //     const ticketsSold = await prisma.ticket.count({
+  //       where: {
+  //         eventId: event.id,
+  //       },
+  //     });
+  //     if (ticketsFromEvent && ticketsSold) {
+  //       setMinticketAmount(ticketsFromEvent?.ticketAmount - ticketsSold);
+  //     }
+  //   };
   const getCategories = async () => {
     const response = await fetch("/api/category");
     if (response.ok) {
@@ -70,6 +93,7 @@ const EventUpdateForm = ({ event, refreshCallback }: any) => {
       setStartDate(new Date(event.startDate));
       setEndDate(new Date(event.endDate));
       setQrCodeTheme(event.qrCodeTheme);
+      setMinticketAmount(await ticketsSold(event.id));
     };
     if (event) {
       getCategories();
@@ -246,7 +270,7 @@ const EventUpdateForm = ({ event, refreshCallback }: any) => {
                   id="ticketAmount"
                   value={ticketAmount}
                   onChange={(e) => setTicketAmount(parseInt(e.target.value))}
-                  min={1}
+                  min={minTicketAmount}
                   max={1000}
                 />
               </div>

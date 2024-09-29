@@ -78,7 +78,7 @@ const EventPage = () => {
       <div className="relative h-64 md:h-96 w-full">
         <img src={event.imageUrl} alt={event.eventName} className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-end p-6">
-          <Link href="/admin/dashboard/events">
+          <Link href="/admin/dashboard/events" className="w-fit">
             <Button variant="outline" className="self-start mb-4">
               <ChevronLeft className="mr-2 h-4 w-4" /> Back to Events
             </Button>

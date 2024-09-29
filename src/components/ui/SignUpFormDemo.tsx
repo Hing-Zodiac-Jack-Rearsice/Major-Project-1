@@ -102,7 +102,7 @@ export function SignupFormDemo() {
   };
 
   const handleGoogleSignIn = () => {
-    if (!acceptTerms) {
+    if (!isLogin && !acceptTerms) {
       setError("You must accept the terms and conditions to sign up with Google.");
       return;
     }
@@ -285,7 +285,7 @@ export function SignupFormDemo() {
           </div>
           <Button variant="outline" className="w-full" onClick={handleGoogleSignIn}>
             <IconBrandGoogle className="mr-2 h-4 w-4" />
-            Sign up with Google
+            {isLogin ? "Sign in with Google" : "Sign up with Google"}
           </Button>
         </CardFooter>
       </Card>
