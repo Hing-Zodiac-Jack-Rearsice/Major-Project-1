@@ -5,7 +5,6 @@ import { useSession } from "next-auth/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -29,13 +28,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { toast } from "@/components/ui/use-toast";
+import { UserCircle, CalendarClock, Users, AlertTriangle } from "lucide-react";
 
-const SuperAdminDashboard = () => {
+export default function SuperAdminDashboard() {
   const { data: session, status } = useSession();
-
-  // Add this console log to check the session data
-  console.log("Session data:", session);
-
   const [users, setUsers] = useState([]);
   const [pendingEvents, setPendingEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -139,20 +135,75 @@ const SuperAdminDashboard = () => {
     }
   };
 
-  if (status === "loading") return <div>Loading session...</div>;
-  if (!session) return <div>No session found. Please log in.</div>;
+  if (status === "loading")
+    return (
+      <div className="flex items-center justify-center h-screen">
+        Loading session...
+      </div>
+    );
+  if (!session)
+    return (
+      <div className="flex items-center justify-center h-screen">
+        No session found. Please log in.
+      </div>
+    );
   if (session?.user?.role !== "super_admin")
-    return <div>Access denied. You need to be a super admin.</div>;
-  if (loading) return <div>Loading data...</div>;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        Access denied. You need to be a super admin.
+      </div>
+    );
+  if (loading)
+    return (
+      <div className="flex items-center justify-center h-screen">
+        Loading data...
+      </div>
+    );
 
   return (
-    <div className="container mx-auto p-6 mt-20 bg-red-200 min-h-screen">
-      <h1 className="text-3xl font-bold mb-6">Super Admin Dashboard</h1>
-      <p>Session user role: {session.user.role}</p>
-      <p>Number of users: {users.length}</p>
-      <p>Number of pending events: {pendingEvents.length}</p>
+    <div className="container mx-auto p-6 mt-20 bg-background min-h-screen">
+      <div className="mb-8">
+        <h1 className="text-4xl font-bold mb-2">Super Admin Dashboard</h1>
+        <p className="text-muted-foreground">
+          Welcome back, {session.user.name}
+        </p>
+      </div>
 
-      <Tabs defaultValue="users">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{users.length}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Pending Events
+            </CardTitle>
+            <CalendarClock className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{pendingEvents.length}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Your Role</CardTitle>
+            <UserCircle className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold capitalize">
+              {session.user.role}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Tabs defaultValue="users" className="space-y-4">
         <TabsList>
           <TabsTrigger value="users">Manage Users</TabsTrigger>
           <TabsTrigger value="events">Pending Events</TabsTrigger>
@@ -176,7 +227,7 @@ const SuperAdminDashboard = () => {
                 <TableBody>
                   {users.map((user: any) => (
                     <TableRow key={user.id}>
-                      <TableCell>{user.name}</TableCell>
+                      <TableCell className="font-medium">{user.name}</TableCell>
                       <TableCell>{user.email}</TableCell>
                       <TableCell>
                         <Select
@@ -186,12 +237,13 @@ const SuperAdminDashboard = () => {
                           }
                           disabled={user.role === "super_admin"}
                         >
-                          <SelectTrigger>
-                            <SelectValue>{user.role}</SelectValue>
+                          <SelectTrigger className="w-[180px]">
+                            <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="user">User</SelectItem>
                             <SelectItem value="admin">Admin</SelectItem>
+                            <SelectItem value="banned">Banned</SelectItem>
                           </SelectContent>
                         </Select>
                       </TableCell>
@@ -200,21 +252,32 @@ const SuperAdminDashboard = () => {
                           <DialogTrigger asChild>
                             <Button
                               variant="destructive"
-                              disabled={user.role === "super_admin"}
+                              size="sm"
+                              disabled={
+                                user.role === "super_admin" ||
+                                user.role === "banned"
+                              }
                             >
-                              Ban User
+                              {user.role === "banned" ? "Banned" : "Ban User"}
                             </Button>
                           </DialogTrigger>
                           <DialogContent>
                             <DialogHeader>
                               <DialogTitle>Ban User</DialogTitle>
                             </DialogHeader>
-                            <p>Are you sure you want to ban this user?</p>
+                            <div className="flex items-center space-x-2">
+                              <AlertTriangle className="h-6 w-6 text-destructive" />
+                              <p>Are you sure you want to ban this user?</p>
+                            </div>
                             <Button
                               onClick={() =>
                                 handleUserRoleChange(user.id, "banned")
                               }
-                              disabled={user.role === "super_admin"}
+                              disabled={
+                                user.role === "super_admin" ||
+                                user.role === "banned"
+                              }
+                              variant="destructive"
                             >
                               Confirm Ban
                             </Button>
@@ -247,24 +310,29 @@ const SuperAdminDashboard = () => {
                 <TableBody>
                   {pendingEvents.map((event: any) => (
                     <TableRow key={event.id}>
-                      <TableCell>{event.eventName}</TableCell>
+                      <TableCell className="font-medium">
+                        {event.eventName}
+                      </TableCell>
                       <TableCell>{event.organizer}</TableCell>
                       <TableCell>
                         {new Date(event.startDate).toLocaleDateString()}
                       </TableCell>
                       <TableCell>
-                        <Button
-                          onClick={() => handleEventApproval(event.id, true)}
-                          className="mr-2"
-                        >
-                          Approve
-                        </Button>
-                        <Button
-                          onClick={() => handleEventApproval(event.id, false)}
-                          variant="destructive"
-                        >
-                          Reject
-                        </Button>
+                        <div className="flex space-x-2">
+                          <Button
+                            onClick={() => handleEventApproval(event.id, true)}
+                            size="sm"
+                          >
+                            Approve
+                          </Button>
+                          <Button
+                            onClick={() => handleEventApproval(event.id, false)}
+                            variant="destructive"
+                            size="sm"
+                          >
+                            Reject
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -276,6 +344,4 @@ const SuperAdminDashboard = () => {
       </Tabs>
     </div>
   );
-};
-
-export default SuperAdminDashboard;
+}
