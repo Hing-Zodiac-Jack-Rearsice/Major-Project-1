@@ -22,7 +22,7 @@ model User {
   image                 String?
   accounts              Account[]
   sessions              Session[]
-  role                  String?
+  role                  String?         @default("user")
   // Optional for WebAuthn support
   Authenticator         Authenticator[]
   // Stripe priceID 
@@ -117,10 +117,10 @@ model Event {
   attendances  Attendance[]
   sales        Sale[]
   category     Category?    @relation(fields: [categoryName], references: [category])
-  status String @default("pending")
+  status       String       @default("pending")
   // qrcode color
   // qrCodeColor String? @default("#000000")
-  qrCodeTheme String? @default("classic")
+  qrCodeTheme  String?      @default("classic")
 }
 
 model Category {
