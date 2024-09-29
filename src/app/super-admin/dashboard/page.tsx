@@ -64,9 +64,22 @@ const SuperAdminDashboard = () => {
   }, []);
 
   const fetchPendingEvents = useCallback(async () => {
-    const res = await fetch("/api/events/pendingEvent");
-    const data = await res.json();
-    setPendingEvents(data.events);
+    try {
+      const res = await fetch("/api/events/pendingEvent");
+      if (res.ok) {
+        const data = await res.json();
+        setPendingEvents(data.events);
+      } else {
+        const errorData = await res.json();
+        throw new Error(errorData.error);
+      }
+    } catch (error) {
+      console.error("Error fetching pending events:", error);
+      toast({
+        title: "Failed to fetch pending events",
+        variant: "destructive",
+      });
+    }
   }, []);
 
   useEffect(() => {
@@ -102,17 +115,27 @@ const SuperAdminDashboard = () => {
   };
 
   const handleEventApproval = async (eventId: string, approved: boolean) => {
-    const res = await fetch(`/api/events/${eventId}/approve`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ approved }),
-    });
+    try {
+      const res = await fetch(`/api/events/${eventId}/approve`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ approved }),
+      });
 
-    if (res.ok) {
-      toast({ title: approved ? "Event approved" : "Event rejected" });
-      fetchPendingEvents();
-    } else {
-      toast({ title: "Failed to process event", variant: "destructive" });
+      if (res.ok) {
+        toast({ title: approved ? "Event approved" : "Event rejected" });
+        fetchPendingEvents();
+      } else {
+        const errorData = await res.json();
+        throw new Error(errorData.error);
+      }
+    } catch (error) {
+      console.error("Error processing event:", error);
+      toast({
+        title: "Failed to process event",
+        description: error instanceof Error ? error.message : "Unknown error",
+        variant: "destructive",
+      });
     }
   };
 

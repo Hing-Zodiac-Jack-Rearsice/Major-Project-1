@@ -31,7 +31,7 @@ const Page = () => {
   // filter events to show only upcoming events for clients to see so that they cant purchase past events lol
   const filterUpcomingEvents = (events: any) => {
     const today = new Date();
-    // return only events that are in the future by comparing the start date to the current date which is today lol
+    today.setHours(0, 0, 0, 0);
     return events.filter((event: any) => new Date(event.startDate) >= today);
   };
   const fetchEvents = async () => {
@@ -58,10 +58,20 @@ const Page = () => {
     setSearchedEvents([]);
   }, [category]);
 
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      fetchEvents();
+    }, 30000); // Fetch events every 30 seconds
+
+    return () => clearInterval(intervalId);
+  }, [category]);
+
   const requestSearchApi = async (query: any) => {
     try {
       const res = await fetch(
-        `/api/events/category/${category}/search?query=${encodeURIComponent(query)}`
+        `/api/events/category/${category}/search?query=${encodeURIComponent(
+          query
+        )}`
       );
       const data = await res.json();
       setSearchedEvents(data.data || []);
@@ -82,7 +92,9 @@ const Page = () => {
   };
 
   const eventsToDisplay =
-    search === "" ? filterUpcomingEvents(events) : filterUpcomingEvents(searchedEvents);
+    search === ""
+      ? filterUpcomingEvents(events)
+      : filterUpcomingEvents(searchedEvents);
 
   return (
     <div className="min-h-screen bg-background mt-16">
@@ -113,7 +125,8 @@ const Page = () => {
                 <SelectItem value="all">All Categories</SelectItem>
                 {categories.map((cat: any) => (
                   <SelectItem key={cat.id} value={cat.category}>
-                    {cat.category.charAt(0).toUpperCase() + cat.category.slice(1).toLowerCase()}
+                    {cat.category.charAt(0).toUpperCase() +
+                      cat.category.slice(1).toLowerCase()}
                   </SelectItem>
                 ))}
               </SelectGroup>
@@ -135,7 +148,9 @@ const Page = () => {
           <div className="text-center py-12">
             <Calendar className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
             <h2 className="text-2xl font-semibold mb-2">No events found</h2>
-            <p className="text-muted-foreground">Try adjusting your search or category selection</p>
+            <p className="text-muted-foreground">
+              Try adjusting your search or category selection
+            </p>
           </div>
         )}
       </div>

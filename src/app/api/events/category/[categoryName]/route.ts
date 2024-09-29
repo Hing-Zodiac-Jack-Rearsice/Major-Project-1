@@ -7,12 +7,17 @@ export async function GET(request: Request, { params }: { params: { categoryName
   const session = await auth();
 
   if (categoryName === "all") {
-    const allEvents = await prisma.event.findMany();
+    const allEvents = await prisma.event.findMany({
+      where: {
+        status: 'approved',
+      },
+    });
     return new NextResponse(JSON.stringify({ data: allEvents }), { status: 200 });
   }
   const eventsFromCategory = await prisma.event.findMany({
     where: {
       categoryName: categoryName,
+      status: 'approved',
     },
   });
   return new NextResponse(JSON.stringify({ data: eventsFromCategory }), { status: 200 });

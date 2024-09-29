@@ -54,6 +54,7 @@ export async function POST(request: Request) {
           imageUrl: body.imageUrl,
           categoryName: body.categoryName,
           qrCodeTheme: body.qrCodeTheme,
+          status: body.status || "pending",
         },
       });
       return new NextResponse(JSON.stringify({ data: uploadEvent }), { status: 200 });

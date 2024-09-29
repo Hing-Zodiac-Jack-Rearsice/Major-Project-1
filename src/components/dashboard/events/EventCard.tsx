@@ -1,6 +1,12 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Calendar, Clock, Loader2, MapPin } from "lucide-react";
 import {
   AlertDialog,
@@ -13,8 +19,13 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
 
 export function EventCard({ event, requestRefresh, canDelete, onDelete }: any) {
   const eventDate = new Date(event.startDate);
@@ -52,7 +63,9 @@ export function EventCard({ event, requestRefresh, canDelete, onDelete }: any) {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         <CardHeader className="absolute bottom-0 left-0 right-0 text-white">
-          <CardTitle className="text-2xl font-bold">{event.eventName}</CardTitle>
+          <CardTitle className="text-2xl font-bold">
+            {event.eventName}
+          </CardTitle>
         </CardHeader>
       </div>
       <CardContent className="mt-4 space-y-2">
@@ -62,7 +75,9 @@ export function EventCard({ event, requestRefresh, canDelete, onDelete }: any) {
         </div>
         <div className="flex items-center space-x-2 text-sm text-muted-foreground">
           <Clock className="h-4 w-4" />
-          <span>{`${formatTime(eventDate)} - ${formatTime(eventEndDate)}`}</span>
+          <span>{`${formatTime(eventDate)} - ${formatTime(
+            eventEndDate
+          )}`}</span>
         </div>
         {event.location && (
           <div className="flex items-center space-x-2 text-sm text-muted-foreground">
@@ -86,20 +101,25 @@ export function EventCard({ event, requestRefresh, canDelete, onDelete }: any) {
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete your event and remove
-                  the data from our servers.
+                  This action cannot be undone. This will permanently delete
+                  your event and remove the data from our servers.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Go back</AlertDialogCancel>
-                <AlertDialogAction onClick={handleDelete}>Confirm</AlertDialogAction>
+                <AlertDialogAction onClick={handleDelete}>
+                  Confirm
+                </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
         ) : (
           <HoverCard>
             <HoverCardTrigger asChild>
-              <Button variant="outline" className="cursor-not-allowed opacity-50">
+              <Button
+                variant="outline"
+                className="cursor-not-allowed opacity-50"
+              >
                 Cancel
               </Button>
             </HoverCardTrigger>
@@ -112,6 +132,11 @@ export function EventCard({ event, requestRefresh, canDelete, onDelete }: any) {
           <Button>Manage</Button>
         </Link>
       </CardFooter>
+      <div className="flex justify-between items-center mb-2">
+        {event.status === "pending" && (
+          <Badge variant="secondary">Pending Approval</Badge>
+        )}
+      </div>
     </Card>
   );
 }

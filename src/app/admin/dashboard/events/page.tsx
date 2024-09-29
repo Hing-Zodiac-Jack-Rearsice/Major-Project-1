@@ -192,7 +192,7 @@ export default function AdminDashboard() {
                 </SelectGroup>
               </SelectContent>
             </Select>
-            <EventForm refreshCallback={fetchEvents}>
+            <EventForm refreshCallback={fetchEvents} initialStatus="pending">
               <Button>
                 <Plus className="mr-2 h-4 w-4" /> Add Event
               </Button>

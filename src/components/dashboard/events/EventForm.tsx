@@ -27,14 +27,33 @@ import { add, format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { TimePickerDemo } from "@/components/ui/time-picker-demo";
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import {
+  getStorage,
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+} from "firebase/storage";
 import { app } from "@/lib/firebase";
 import Popup from "@/components/popup/Popup";
 import QRCodePreview from "@/components/QRCodePreview";
 
-const EventForm = ({ refreshCallback }: any) => {
+interface EventFormProps {
+  children: React.ReactNode;
+  refreshCallback: () => void;
+  initialStatus: string;
+}
+
+const EventForm: React.FC<EventFormProps> = ({
+  children,
+  refreshCallback,
+  initialStatus,
+}) => {
   const [showPopup, setShowPopup] = useState(false);
   const [pStyle, setPStyle] = useState<"success" | "fail">("success");
   const [startDate, setStartDate] = React.useState<Date>();
@@ -100,7 +119,8 @@ const EventForm = ({ refreshCallback }: any) => {
       uploadTask.on(
         "state_changed",
         (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           console.log("Upload is " + progress + "% done");
         },
         (error) => {
@@ -138,6 +158,7 @@ const EventForm = ({ refreshCallback }: any) => {
             imageUrl,
             categoryName: category,
             qrCodeTheme,
+            status: initialStatus,
           }),
         });
         if (response.ok) {
@@ -169,20 +190,30 @@ const EventForm = ({ refreshCallback }: any) => {
         <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Create Event</DialogTitle>
-            <DialogDescription>Fill in the details to create a new event.</DialogDescription>
+            <DialogDescription>
+              Fill in the details to create a new event.
+            </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="flex flex-col gap-2">
               <Label htmlFor="name" className="text-left">
                 Event name
               </Label>
-              <Input id="name" value={eventName} onChange={(e) => setEventName(e.target.value)} />
+              <Input
+                id="name"
+                value={eventName}
+                onChange={(e) => setEventName(e.target.value)}
+              />
             </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="location" className="text-left">
                 Location
               </Label>
-              <Input id="location" value={location} onChange={(e) => setLocation(e.target.value)} />
+              <Input
+                id="location"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+              />
             </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="description" className="text-left">
@@ -206,7 +237,8 @@ const EventForm = ({ refreshCallback }: any) => {
                   <SelectGroup>
                     {categories.map((cat: any) => (
                       <SelectItem key={cat.id} value={cat.category}>
-                        {cat.category.charAt(0).toUpperCase() + cat.category.slice(1).toLowerCase()}
+                        {cat.category.charAt(0).toUpperCase() +
+                          cat.category.slice(1).toLowerCase()}
                       </SelectItem>
                     ))}
                   </SelectGroup>
@@ -255,7 +287,11 @@ const EventForm = ({ refreshCallback }: any) => {
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {startDate ? format(startDate, "PPP HH:mm:ss") : <span>Pick a date</span>}
+                    {startDate ? (
+                      format(startDate, "PPP HH:mm:ss")
+                    ) : (
+                      <span>Pick a date</span>
+                    )}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0">
@@ -285,12 +321,19 @@ const EventForm = ({ refreshCallback }: any) => {
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {endDate ? format(endDate, "PPP HH:mm:ss") : <span>Pick a date</span>}
+                    {endDate ? (
+                      format(endDate, "PPP HH:mm:ss")
+                    ) : (
+                      <span>Pick a date</span>
+                    )}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0">
                   <div className="p-3 border-t border-border">
-                    <TimePickerDemo setDate={handleEndTimeChange} date={endDate} />
+                    <TimePickerDemo
+                      setDate={handleEndTimeChange}
+                      date={endDate}
+                    />
                   </div>
                 </PopoverContent>
               </Popover>
@@ -342,7 +385,11 @@ const EventForm = ({ refreshCallback }: any) => {
       </Dialog>
       {showPopup && (
         <Popup
-          message={pStyle === "success" ? "Event created successfully" : "Failed to create event"}
+          message={
+            pStyle === "success"
+              ? "Event created successfully"
+              : "Failed to create event"
+          }
           onClose={() => setShowPopup(false)}
           style={pStyle}
         />
