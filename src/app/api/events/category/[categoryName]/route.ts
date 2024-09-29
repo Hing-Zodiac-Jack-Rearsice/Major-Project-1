@@ -6,19 +6,20 @@ export async function GET(request: Request, { params }: { params: { categoryName
   const { categoryName } = params;
   const session = await auth();
 
-  if (categoryName === "all") {
-    const allEvents = await prisma.event.findMany({
-      where: {
-        status: 'approved',
-      },
-    });
-    return new NextResponse(JSON.stringify({ data: allEvents }), { status: 200 });
-  }
-  const eventsFromCategory = await prisma.event.findMany({
+  const isAdmin = session?.user?.role === 'admin';
+
+  const baseQuery = {
     where: {
-      categoryName: categoryName,
-      status: 'approved',
+      categoryName: categoryName === "all" ? undefined : categoryName,
+      status: isAdmin ? undefined : 'approved',
     },
-  });
-  return new NextResponse(JSON.stringify({ data: eventsFromCategory }), { status: 200 });
+  };
+
+  try {
+    const events = await prisma.event.findMany(baseQuery);
+    return new NextResponse(JSON.stringify({ data: events }), { status: 200 });
+  } catch (error) {
+    console.error("Error fetching events:", error);
+    return new NextResponse(JSON.stringify({ error: "Internal Server Error" }), { status: 500 });
+  }
 }

@@ -35,7 +35,9 @@ export default function AdminDashboard() {
   const fetchEvents = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/events/category/${category}`);
+      const res = await fetch(
+        `/api/events/category/${category}?includeAll=true`
+      );
       const data = await res.json();
       setEvents(data.data || []);
       checkDeletionStatus(data.data || []);
@@ -99,7 +101,8 @@ export default function AdminDashboard() {
       const matchesTimeFilter =
         timeFilter === "all" ||
         (timeFilter === "upcoming" && eventDate > now) ||
-        (timeFilter === "past" && eventDate <= now);
+        (timeFilter === "past" && eventDate <= now) ||
+        (timeFilter === "pending" && event.status === "pending");
 
       return (
         isAdminEvent && matchesSearch && matchesCategory && matchesTimeFilter
@@ -209,6 +212,7 @@ export default function AdminDashboard() {
             <TabsTrigger value="all">All Events</TabsTrigger>
             <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
             <TabsTrigger value="past">Past</TabsTrigger>
+            <TabsTrigger value="pending">Pending</TabsTrigger>
           </TabsList>
           <TabsContent value="all">
             {loading ? <LoadingSpinner /> : memoizedEventGrid}
@@ -217,6 +221,9 @@ export default function AdminDashboard() {
             {loading ? <LoadingSpinner /> : memoizedEventGrid}
           </TabsContent>
           <TabsContent value="past">
+            {loading ? <LoadingSpinner /> : memoizedEventGrid}
+          </TabsContent>
+          <TabsContent value="pending">
             {loading ? <LoadingSpinner /> : memoizedEventGrid}
           </TabsContent>
         </Tabs>

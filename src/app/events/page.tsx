@@ -28,18 +28,24 @@ const Page = () => {
       setCategories(data.categories);
     }
   };
-  // filter events to show only upcoming events for clients to see so that they cant purchase past events lol
+
   const filterUpcomingEvents = (events: any) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     return events.filter((event: any) => new Date(event.startDate) >= today);
   };
+
   const fetchEvents = async () => {
     setLoading(true);
     try {
       const res = await fetch(`/api/events/category/${category}`);
-      const data = await res.json();
-      setEvents(data.data || []);
+      if (res.ok) {
+        const data = await res.json();
+        setEvents(data.data || []);
+      } else {
+        console.error("Error fetching events:", await res.text());
+        setEvents([]);
+      }
     } catch (error) {
       console.error("Error fetching events:", error);
       setEvents([]);
@@ -49,13 +55,7 @@ const Page = () => {
 
   useEffect(() => {
     getCategories();
-    // fetchEvents();
-  }, []);
-
-  useEffect(() => {
     fetchEvents();
-    setSearch("");
-    setSearchedEvents([]);
   }, [category]);
 
   useEffect(() => {

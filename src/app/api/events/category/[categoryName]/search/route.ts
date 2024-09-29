@@ -1,35 +1,29 @@
 // app/api/search/events/route.ts
 import { NextResponse } from "next/server";
 import prisma from "@/lib/db";
+import { auth } from "@/lib/auth"; // Assuming auth is defined in lib/auth
 
 export async function GET(request: Request, { params }: { params: { categoryName: string } }) {
   const { searchParams } = new URL(request.url);
   const { categoryName } = params;
   const query = searchParams.get("query");
+  const session = await auth();
+
+  const isAdmin = session?.user?.role === 'admin';
 
   if (!query) {
     return NextResponse.json({ error: "Query parameter is required" }, { status: 400 });
   }
-  if (categoryName === "all") {
-    const allEvents = await prisma.event.findMany({
-      where: {
-        eventName: {
-          contains: query,
-          mode: "insensitive", // This makes the search case-insensitive
-        },
-      },
-    });
-    return new NextResponse(JSON.stringify({ data: allEvents }), { status: 200 });
-  }
-  // Perform the search using the query parameter
+
   try {
     const events = await prisma.event.findMany({
       where: {
-        categoryName: categoryName,
+        categoryName: categoryName === "all" ? undefined : categoryName,
         eventName: {
           contains: query,
-          mode: "insensitive", // This makes the search case-insensitive
+          mode: "insensitive",
         },
+        status: isAdmin ? undefined : 'approved',
       },
     });
 
