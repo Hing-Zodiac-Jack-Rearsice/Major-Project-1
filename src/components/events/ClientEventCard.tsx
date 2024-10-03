@@ -40,7 +40,12 @@ export function ClientEventCard({ event }: any) {
       className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 ease-in-out"
     >
       <div className="relative h-56 w-full">
-        <Image src={event.imageUrl} alt={event.eventName} layout="fill" objectFit="cover" />
+        <Image
+          src={event.imageUrl}
+          alt={event.eventName}
+          layout="fill"
+          objectFit="cover"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
         {ticketsLeft <= 100 && ticketsLeft > 0 && (
           <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full font-bold text-sm shadow-lg">
@@ -49,7 +54,9 @@ export function ClientEventCard({ event }: any) {
           </div>
         )}
         <div className="absolute bottom-4 left-4 right-4">
-          <h3 className="text-white text-2xl font-bold truncate mb-2">{event.eventName}</h3>
+          <h3 className="text-white text-2xl font-bold truncate mb-2">
+            {event.eventName}
+          </h3>
           <div className="flex items-center text-white text-sm mb-1">
             <Calendar className="w-4 h-4 mr-2" />
             <span>{formattedDate}</span>
@@ -59,6 +66,9 @@ export function ClientEventCard({ event }: any) {
             <span>
               {formattedTime} - {formattedEndTime}
             </span>
+          </div>
+          <div className="flex items-center text-white text-sm">
+            <span className="font-bold">Price: ${event.ticketPrice}</span>
           </div>
         </div>
       </div>
