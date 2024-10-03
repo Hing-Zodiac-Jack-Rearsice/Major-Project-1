@@ -117,6 +117,18 @@ export async function BuyTicket(formData: FormData) {
   const session = await stripe.checkout.sessions.create({
     customer_email: userSession?.user?.email as string,
     mode: "payment",
+    // invoice_creation: {
+    //   enabled: true,
+    //   invoice_data: {
+    //     description: `Ticket for ${data?.eventName}`,
+    //     metadata: {
+    //       price: data?.ticketPrice as number,
+    //       eventId: id,
+    //       userEmail: userSession?.user?.email as string,
+    //       userName: userSession?.user?.name as string,
+    //     },
+    //   },
+    // },
     line_items: [
       {
         price_data: {

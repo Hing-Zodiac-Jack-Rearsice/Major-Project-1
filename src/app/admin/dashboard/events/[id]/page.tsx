@@ -22,16 +22,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar, Clock, MapPin, Ticket, Users, ChevronLeft, Edit } from "lucide-react";
 import Link from "next/link";
 import EventUpdateForm from "@/components/dashboard/events/EventUpdateForm";
+import { remainingTickets } from "@/app/actions";
+import { Progress } from "@/components/ui/progress";
 
 const EventPage = () => {
   const [event, setEvent] = useState<any>(null);
   const [attendance, setAttendance] = useState<any>(null);
   const { id } = useParams();
+  const [ticketsLeft, setTicketsLeft] = useState(0);
 
   const fetchEvent = async () => {
     const resEvent = await fetch(`/api/events/${id}`);
     const data = await resEvent.json();
     setEvent(data.event);
+    setTicketsLeft(await remainingTickets(id));
   };
 
   const fetchAttendance = async () => {
@@ -49,12 +53,7 @@ const EventPage = () => {
     fetchAttendance();
   }, []);
 
-  if (!event)
-    return (
-      <div className="flex w-full h-screen items-center justify-center">
-        <LoadingSpinner />
-      </div>
-    );
+  if (!event) return <LoadingSpinner />;
 
   const eventDate = new Date(event.startDate);
   const eventEndDate = new Date(event.endDate);
@@ -72,6 +71,9 @@ const EventPage = () => {
     hour: "2-digit",
     minute: "2-digit",
   });
+
+  const ticketsSold = event.ticketAmount - ticketsLeft;
+  const ticketPercentage = (ticketsSold / event.ticketAmount) * 100;
 
   return (
     <div className="min-h-screen bg-background sm:pl-14">
@@ -131,105 +133,31 @@ const EventPage = () => {
           <Card>
             <CardHeader className="flex flex-row items-center space-x-2">
               <Ticket className="h-6 w-6" />
-              <CardTitle>Ticket Price</CardTitle>
+              <CardTitle>Ticket Information</CardTitle>
             </CardHeader>
             <CardContent>
-              <Badge variant="secondary" className="text-lg">
-                ${event.ticketPrice}
-              </Badge>
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm font-medium">Price:</span>
+                <Badge variant="secondary" className="text-lg">
+                  ${event.ticketPrice}
+                </Badge>
+              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Sold:</span>
+                  <span className="font-medium">
+                    {ticketsSold} / {event.ticketAmount}
+                  </span>
+                </div>
+                <Progress value={ticketPercentage} className="h-2" />
+                <div className="flex justify-between text-sm">
+                  <span>Available:</span>
+                  <span className="font-medium text-green-600">{ticketsLeft}</span>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
-
-        <Tabs defaultValue="details" className="mb-8">
-          <TabsList>
-            <TabsTrigger value="details">Event Details</TabsTrigger>
-            <TabsTrigger value="attendees">Attendees</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          </TabsList>
-          <TabsContent value="details">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-xl font-semibold">Event Description</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">{event.description}</p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          <TabsContent value="attendees">
-            <Card>
-              <CardHeader>
-                <div className="flex justify-between items-center">
-                  <CardTitle className="text-2xl font-semibold flex items-center">
-                    <Users className="mr-2 h-6 w-6" /> Attendees
-                  </CardTitle>
-                  <InviteForm eventId={id} onInviteSuccess={() => fetchAttendance()} />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Attendee</TableHead>
-                      <TableHead className="text-right">Status</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {attendance !== null && attendance.length > 0 ? (
-                      attendance.map((attendee: any) => (
-                        <TableRow key={attendee.userEmail}>
-                          <TableCell>
-                            <div className="font-medium">{attendee.userName}</div>
-                            <div className="text-sm text-muted-foreground">
-                              {attendee.userEmail}
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <Badge variant="secondary">{attendee.status}</Badge>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={2} className="text-center">
-                          No attendees yet.
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          <TabsContent value="analytics">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-2xl font-semibold">Analytics</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg">Attendance</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <AttendanceChart eventId={id} />
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg">Sales</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <SalesCard eventId={id} />
-                    </CardContent>
-                  </Card>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
       </div>
     </div>
   );

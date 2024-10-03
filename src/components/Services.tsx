@@ -5,7 +5,7 @@ export default function Services() {
     <div>
       <h1 className="text-3xl font-bold py-4 text-center">Our Focus</h1>
       <section className="grid grid-cols-1 sm:grid-cols-2 gap-6 p-4 sm:p-6">
-        <div className="bg-background rounded-lg shadow-lg overflow-hidden transition-transform duration-300 ease-in-out hover:shadow-xl hover:-translate-y-2">
+        <div className="dark:bg-gray-950 bg-background rounded-lg shadow-lg overflow-hidden transition-transform duration-300 ease-in-out hover:shadow-xl hover:-translate-y-2">
           <div className="p-6 flex items-center gap-4">
             <div className="bg-primary rounded-md p-3 flex items-center justify-center">
               <LaptopIcon className="w-6 h-6 text-primary-foreground" />
@@ -16,7 +16,7 @@ export default function Services() {
             </div>
           </div>
         </div>
-        <div className="bg-background rounded-lg shadow-lg overflow-hidden transition-transform duration-300 ease-in-out hover:shadow-xl hover:-translate-y-2">
+        <div className="dark:bg-gray-950 bg-background rounded-lg shadow-lg overflow-hidden transition-transform duration-300 ease-in-out hover:shadow-xl hover:-translate-y-2">
           <div className="p-6 flex items-center gap-4">
             <div className="bg-primary rounded-md p-3 flex items-center justify-center">
               <SmartphoneIcon className="w-6 h-6 text-primary-foreground" />
@@ -29,7 +29,7 @@ export default function Services() {
             </div>
           </div>
         </div>
-        <div className="bg-background rounded-lg shadow-lg overflow-hidden transition-transform duration-300 ease-in-out hover:shadow-xl hover:-translate-y-2">
+        <div className="dark:bg-gray-950 bg-background rounded-lg shadow-lg overflow-hidden transition-transform duration-300 ease-in-out hover:shadow-xl hover:-translate-y-2">
           <div className="p-6 flex items-center gap-4">
             <div className="bg-primary rounded-md p-3 flex items-center justify-center">
               <DatabaseIcon className="w-6 h-6 text-primary-foreground" />
@@ -40,7 +40,7 @@ export default function Services() {
             </div>
           </div>
         </div>
-        <div className="bg-background rounded-lg shadow-lg overflow-hidden transition-transform duration-300 ease-in-out hover:shadow-xl hover:-translate-y-2">
+        <div className="dark:bg-gray-950 bg-background rounded-lg shadow-lg overflow-hidden transition-transform duration-300 ease-in-out hover:shadow-xl hover:-translate-y-2">
           <div className="p-6 flex items-center gap-4">
             <div className="bg-primary rounded-md p-3 flex items-center justify-center">
               <CloudIcon className="w-6 h-6 text-primary-foreground" />
@@ -56,7 +56,7 @@ export default function Services() {
   );
 }
 
-function CloudIcon(props) {
+function CloudIcon(props: any) {
   return (
     <svg
       {...props}
@@ -75,7 +75,7 @@ function CloudIcon(props) {
   );
 }
 
-function DatabaseIcon(props) {
+function DatabaseIcon(props: any) {
   return (
     <svg
       {...props}
@@ -96,7 +96,7 @@ function DatabaseIcon(props) {
   );
 }
 
-function LaptopIcon(props) {
+function LaptopIcon(props: any) {
   return (
     <svg
       {...props}
@@ -115,7 +115,7 @@ function LaptopIcon(props) {
   );
 }
 
-function SmartphoneIcon(props) {
+function SmartphoneIcon(props: any) {
   return (
     <svg
       {...props}
@@ -135,7 +135,7 @@ function SmartphoneIcon(props) {
   );
 }
 
-function XIcon(props) {
+function XIcon(props: any) {
   return (
     <svg
       {...props}

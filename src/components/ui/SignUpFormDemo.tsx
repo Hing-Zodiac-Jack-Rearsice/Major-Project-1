@@ -159,7 +159,7 @@ export function SignupFormDemo() {
         </CardHeader>
         <CardContent className="p-4 md:p-8 flex-grow flex flex-col">
           <Tabs
-            defaultValue={isLogin ? "login" : "register"}
+            defaultValue={isLogin ? "l ogin" : "register"}
             onValueChange={(value) => setIsLogin(value === "login")}
             className="flex-grow flex flex-col"
           >
