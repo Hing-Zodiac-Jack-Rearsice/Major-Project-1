@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
 import { ClientEventCard } from "@/components/events/ClientEventCard";
 import { Input } from "@/components/ui/input";
@@ -10,9 +11,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Calendar, Loader2, Ticket } from "lucide-react";
+import { Search, Calendar, Loader2, Ticket, Plus } from "lucide-react";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import debounce from "lodash/debounce"; // Import debounce
 
 const Page = () => {
   const [events, setEvents] = useState<any>([]);
@@ -21,6 +24,7 @@ const Page = () => {
   const [category, setCategory] = useState("all");
   const [categories, setCategories] = useState<any>([]);
   const [loading, setLoading] = useState(true);
+  const [timeUntilNextEvent, setTimeUntilNextEvent] = useState("");
 
   const getCategories = async () => {
     const response = await fetch("/api/category");
@@ -60,17 +64,39 @@ const Page = () => {
   }, [category]);
 
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      fetchEvents();
-    }, 30000); // Fetch events every 30 seconds
+    const updateCountdown = () => {
+      const now = new Date();
+      const nextEvent = events.find(
+        (event: any) => new Date(event.startDate) > now
+      );
+      if (nextEvent) {
+        const timeDiff =
+          new Date(nextEvent.startDate).getTime() - now.getTime();
+        const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor(
+          (timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+        );
+        const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+        setTimeUntilNextEvent(`${days}d ${hours}h ${minutes}m ${seconds}s`);
+      } else {
+        setTimeUntilNextEvent("No upcoming events");
+      }
+    };
 
-    return () => clearInterval(intervalId);
-  }, [category]);
+    updateCountdown();
+    const countdownInterval = setInterval(updateCountdown, 1000);
 
-  const requestSearchApi = async (query: any) => {
+    return () => clearInterval(countdownInterval);
+  }, [events]);
+
+  // Debounced search function
+  const requestSearchApi = debounce(async (query: string) => {
     try {
       const res = await fetch(
-        `/api/events/category/${category}/search?query=${encodeURIComponent(query)}`
+        `/api/events/category/${category}/search?query=${encodeURIComponent(
+          query
+        )}`
       );
       const data = await res.json();
       setSearchedEvents(data.data || []);
@@ -78,34 +104,64 @@ const Page = () => {
       console.error("Error searching events:", error);
       setSearchedEvents([]);
     }
-  };
+  }, 300); // Adjust the debounce delay as needed
 
   const handleSearch = (e: any) => {
     const val = e.target.value;
     setSearch(val);
     if (val.trim() !== "") {
-      requestSearchApi(val);
+      requestSearchApi(val); // Call the debounced search function
     } else {
       setSearchedEvents([]);
     }
   };
 
   const eventsToDisplay =
-    search === "" ? filterUpcomingEvents(events) : filterUpcomingEvents(searchedEvents);
+    search === ""
+      ? filterUpcomingEvents(events)
+      : filterUpcomingEvents(searchedEvents);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-secondary/10 pt-24">
-      <div className="container mx-auto px-6 py-8">
-        <motion.header
-          initial={{ opacity: 0, y: -50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="mb-12 text-center"
+    <div className="mt-16 min-h-screen bg-gradient-to-b from-background to-secondary/10">
+      <div className="relative h-96 overflow-hidden">
+        <video
+          autoPlay
+          loop
+          muted
+          className="absolute w-full h-full object-cover"
         >
-          <h1 className="text-4xl font-bold mb-3">Discover Amazing Events</h1>
-          <p className="text-xl text-muted-foreground">Find and join exciting experiences</p>
-        </motion.header>
+          <source src="/videos/trailer-video.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+        <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center text-white">
+          <motion.h1
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-5xl font-bold mb-4"
+          >
+            Discover Amazing Events
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="text-2xl mb-8"
+          >
+            Find and join exciting experiences
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="text-3xl font-bold"
+          >
+            Next event in: {timeUntilNextEvent}
+          </motion.div>
+        </div>
+      </div>
 
+      <div className="container mx-auto px-6 py-12">
         <div className="flex flex-col md:flex-row items-center justify-center mb-12 gap-4">
           <div className="relative w-full md:w-1/2">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
@@ -127,7 +183,8 @@ const Page = () => {
                 <SelectItem value="all">All Categories</SelectItem>
                 {categories.map((cat: any) => (
                   <SelectItem key={cat.id} value={cat.category}>
-                    {cat.category.charAt(0).toUpperCase() + cat.category.slice(1).toLowerCase()}
+                    {cat.category.charAt(0).toUpperCase() +
+                      cat.category.slice(1).toLowerCase()}
                   </SelectItem>
                 ))}
               </SelectGroup>
@@ -161,7 +218,7 @@ const Page = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center py-16 rounded-lg shadow-lg"
+            className="text-center py-16 rounded-lg shadow-lg bg-background"
           >
             <Calendar className="mx-auto h-20 w-20 text-muted-foreground mb-6" />
             <h2 className="text-3xl font-semibold mb-3">No events found</h2>
@@ -171,6 +228,21 @@ const Page = () => {
           </motion.div>
         )}
       </div>
+
+      <motion.div
+        className="fixed bottom-8 right-8"
+        initial={{ opacity: 0, scale: 0 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.3 }}
+      >
+        <Button
+          size="lg"
+          className="rounded-full w-16 h-16 shadow-lg"
+          onClick={() => alert("Create new event")}
+        >
+          <Plus className="w-8 h-8" />
+        </Button>
+      </motion.div>
     </div>
   );
 };
