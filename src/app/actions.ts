@@ -4,6 +4,8 @@ import prisma from "@/lib/db";
 import { stripe } from "@/lib/stripe";
 import { redirect } from "next/navigation";
 import { NextResponse } from "next/server";
+import generateReceipt from "@/utils/generateReceipt";
+import { sendEmail } from "@/lib/email";
 export async function checkForDelete(eventId: any) {
   const canDelete = await prisma.event.findUnique({
     where: {
@@ -117,18 +119,6 @@ export async function BuyTicket(formData: FormData) {
   const session = await stripe.checkout.sessions.create({
     customer_email: userSession?.user?.email as string,
     mode: "payment",
-    // invoice_creation: {
-    //   enabled: true,
-    //   invoice_data: {
-    //     description: `Ticket for ${data?.eventName}`,
-    //     metadata: {
-    //       price: data?.ticketPrice as number,
-    //       eventId: id,
-    //       userEmail: userSession?.user?.email as string,
-    //       userName: userSession?.user?.name as string,
-    //     },
-    //   },
-    // },
     line_items: [
       {
         price_data: {
@@ -144,8 +134,6 @@ export async function BuyTicket(formData: FormData) {
       },
     ],
     payment_intent_data: {
-      // sends the money received to sombot stripe account to the actual ticket seller
-      //   application_fee_amount: 0,
       transfer_data: {
         destination: data?.user?.connectedAccountId as string,
       },
@@ -159,6 +147,14 @@ export async function BuyTicket(formData: FormData) {
       userName: userSession?.user?.name as string,
     },
   });
+  await sendReceipt(
+    id,
+    data.ticketPrice,
+    1, // quantity
+    session.payment_intent as string,
+    userSession?.user?.name as string,
+    userSession.user.email as string
+  );
   return redirect(session.url as string);
 }
 
@@ -193,3 +189,57 @@ export async function getStripeDashboardLink() {
   const loginLink = await stripe.accounts.createLoginLink(data?.connectedAccountId as string);
   return redirect(loginLink.url as string);
 }
+
+
+const getPaymentInformation = async (paymentIntentId: string) => {
+  const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+  const paymentMethod = paymentIntent.payment_method_types[0];
+  const amount = paymentIntent.amount;
+  const currency = paymentIntent.currency;
+  const paymentDate = paymentIntent.created;
+  const orderId = paymentIntent.id; // assuming the orderId is the same as the paymentIntentId
+
+  return {
+    paymentMethod,
+    amount,
+    currency,
+    paymentDate,
+    orderId, // add the orderId property to the returned object
+  };
+};
+
+const sendReceipt = async (
+  eventId: string,
+  ticketPrice: number,
+  quantity: number,
+  paymentIntentId: string,
+  buyerName: string,
+  buyerEmail: string,
+) => {
+  const paymentInformation = await getPaymentInformation(paymentIntentId);
+  const receipt = await generateReceipt(
+    eventId,
+    ticketPrice,
+    quantity,
+    paymentInformation.paymentMethod,
+    new Date(paymentInformation.paymentDate * 1000).toLocaleString(), // Convert to string
+    paymentInformation.orderId,
+    buyerName,
+    buyerEmail
+  );
+
+  const email = {
+    to: buyerEmail,
+    subject: "Receipt for Event Ticket Purchase",
+    body: "Please find your receipt attached.",
+    attachments: [
+      {
+        filename: "receipt.pdf",
+        content: receipt,
+        encoding: "base64",
+      },
+    ],
+  };
+
+  await sendEmail(email.to, email.subject, email.body, email.attachments);
+};
