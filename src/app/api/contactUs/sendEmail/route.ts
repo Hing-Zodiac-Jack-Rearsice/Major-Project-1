@@ -13,7 +13,8 @@ export async function POST(request: Request) {
 
     try {
         await transporter.sendMail({
-            from: `${email}` ?? 'default@example.com', // Sender's email from session
+            from: process.env.EMAIL_USER, // Sender's email from session
+            replyTo: session.user?.email as string,
             to: "chatforgon@gmail.com",   // Recipient's email
             subject: `Request Support from ${session.user?.name}`,
             text: `Name: ${name}\nMessage: ${message}`, // Corrected string template syntax
