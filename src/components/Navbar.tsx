@@ -24,6 +24,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
+
 export default function Navbar() {
   const pathName = usePathname();
   const router = useRouter();
@@ -86,6 +87,16 @@ export default function Navbar() {
           Dashboard
         </Link>
       )}
+      {(session?.user.role === "user" || session?.user.role === "admin") && (
+        <Link
+          href="/contactUs"
+          className="text-sm font-medium hover:text-primary"
+          prefetch={false}
+          onClick={() => mobile && handleNavigation("/contactUs")}
+        >
+          Contact Us
+        </Link>
+      )}
     </>
   );
 
@@ -120,17 +131,8 @@ export default function Navbar() {
               </HoverCardTrigger>
               <HoverCardContent className="w-fit">
                 <div className="flex justify-between space-x-4">
-                  {/* <Avatar>
-                    <AvatarImage src="https://github.com/vercel.png" />
-                    <AvatarFallback>VC</AvatarFallback>
-                  </Avatar> */}
                   <div className="space-y-1">
-                    {/* <h4 className="text-sm font-semibold">@nextjs</h4> */}
                     <p className="text-sm">You are viewing as admin.</p>
-                    {/* <div className="flex items-center pt-2">
-                      <CalendarDays className="mr-2 h-4 w-4 opacity-70" />
-                      <span className="text-xs text-muted-foreground">Joined December 2021</span>
-                    </div> */}
                   </div>
                 </div>
               </HoverCardContent>
@@ -243,7 +245,7 @@ export default function Navbar() {
                   </div>
                 )}
                 <nav className="flex flex-col space-y-4">
-                  <NavLinks />
+                  <NavLinks mobile />
                   {session?.user.role === "user" && (
                     <Link
                       href="/tickets"
