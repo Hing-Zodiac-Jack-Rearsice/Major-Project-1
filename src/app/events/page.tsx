@@ -66,16 +66,11 @@ const Page = () => {
   useEffect(() => {
     const updateCountdown = () => {
       const now = new Date();
-      const nextEvent = events.find(
-        (event: any) => new Date(event.startDate) > now
-      );
+      const nextEvent = events.find((event: any) => new Date(event.startDate) > now);
       if (nextEvent) {
-        const timeDiff =
-          new Date(nextEvent.startDate).getTime() - now.getTime();
+        const timeDiff = new Date(nextEvent.startDate).getTime() - now.getTime();
         const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor(
-          (timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-        );
+        const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
         setTimeUntilNextEvent(`${days}d ${hours}h ${minutes}m ${seconds}s`);
@@ -94,9 +89,7 @@ const Page = () => {
   const requestSearchApi = debounce(async (query: string) => {
     try {
       const res = await fetch(
-        `/api/events/category/${category}/search?query=${encodeURIComponent(
-          query
-        )}`
+        `/api/events/category/${category}/search?query=${encodeURIComponent(query)}`
       );
       const data = await res.json();
       setSearchedEvents(data.data || []);
@@ -117,19 +110,12 @@ const Page = () => {
   };
 
   const eventsToDisplay =
-    search === ""
-      ? filterUpcomingEvents(events)
-      : filterUpcomingEvents(searchedEvents);
+    search === "" ? filterUpcomingEvents(events) : filterUpcomingEvents(searchedEvents);
 
   return (
     <div className="mt-16 min-h-screen bg-gradient-to-b from-background to-secondary/10">
       <div className="relative h-96 overflow-hidden">
-        <video
-          autoPlay
-          loop
-          muted
-          className="absolute w-full h-full object-cover"
-        >
+        <video autoPlay loop muted className="absolute w-full h-full object-cover">
           <source src="/videos/trailer-video.mp4" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
@@ -183,8 +169,7 @@ const Page = () => {
                 <SelectItem value="all">All Categories</SelectItem>
                 {categories.map((cat: any) => (
                   <SelectItem key={cat.id} value={cat.category}>
-                    {cat.category.charAt(0).toUpperCase() +
-                      cat.category.slice(1).toLowerCase()}
+                    {cat.category.charAt(0).toUpperCase() + cat.category.slice(1).toLowerCase()}
                   </SelectItem>
                 ))}
               </SelectGroup>
@@ -235,7 +220,7 @@ const Page = () => {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.3 }}
       >
-        {session?.user?.role === "admin" && (
+        {/* {session?.user?.role === "admin" && (
           <Button
             size="lg"
             className="rounded-full w-16 h-16 shadow-lg"
@@ -243,7 +228,7 @@ const Page = () => {
           >
             <Plus className="w-8 h-8" />
           </Button>
-        )}
+        )} */}
       </motion.div>
     </div>
   );
