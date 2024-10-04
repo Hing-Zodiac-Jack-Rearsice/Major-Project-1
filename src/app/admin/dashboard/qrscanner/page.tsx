@@ -8,14 +8,21 @@ const Page = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [pStyle, setPStyle] = useState<"success" | "fail">("success");
   const [msg, setMsg] = useState("");
-  const ENCRYPTION_KEY = Buffer.from(process.env.NEXT_PUBLIC_ENCRYPTION_KEY as string, "hex");
+  const ENCRYPTION_KEY = Buffer.from(
+    process.env.NEXT_PUBLIC_ENCRYPTION_KEY as string,
+    "hex"
+  );
   const IV = Buffer.from(process.env.NEXT_PUBLIC_IV as string, "hex");
   const [result, setResult] = useState("");
   const [parsedResult, setParsedResult] = useState<any>(null);
 
   // Decryption function
   const decrypt = (encryptedText: string) => {
-    const decipher = crypto.createDecipheriv("aes-256-cbc", ENCRYPTION_KEY as any, IV as any);
+    const decipher = crypto.createDecipheriv(
+      "aes-256-cbc",
+      ENCRYPTION_KEY as any,
+      IV as any
+    );
     let decrypted = decipher.update(encryptedText, "hex", "utf8");
     decrypted += decipher.final("utf8");
     return decrypted;
@@ -85,7 +92,9 @@ const Page = () => {
     <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-50 dark:bg-zinc-950">
       <div className="max-w-3xl w-full rounded-lg p-6">
         <h1 className="text-2xl font-bold text-center mb-4">QR Code Scanner</h1>
-        <p className="text-center mb-4">Scan your event's QR code to register your attendance.</p>
+        <p className="text-center mb-4">
+          Scan your event&apos QR code to register your attendance.
+        </p>
 
         {/* Larger camera view */}
         <div className="relative w-full h-[75vh] rounded-lg overflow-hidden mb-4">
@@ -104,7 +113,13 @@ const Page = () => {
       </div>
 
       {/* Popup Component for feedback */}
-      {showPopup && <Popup message={msg} onClose={() => setShowPopup(false)} style={pStyle} />}
+      {showPopup && (
+        <Popup
+          message={msg}
+          onClose={() => setShowPopup(false)}
+          style={pStyle}
+        />
+      )}
     </div>
   );
 };
