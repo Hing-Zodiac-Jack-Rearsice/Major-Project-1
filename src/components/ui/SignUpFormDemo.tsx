@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState } from "react";
 import { getSession, signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -159,7 +158,7 @@ export function SignupFormDemo() {
         </CardHeader>
         <CardContent className="p-4 md:p-8 flex-grow flex flex-col">
           <Tabs
-            defaultValue={isLogin ? "l ogin" : "register"}
+            defaultValue="login"
             onValueChange={(value) => setIsLogin(value === "login")}
             className="flex-grow flex flex-col"
           >

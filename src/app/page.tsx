@@ -36,7 +36,7 @@ export default function Home() {
             ) : (
               <Link href="/login">
                 <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white transition duration-200 rounded-lg shadow-[0px_2px_0px_0px_#FFFFFF40_inset]">
-                  Try 7 days free
+                  Try 30 days free
                 </button>
               </Link>
             )}
