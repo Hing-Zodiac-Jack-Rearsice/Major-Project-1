@@ -18,7 +18,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
     }
 
-    const buffer = Buffer.from(await file.arrayBuffer());
+    const buffer: Buffer = Buffer.from(await file.arrayBuffer());
     const filename = Date.now() + "-" + file.name.replaceAll(" ", "_");
     const relativePath = `/uploads/${filename}`;
     const absolutePath = path.join(process.cwd(), "public", relativePath);
@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     const uploadsDir = path.join(process.cwd(), "public", "uploads");
     await fs.promises.mkdir(uploadsDir, { recursive: true });
 
-    await writeFile(absolutePath, buffer as any);
+    await writeFile(absolutePath, buffer);
 
     const imageUrl = `/uploads/${filename}`;
 
