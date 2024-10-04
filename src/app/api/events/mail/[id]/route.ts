@@ -9,7 +9,7 @@ import prisma from "@/lib/db";
 import { error } from "console";
 
 // Encryption key and IV (Initialization Vector)
-export const ENCRYPTION_KEY = Buffer.from(process.env.NEXT_PUBLIC_ENCRYPTION_KEY as string, "hex"); // 256 bits key
+const ENCRYPTION_KEY = Buffer.from(process.env.NEXT_PUBLIC_ENCRYPTION_KEY as string, "hex"); // 256 bits key
 export const IV = Buffer.from(process.env.NEXT_PUBLIC_IV as string, "hex"); // 128 bits IV
 
 const encrypt = (text: any) => {
