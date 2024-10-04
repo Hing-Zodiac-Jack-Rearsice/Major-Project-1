@@ -10,7 +10,7 @@ import { error } from "console";
 
 // Encryption key and IV (Initialization Vector)
 const ENCRYPTION_KEY = Buffer.from(process.env.NEXT_PUBLIC_ENCRYPTION_KEY as string, "hex"); // 256 bits key
-export const IV = Buffer.from(process.env.NEXT_PUBLIC_IV as string, "hex"); // 128 bits IV
+const IV = Buffer.from(process.env.NEXT_PUBLIC_IV as string, "hex"); // 128 bits IV
 
 const encrypt = (text: any) => {
   const cipher = crypto.createCipheriv("aes-256-cbc", ENCRYPTION_KEY as any, IV as any);
