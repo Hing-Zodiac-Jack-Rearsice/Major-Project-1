@@ -29,9 +29,18 @@ import { add, format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { TimePickerDemo } from "@/components/ui/time-picker-demo";
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import {
+  getStorage,
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+} from "firebase/storage";
 import { app } from "@/lib/firebase";
 import Popup from "@/components/popup/Popup";
 import QRCodePreview from "@/components/QRCodePreview";
@@ -40,7 +49,6 @@ import { set } from "lodash";
 import { ticketsSold } from "@/app/actions";
 
 const EventUpdateForm = ({ event, refreshCallback }: any) => {
-  //   const router = useRouter();
   const [showPopup, setShowPopup] = useState(false);
   const [pStyle, setPStyle] = useState<"success" | "fail">("success");
   const [startDate, setStartDate] = React.useState<Date>();
@@ -56,24 +64,9 @@ const EventUpdateForm = ({ event, refreshCallback }: any) => {
   const [qrCodeTheme, setQrCodeTheme] = useState("modern");
   const [isOpen, setIsOpen] = useState(false);
   const [minTicketAmount, setMinticketAmount] = useState(0);
-  //   const getTicketAmount = async () => {
-  //     const ticketsFromEvent = await prisma.event.findUnique({
-  //       where: {
-  //         id: event.id,
-  //       },
-  //       select: {
-  //         ticketAmount: true,
-  //       },
-  //     });
-  //     const ticketsSold = await prisma.ticket.count({
-  //       where: {
-  //         eventId: event.id,
-  //       },
-  //     });
-  //     if (ticketsFromEvent && ticketsSold) {
-  //       setMinticketAmount(ticketsFromEvent?.ticketAmount - ticketsSold);
-  //     }
-  //   };
+  const [ticketsSoldCount, setTicketsSoldCount] = useState(0);
+  const [isEventExpired, setIsEventExpired] = useState(false);
+
   const getCategories = async () => {
     const response = await fetch("/api/category");
     if (response.ok) {
@@ -81,6 +74,7 @@ const EventUpdateForm = ({ event, refreshCallback }: any) => {
       setCategories(data.categories);
     }
   };
+
   useEffect(() => {
     const fetchEventDetails = async () => {
       setCategory(event.categoryName);
@@ -89,12 +83,20 @@ const EventUpdateForm = ({ event, refreshCallback }: any) => {
       setLocation(event.location);
       setTicketAmount(event.ticketAmount);
       setTicketPrice(event.ticketPrice);
-      setCategory(event.categoryName);
+      setQrCodeTheme(event.qrCodeTheme);
       setStartDate(new Date(event.startDate));
       setEndDate(new Date(event.endDate));
-      setQrCodeTheme(event.qrCodeTheme);
-      setMinticketAmount(await ticketsSold(event.id));
+      const soldCount = await ticketsSold(event.id);
+      setMinticketAmount(event.ticketAmount - soldCount);
+      setTicketsSoldCount(soldCount);
+
+      // Check if the event is expired
+      const currentDate = new Date();
+      if (new Date(event.endDate) < currentDate) {
+        setIsEventExpired(true);
+      }
     };
+
     if (event) {
       getCategories();
       fetchEventDetails();
@@ -139,7 +141,8 @@ const EventUpdateForm = ({ event, refreshCallback }: any) => {
       uploadTask.on(
         "state_changed",
         (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           console.log("Upload is " + progress + "% done");
         },
         (error) => {
@@ -216,20 +219,30 @@ const EventUpdateForm = ({ event, refreshCallback }: any) => {
         <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Event</DialogTitle>
-            <DialogDescription>Update the details of the event.</DialogDescription>
+            <DialogDescription>
+              Update the details of the event.
+            </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="flex flex-col gap-2">
               <Label htmlFor="name" className="text-left">
                 Event name
               </Label>
-              <Input id="name" value={eventName} onChange={(e) => setEventName(e.target.value)} />
+              <Input
+                id="name"
+                value={eventName}
+                onChange={(e) => setEventName(e.target.value)}
+              />
             </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="location" className="text-left">
                 Location
               </Label>
-              <Input id="location" value={location} onChange={(e) => setLocation(e.target.value)} />
+              <Input
+                id="location"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+              />
             </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="description" className="text-left">
@@ -253,7 +266,8 @@ const EventUpdateForm = ({ event, refreshCallback }: any) => {
                   <SelectGroup>
                     {categories.map((cat: any) => (
                       <SelectItem key={cat.id} value={cat.category}>
-                        {cat.category.charAt(0).toUpperCase() + cat.category.slice(1).toLowerCase()}
+                        {cat.category.charAt(0).toUpperCase() +
+                          cat.category.slice(1).toLowerCase()}
                       </SelectItem>
                     ))}
                   </SelectGroup>
@@ -302,7 +316,11 @@ const EventUpdateForm = ({ event, refreshCallback }: any) => {
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {startDate ? format(startDate, "PPP HH:mm:ss") : <span>Pick a date</span>}
+                    {startDate ? (
+                      format(startDate, "PPP HH:mm:ss")
+                    ) : (
+                      <span>Pick a date</span>
+                    )}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0">
@@ -332,12 +350,19 @@ const EventUpdateForm = ({ event, refreshCallback }: any) => {
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {endDate ? format(endDate, "PPP HH:mm:ss") : <span>Pick a date</span>}
+                    {endDate ? (
+                      format(endDate, "PPP HH:mm:ss")
+                    ) : (
+                      <span>Pick a date</span>
+                    )}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0">
                   <div className="p-3 border-t border-border">
-                    <TimePickerDemo setDate={handleEndTimeChange} date={endDate} />
+                    <TimePickerDemo
+                      setDate={handleEndTimeChange}
+                      date={endDate}
+                    />
                   </div>
                 </PopoverContent>
               </Popover>
@@ -381,15 +406,34 @@ const EventUpdateForm = ({ event, refreshCallback }: any) => {
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit" onClick={handleUpdate}>
+            <Button
+              type="submit"
+              onClick={handleUpdate}
+              disabled={ticketsSoldCount > 0 || isEventExpired}
+            >
               Update
             </Button>
+            {ticketsSoldCount > 0 && (
+              <p className="text-red-500">
+                You cannot update this event because tickets have already been
+                sold.
+              </p>
+            )}
+            {isEventExpired && (
+              <p className="text-red-500">
+                You cannot update this event because it has already expired.
+              </p>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>
       {showPopup && (
         <Popup
-          message={pStyle === "success" ? "Event updated successfully" : "Failed to update event"}
+          message={
+            pStyle === "success"
+              ? "Event updated successfully"
+              : "Failed to update event"
+          }
           onClose={() => setShowPopup(false)}
           style={pStyle}
         />
