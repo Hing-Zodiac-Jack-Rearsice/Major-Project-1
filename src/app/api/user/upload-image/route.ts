@@ -27,7 +27,7 @@ export async function POST(request: Request) {
         const uploadsDir = path.join(process.cwd(), "public", "uploads");
         await fs.promises.mkdir(uploadsDir, { recursive: true });
 
-        await writeFile(absolutePath, buffer);
+        await writeFile(absolutePath, buffer as any);
 
         const imageUrl = `/uploads/${filename}`;
 
