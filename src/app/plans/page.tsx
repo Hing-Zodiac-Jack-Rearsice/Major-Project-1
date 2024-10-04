@@ -120,7 +120,7 @@ export default function PricingPage() {
             <CardDescription>Everything you need for successful events</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4">
-            <div className="text-4xl font-bold">Free for 7 days</div>
+            <div className="text-4xl font-bold">Free for 30 days</div>
             <p className="text-muted-foreground">Then $9.99 per month after the trial period.</p>
             <ul className="space-y-2">
               {features.map((feature, index) => (
