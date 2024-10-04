@@ -26,10 +26,30 @@ export async function PATCH(request: Request, { params }: { params: { id: string
       where: { id: id as string },
     });
 
-    if (!event || new Date(event.endDate) < new Date()) {
+    if (!event) {
+      return NextResponse.json({ error: "Event not found" }, { status: 404 });
+    }
+
+    const currentDate = new Date();
+    if (new Date(event.endDate) < currentDate) {
       return NextResponse.json({ error: "Cannot update expired event" }, { status: 400 });
     }
 
+    const ticketsSoldCount = await prisma.ticket.count({
+      where: { eventId: id as string },
+    });
+
+    if (ticketsSoldCount > 0) {
+      // If at least one ticket is sold, restrict updates to ticket amount only
+      if (body.ticketAmount !== undefined && body.ticketAmount < ticketsSoldCount) {
+        return NextResponse.json({ error: "Cannot reduce ticket amount below sold tickets" }, { status: 400 });
+      } else {
+        // Prevent other updates if tickets are sold
+        return NextResponse.json({ error: "Cannot update event details after tickets are sold" }, { status: 400 });
+      }
+    }
+
+    // Proceed with the update if no tickets have been sold
     const updatedEvent = await prisma.event.update({
       where: { id: id as string },
       data: {
@@ -51,8 +71,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     console.error("Error updating event:", error);
     return NextResponse.json(
       {
-        error: `Failed to update event: ${error instanceof Error ? error.message : "Unknown error"
-          }`,
+        error: `Failed to update event: ${error instanceof Error ? error.message : "Unknown error"}`,
       },
       { status: 500 }
     );
