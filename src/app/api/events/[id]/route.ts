@@ -22,6 +22,14 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     const { id } = params;
     const body = await request.json();
 
+    const event = await prisma.event.findUnique({
+      where: { id: id as string },
+    });
+
+    if (!event || new Date(event.endDate) < new Date()) {
+      return NextResponse.json({ error: "Cannot update expired event" }, { status: 400 });
+    }
+
     const updatedEvent = await prisma.event.update({
       where: { id: id as string },
       data: {
@@ -43,9 +51,8 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     console.error("Error updating event:", error);
     return NextResponse.json(
       {
-        error: `Failed to update event: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`,
+        error: `Failed to update event: ${error instanceof Error ? error.message : "Unknown error"
+          }`,
       },
       { status: 500 }
     );
