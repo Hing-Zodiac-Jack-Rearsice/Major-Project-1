@@ -150,8 +150,8 @@ export async function BuyTicket(formData: FormData) {
         destination: data?.user?.connectedAccountId as string,
       },
     },
-    success_url: "http://localhost:3000/payment/success",
-    cancel_url: "http://localhost:3000/payment/cancel",
+    success_url: process.env.NEXT_PUBLIC_SUCCESS_URL,
+    cancel_url: process.env.NEXT_PUBLIC_CANCEL_URL,
     metadata: {
       price: data?.ticketPrice as number,
       eventId: id,
