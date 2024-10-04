@@ -8,21 +8,14 @@ const Page = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [pStyle, setPStyle] = useState<"success" | "fail">("success");
   const [msg, setMsg] = useState("");
-  const ENCRYPTION_KEY = Buffer.from(
-    process.env.NEXT_PUBLIC_ENCRYPTION_KEY as string,
-    "hex"
-  );
+  const ENCRYPTION_KEY = Buffer.from(process.env.NEXT_PUBLIC_ENCRYPTION_KEY as string, "hex");
   const IV = Buffer.from(process.env.NEXT_PUBLIC_IV as string, "hex");
   const [result, setResult] = useState("");
   const [parsedResult, setParsedResult] = useState<any>(null);
 
   // Decryption function
   const decrypt = (encryptedText: string) => {
-    const decipher = crypto.createDecipheriv(
-      "aes-256-cbc",
-      ENCRYPTION_KEY as any,
-      IV as any
-    );
+    const decipher = crypto.createDecipheriv("aes-256-cbc", ENCRYPTION_KEY as any, IV as any);
     let decrypted = decipher.update(encryptedText, "hex", "utf8");
     decrypted += decipher.final("utf8");
     return decrypted;
@@ -113,13 +106,7 @@ const Page = () => {
       </div>
 
       {/* Popup Component for feedback */}
-      {showPopup && (
-        <Popup
-          message={msg}
-          onClose={() => setShowPopup(false)}
-          style={pStyle}
-        />
-      )}
+      {showPopup && <Popup message={msg} onClose={() => setShowPopup(false)} style={pStyle} />}
     </div>
   );
 };
