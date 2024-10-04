@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -11,7 +12,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, Loader2, MapPin, Ticket } from "lucide-react";
 import { set } from "date-fns";
@@ -88,7 +95,8 @@ const EventTicketsPage = () => {
               <SelectItem value="all">All Categories</SelectItem>
               {categories.map((cat: any) => (
                 <SelectItem key={cat.id} value={cat.category}>
-                  {cat.category.charAt(0).toUpperCase() + cat.category.slice(1).toLowerCase()}
+                  {cat.category.charAt(0).toUpperCase() +
+                    cat.category.slice(1).toLowerCase()}
                 </SelectItem>
               ))}
             </SelectGroup>
@@ -112,21 +120,29 @@ const EventTicketsPage = () => {
                 />
               </CardHeader>
               <CardContent className="p-4">
-                <CardTitle className="mb-2 text-xl">{ticket.eventName}</CardTitle>
+                <CardTitle className="mb-2 text-xl">
+                  {ticket.eventName}
+                </CardTitle>
                 <div className="mb-2 flex items-center text-sm text-gray-600 dark:text-gray-300">
                   <Calendar className="mr-2 h-4 w-4" />
-                  {new Date(ticket.event.startDate).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
+                  {new Date(ticket.event.startDate).toLocaleDateString(
+                    "en-US",
+                    {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    }
+                  )}
                 </div>
                 <div className="mb-2 flex items-center text-sm text-gray-600 dark:text-gray-300">
                   <Clock className="mr-2 h-4 w-4" />
-                  {new Date(ticket.event.startDate).toLocaleTimeString("en-US", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}{" "}
+                  {new Date(ticket.event.startDate).toLocaleTimeString(
+                    "en-US",
+                    {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    }
+                  )}{" "}
                   -{" "}
                   {new Date(ticket.event.endDate).toLocaleTimeString("en-US", {
                     hour: "2-digit",
@@ -140,7 +156,11 @@ const EventTicketsPage = () => {
               </CardContent>
               <CardFooter className="flex justify-between p-4">
                 <Badge variant="secondary">{ticket.event.categoryName}</Badge>
-                <img src={ticket.qrCodeUrl} alt="QR Code" className="h-12 w-12" />
+                <img
+                  src={ticket.qrCodeUrl}
+                  alt="QR Code"
+                  className="h-12 w-12"
+                />
               </CardFooter>
             </Card>
           ))}
@@ -153,8 +173,8 @@ const EventTicketsPage = () => {
               No tickets found
             </h2>
             <p className="text-gray-600 dark:text-gray-300">
-              It looks like you don't have any tickets yet. Check out our upcoming events and grab
-              your tickets!
+              It looks like you don't have any tickets yet. Check out our
+              upcoming events and grab your tickets!
             </p>
           </div>
         </Card>
@@ -172,7 +192,9 @@ const EventTicketsPage = () => {
                 alt="QR Code"
                 className="w-full max-w-[400px] h-auto mb-6"
               />
-              <h2 className="text-2xl font-bold text-center">{selectedTicket.eventName}</h2>
+              <h2 className="text-2xl font-bold text-center">
+                {selectedTicket.eventName}
+              </h2>
               <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
                 Scan this QR code at the event entrance
               </p>
