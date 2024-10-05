@@ -28,8 +28,8 @@ const Page = () => {
 
   const getCategories = async () => {
     const response = await fetch("/api/category");
-    const data = await response.json();
     if (response.ok) {
+      const data = await response.json();
       setCategories(data.categories);
     }
   };

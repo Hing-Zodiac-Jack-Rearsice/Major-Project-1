@@ -30,12 +30,14 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 export function SignupFormDemo() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const [registerEmail, setRegisterEmail] = useState("");
+  const [registerPassword, setRegisterPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [name, setName] = useState("");
   const [error, setError] = useState("");
-  const [isLogin, setIsLogin] = useState(true);
+  const [activeTab, setActiveTab] = useState("login");
   const { data: session } = useSession();
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
@@ -44,15 +46,15 @@ export function SignupFormDemo() {
     e.preventDefault();
     setError("");
 
-    if (!isLogin && !acceptTerms) {
+    if (activeTab === "register" && !acceptTerms) {
       setError("You must accept the terms and conditions to sign up.");
       return;
     }
 
-    if (isLogin) {
+    if (activeTab === "login") {
       const result = await signIn("credentials", {
-        email,
-        password,
+        email: loginEmail,
+        password: loginPassword,
         redirect: false,
       });
       if (result?.error) {
@@ -64,7 +66,7 @@ export function SignupFormDemo() {
         router.push("/events");
       }
     } else {
-      if (password !== confirmPassword) {
+      if (registerPassword !== confirmPassword) {
         setError("Passwords do not match");
         return;
       }
@@ -72,15 +74,15 @@ export function SignupFormDemo() {
         const response = await fetch("/api/auth/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password, name }),
+          body: JSON.stringify({ email: registerEmail, password: registerPassword, name }),
         });
 
         if (response.ok) {
           const result = await response.json();
           console.log("User registered:", result.user);
           const signInResult = await signIn("credentials", {
-            email,
-            password,
+            email: registerEmail,
+            password: registerPassword,
             redirect: false,
           });
           if (signInResult?.ok) {
@@ -101,7 +103,7 @@ export function SignupFormDemo() {
   };
 
   const handleGoogleSignIn = () => {
-    if (!isLogin && !acceptTerms) {
+    if (activeTab === "register" && !acceptTerms) {
       setError("You must accept the terms and conditions to sign up with Google.");
       return;
     }
@@ -151,15 +153,16 @@ export function SignupFormDemo() {
 
       <Card className="w-full md:w-1/2 rounded-none md:rounded-lg shadow-none md:shadow-lg flex flex-col">
         <CardHeader className="p-4 md:p-8">
-          <CardTitle>{isLogin ? "Welcome back" : "Create an account"}</CardTitle>
+          <CardTitle>{activeTab === "login" ? "Welcome back" : "Create an account"}</CardTitle>
           <CardDescription>
-            {isLogin ? "Sign in to your account" : "Sign up for a new account"}
+            {activeTab === "login" ? "Sign in to your account" : "Sign up for a new account"}
           </CardDescription>
         </CardHeader>
         <CardContent className="p-4 md:p-8 flex-grow flex flex-col">
           <Tabs
             defaultValue="login"
-            onValueChange={(value) => setIsLogin(value === "login")}
+            value={activeTab}
+            onValueChange={(value) => setActiveTab(value)}
             className="flex-grow flex flex-col"
           >
             <TabsList className="grid w-full grid-cols-2">
@@ -170,23 +173,23 @@ export function SignupFormDemo() {
               <form onSubmit={handleSubmit} className="flex flex-col flex-grow">
                 <div className="space-y-4 flex-grow">
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="login-email">Email</Label>
                     <Input
-                      id="email"
+                      id="login-email"
                       placeholder="johndoe@example.com"
                       type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      value={loginEmail}
+                      onChange={(e) => setLoginEmail(e.target.value)}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="login-password">Password</Label>
                     <Input
-                      id="password"
+                      id="login-password"
                       placeholder="••••••••"
                       type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      value={loginPassword}
+                      onChange={(e) => setLoginPassword(e.target.value)}
                     />
                   </div>
                 </div>
@@ -209,23 +212,23 @@ export function SignupFormDemo() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="register-email">Email</Label>
                     <Input
-                      id="email"
+                      id="register-email"
                       placeholder="johndoe@example.com"
                       type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      value={registerEmail}
+                      onChange={(e) => setRegisterEmail(e.target.value)}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="register-password">Password</Label>
                     <Input
-                      id="password"
+                      id="register-password"
                       placeholder="••••••••"
                       type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      value={registerPassword}
+                      onChange={(e) => setRegisterPassword(e.target.value)}
                     />
                   </div>
                   <div className="space-y-2">
@@ -284,7 +287,7 @@ export function SignupFormDemo() {
           </div>
           <Button variant="outline" className="w-full" onClick={handleGoogleSignIn}>
             <IconBrandGoogle className="mr-2 h-4 w-4" />
-            {isLogin ? "Sign in with Google" : "Sign up with Google"}
+            {activeTab === "login" ? "Sign in with Google" : "Sign up with Google"}
           </Button>
         </CardFooter>
       </Card>
