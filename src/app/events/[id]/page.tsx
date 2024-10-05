@@ -138,8 +138,12 @@ export default function EventPage() {
             )}
             <CardFooter className="flex justify-start pt-6">
               {session?.user.role === "admin" ? (
-                <Button variant="secondary" className="w-full md:w-auto">
-                  Admins are not permitted to purchase. View only.
+                <Button
+                  variant="secondary"
+                  className="w-full md:max-w-min"
+                  style={{ width: "fit-content" }}
+                >
+                  Admins are not permitted to purchase. view only
                 </Button>
               ) : (
                 <BuyButton
