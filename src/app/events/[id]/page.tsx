@@ -136,12 +136,11 @@ export default function EventPage() {
             ) : (
               <TicketsLeftCard ticketsLeft={ticketsLeft} />
             )}
-            <CardFooter className="flex justify-start pt-6">
+            <CardFooter className="flex justify-start pt-6 sm:flex-row sm:justify-between sm:space-x-4">
               {session?.user.role === "admin" ? (
                 <Button
                   variant="secondary"
-                  className="w-full md:max-w-min"
-                  style={{ width: "fit-content" }}
+                  className="w-full sm:max-w-min sm:flex-1"
                 >
                   Admins are not permitted to purchase. view only
                 </Button>
@@ -150,6 +149,7 @@ export default function EventPage() {
                   eventId={event.id}
                   ticketPrice={event.ticketPrice}
                   userEmail={session?.user.email}
+                  className="sm:flex-1"
                 />
               )}
             </CardFooter>
