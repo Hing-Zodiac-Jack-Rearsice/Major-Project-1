@@ -5,6 +5,7 @@ import { stripe } from "@/lib/stripe";
 import { redirect } from "next/navigation";
 import { NextResponse } from "next/server";
 
+// url change depend on production and localhost
 const url = process.env.NEXT_PUBLIC_URL;
 export async function checkForDelete(eventId: any) {
   const canDelete = await prisma.event.findUnique({
