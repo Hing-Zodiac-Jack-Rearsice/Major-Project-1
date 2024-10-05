@@ -142,7 +142,7 @@ export default function EventPage() {
                   variant="secondary"
                   className="w-full sm:max-w-min sm:flex-1"
                 >
-                  Admins are not permitted to purchase. view only
+                  Admins are allow to view only
                 </Button>
               ) : (
                 <BuyButton
