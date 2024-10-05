@@ -4,6 +4,8 @@ import prisma from "@/lib/db";
 import { stripe } from "@/lib/stripe";
 import { redirect } from "next/navigation";
 import { NextResponse } from "next/server";
+
+const url = process.env.NEXT_PUBLIC_URL;
 export async function checkForDelete(eventId: any) {
   const canDelete = await prisma.event.findUnique({
     where: {
@@ -150,8 +152,8 @@ export async function BuyTicket(formData: FormData) {
         destination: data?.user?.connectedAccountId as string,
       },
     },
-    success_url: process.env.NEXT_PUBLIC_SUCCESS_URL,
-    cancel_url: process.env.NEXT_PUBLIC_CANCEL_URL,
+    success_url: `${url}/payment/success`,
+    cancel_url: `${url}/payment/cancel`,
     metadata: {
       price: data?.ticketPrice as number,
       eventId: id,
@@ -174,8 +176,8 @@ export async function CreateStripeAccountLink() {
   });
   const accountLink = await stripe.accountLinks.create({
     account: data?.connectedAccountId as string,
-    refresh_url: "http://localhost:3000",
-    return_url: "http://localhost:3000/admin/dashboard",
+    refresh_url: `${url}`,
+    return_url: `${url}/admin/dashboard`,
     type: "account_onboarding",
   });
   return redirect(accountLink.url as string);

@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 export async function POST(request: Request) {
+  const url = process.env.NEXT_PUBLIC_URL;
   const body = await request.text();
   const signature = headers().get("Stripe-Signature") as string;
   let event;
@@ -25,7 +26,7 @@ export async function POST(request: Request) {
       const price = session?.metadata?.price;
       //  post req to generate qr code and mail to the buyer after payment is confirmed
       // also generating attendace data for that specific user
-      const res = await fetch(`http://localhost:3000/api/events/mail/${eventId}`, {
+      const res = await fetch(`${url}/api/events/mail/${eventId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -33,7 +34,7 @@ export async function POST(request: Request) {
         body: JSON.stringify({ userEmail, userName }),
       });
       // post req to generate sales data
-      const generateSale = await fetch(`http://localhost:3000/api/sales`, {
+      const generateSale = await fetch(`${url}/api/sales`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

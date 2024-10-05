@@ -6,8 +6,7 @@ import { NextResponse } from "next/server";
 // encryption module
 import crypto from "crypto";
 import prisma from "@/lib/db";
-import { error } from "console";
-
+const url = process.env.NEXT_PUBLIC_URL;
 // Encryption key and IV (Initialization Vector)
 const ENCRYPTION_KEY = Buffer.from(process.env.NEXT_PUBLIC_ENCRYPTION_KEY as string, "hex"); // 256 bits key
 const IV = Buffer.from(process.env.NEXT_PUBLIC_IV as string, "hex"); // 128 bits IV
@@ -28,7 +27,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
   if (emailFromBody !== "") {
     const { id } = params;
     // use id params to find unique event
-    const res = await fetch(`http://localhost:3000/api/events/${id}`);
+    const res = await fetch(`${url}/api/events/${id}`);
     //   if data is received successfully from api run the below methods to generate qr and send the qr ticket to the buyer
 
     if (res.ok) {
@@ -80,7 +79,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
         });
         const qrBuffer = Buffer.from(qrUri.split(",")[1], "base64");
         const qrUrl = await uploadQr(qrBuffer);
-        const res = await fetch("http://localhost:3000/api/events/tickets", {
+        const res = await fetch(`${url}/api/events/tickets`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -100,7 +99,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
 
       const addUserToAttendace = async () => {
         try {
-          const res = await fetch(`http://localhost:3000/api/attendance/${id}`, {
+          const res = await fetch(`${url}/api/attendance/${id}`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -197,7 +196,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
     The ${uniqueEvent?.eventName} Team`,
           qrUrl: qrUrl,
         };
-        const res = await fetch(`http://localhost:3000/api/mail`, {
+        const res = await fetch(`${url}/api/mail`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
