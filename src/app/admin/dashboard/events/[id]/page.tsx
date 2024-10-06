@@ -17,9 +17,13 @@ import { AttendanceChart } from "@/components/dashboard/events/AttendanceChart";
 import { SalesCard } from "@/components/dashboard/events/SalesCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, Clock, MapPin, Ticket, Users, ChevronLeft, Edit } from "lucide-react";
+import { Calendar, MapPin, Ticket, ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import EventUpdateForm from "@/components/dashboard/events/EventUpdateForm";
 import { remainingTickets } from "@/app/actions";
@@ -30,18 +34,32 @@ const EventPage = () => {
   const [attendance, setAttendance] = useState<any>(null);
   const { id } = useParams();
   const [ticketsLeft, setTicketsLeft] = useState(0);
+  const [loading, setLoading] = useState(true); // Track loading state
 
   const fetchEvent = async () => {
-    const resEvent = await fetch(`/api/events/${id}`);
-    const data = await resEvent.json();
-    setEvent(data.event);
-    setTicketsLeft(await remainingTickets(id));
+    setLoading(true); // Set loading state
+    try {
+      const resEvent = await fetch(`/api/events/${id}`);
+      if (!resEvent.ok) throw new Error("Failed to fetch event");
+      const data = await resEvent.json();
+      setEvent(data.event);
+      setTicketsLeft(await remainingTickets(id));
+    } catch (error) {
+      console.error("Error fetching event:", error);
+    } finally {
+      setLoading(false); // Reset loading state
+    }
   };
 
   const fetchAttendance = async () => {
-    const resAttendance = await fetch(`/api/attendance/events/${id}`);
-    const attendanceData = await resAttendance.json();
-    setAttendance(attendanceData.attendance);
+    try {
+      const resAttendance = await fetch(`/api/attendance/events/${id}`);
+      if (!resAttendance.ok) throw new Error("Failed to fetch attendance");
+      const attendanceData = await resAttendance.json();
+      setAttendance(attendanceData.attendance);
+    } catch (error) {
+      console.error("Error fetching attendance:", error);
+    }
   };
 
   const handleUpdateEvent = (updatedEvent: any) => {
@@ -51,9 +69,9 @@ const EventPage = () => {
   useEffect(() => {
     fetchEvent();
     fetchAttendance();
-  }, []);
+  }, [id]); // Fetch data when the ID changes
 
-  if (!event) return <LoadingSpinner />;
+  if (loading) return <LoadingSpinner />; // Show loading spinner while fetching
 
   const eventDate = new Date(event.startDate);
   const eventEndDate = new Date(event.endDate);
@@ -78,14 +96,20 @@ const EventPage = () => {
   return (
     <div className="min-h-screen bg-background sm:pl-14">
       <div className="relative h-64 md:h-96 w-full">
-        <img src={event.imageUrl} alt={event.eventName} className="w-full h-full object-cover" />
+        <img
+          src={event.imageUrl}
+          alt={event.eventName}
+          className="w-full h-full object-cover"
+        />
         <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-end p-6">
           <Link href="/admin/dashboard/events" className="w-fit">
             <Button variant="outline" className="self-start mb-4">
               <ChevronLeft className="mr-2 h-4 w-4" /> Back to Events
             </Button>
           </Link>
-          <h1 className="text-3xl font-semibold text-white sm:text-5xl mb-2">{event.eventName}</h1>
+          <h1 className="text-3xl font-semibold text-white sm:text-5xl mb-2">
+            {event.eventName}
+          </h1>
           <p className="text-xl text-white">{formattedDate}</p>
         </div>
       </div>
@@ -102,7 +126,9 @@ const EventPage = () => {
               </Button>
             </HoverCardTrigger>
             <HoverCardContent className="w-64">
-              <p className="text-sm">These details will be visible to the client side</p>
+              <p className="text-sm">
+                These details will be visible to the client side
+              </p>
             </HoverCardContent>
           </HoverCard>
           <EventUpdateForm event={event} refreshCallback={fetchEvent} />
@@ -152,7 +178,9 @@ const EventPage = () => {
                 <Progress value={ticketPercentage} className="h-2" />
                 <div className="flex justify-between text-sm">
                   <span>Available:</span>
-                  <span className="font-medium text-green-600">{ticketsLeft}</span>
+                  <span className="font-medium text-green-600">
+                    {ticketsLeft}
+                  </span>
                 </div>
               </div>
             </CardContent>
