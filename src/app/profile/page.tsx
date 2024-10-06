@@ -20,6 +20,7 @@ const ProfilePage = () => {
   });
   const [file, setFile] = useState<File | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false); // New state for loading
 
   const fetchUserData = useCallback(async () => {
     try {
@@ -89,6 +90,7 @@ const ProfilePage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true); // Set loading state to true
     try {
       let imageUrl = formData.image;
       if (file) {
@@ -122,6 +124,8 @@ const ProfilePage = () => {
           ? error.message
           : "An error occurred while updating the profile. Please try again."
       );
+    } finally {
+      setIsSubmitting(false); // Reset loading state
     }
   };
 
@@ -202,7 +206,9 @@ const ProfilePage = () => {
             )}
             {isEditing ? (
               <>
-                <Button type="submit">Save Changes</Button>
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? "Updating..." : "Save Changes"}
+                </Button>
                 <Button
                   type="button"
                   variant="outline"
