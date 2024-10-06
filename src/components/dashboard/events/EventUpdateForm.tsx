@@ -66,6 +66,7 @@ const EventUpdateForm = ({ event, refreshCallback }: any) => {
   const [minTicketAmount, setMinticketAmount] = useState(0);
   const [ticketsSoldCount, setTicketsSoldCount] = useState(0);
   const [isEventExpired, setIsEventExpired] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false); // Track submission status
 
   const getCategories = async () => {
     const response = await fetch("/api/category");
@@ -160,6 +161,9 @@ const EventUpdateForm = ({ event, refreshCallback }: any) => {
     });
   };
   const handleUpdate = async () => {
+    if (isSubmitting) return; // Prevent multiple submissions
+    setIsSubmitting(true); // Set submitting state
+
     let imageUrl = "";
     if (file) {
       try {
@@ -168,6 +172,7 @@ const EventUpdateForm = ({ event, refreshCallback }: any) => {
         console.error("Error uploading image:", error);
         setShowPopup(true);
         setPStyle("fail");
+        setIsSubmitting(false); // Reset submitting state
         return;
       }
     }
@@ -204,6 +209,8 @@ const EventUpdateForm = ({ event, refreshCallback }: any) => {
       console.error("Error updating event:", error);
       setShowPopup(true);
       setPStyle("fail");
+    } finally {
+      setIsSubmitting(false); // Reset submitting state
     }
   };
 
@@ -409,9 +416,9 @@ const EventUpdateForm = ({ event, refreshCallback }: any) => {
             <Button
               type="submit"
               onClick={handleUpdate}
-              disabled={ticketsSoldCount > 0 || isEventExpired}
+              disabled={ticketsSoldCount > 0 || isEventExpired || isSubmitting}
             >
-              Update
+              {isSubmitting ? "Updating..." : "Update"}
             </Button>
             {ticketsSoldCount > 0 && (
               <p className="text-red-500">
