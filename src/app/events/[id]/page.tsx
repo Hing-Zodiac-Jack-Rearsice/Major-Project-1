@@ -5,22 +5,9 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import BuyButton from "@/components/events/BuyButton";
-import {
-  CalendarDays,
-  Clock,
-  MapPin,
-  Ticket,
-  Users,
-  Star,
-  Coffee,
-} from "lucide-react";
+import { CalendarDays, Clock, MapPin, Ticket, Users, Star, Coffee } from "lucide-react";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { remainingTickets } from "@/app/actions";
 
@@ -104,11 +91,7 @@ export default function EventPage() {
     <div className="container mx-auto px-4 py-8">
       <Card className="overflow-hidden shadow-lg">
         <div className="relative h-96">
-          <img
-            src={event.imageUrl}
-            alt={event.eventName}
-            className="w-full h-full object-cover"
-          />
+          <img src={event.imageUrl} alt={event.eventName} className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />
           <h1 className="absolute bottom-4 left-4 text-4xl font-bold text-white">
             {event.eventName}
@@ -131,18 +114,11 @@ export default function EventPage() {
               title="Location"
               content={event.location}
             />
-            {loadingTickets ? (
-              <LoadingSpinner />
-            ) : (
-              <TicketsLeftCard ticketsLeft={ticketsLeft} />
-            )}
+            {loadingTickets ? <LoadingSpinner /> : <TicketsLeftCard ticketsLeft={ticketsLeft} />}
             <CardFooter className="flex justify-start pt-6 sm:flex-row sm:justify-between sm:space-x-4">
               {session?.user.role === "admin" ? (
-                <Button
-                  variant="secondary"
-                  className="w-full sm:max-w-min sm:flex-1"
-                >
-                  Admins are allow to view only
+                <Button variant="secondary" className="w-full sm:max-w-min sm:flex-1">
+                  Admins are in view only
                 </Button>
               ) : (
                 <BuyButton
@@ -155,18 +131,13 @@ export default function EventPage() {
             </CardFooter>
           </div>
           <div className="md:col-span-2 space-y-8">
-            <EventSection
-              title="About This Event"
-              content={event.description}
-            />
+            <EventSection title="About This Event" content={event.description} />
             <EventSection
               title="What to Expect"
               content={
                 <ul className="list-disc list-inside space-y-2 text-muted-foreground">
                   <li>Engaging presentations from industry experts</li>
-                  <li>
-                    Networking opportunities with like-minded professionals
-                  </li>
+                  <li>Networking opportunities with like-minded professionals</li>
                   <li>Interactive workshops and hands-on sessions</li>
                   <li>Delicious refreshments and meals provided</li>
                 </ul>
@@ -223,13 +194,7 @@ function TicketsLeftCard({ ticketsLeft }: { ticketsLeft: number }) {
   );
 }
 
-function EventSection({
-  title,
-  content,
-}: {
-  title: string;
-  content: React.ReactNode;
-}) {
+function EventSection({ title, content }: { title: string; content: React.ReactNode }) {
   return (
     <div className="space-y-2">
       <h2 className="text-2xl font-semibold">{title}</h2>
@@ -260,20 +225,15 @@ function EventSchedule() {
       content={
         <div className="space-y-4">
           <p className="text-muted-foreground">
-            The event will feature a full-day schedule packed with keynote
-            sessions, panel discussions, and interactive workshops. Here's a
-            breakdown of the day's schedule:
+            The event will feature a full-day schedule packed with keynote sessions, panel
+            discussions, and interactive workshops. Here's a breakdown of the day's schedule:
           </p>
           <ul className="space-y-2">
             {scheduleItems.map((item, index) => (
-              <li
-                key={index}
-                className="flex items-start space-x-3 bg-secondary/5 rounded-md p-3"
-              >
+              <li key={index} className="flex items-start space-x-3 bg-secondary/5 rounded-md p-3">
                 <Clock className="w-5 h-5 text-primary mt-1" />
                 <div>
-                  <span className="font-semibold">{item.time}:</span>{" "}
-                  {item.event}
+                  <span className="font-semibold">{item.time}:</span> {item.event}
                 </div>
               </li>
             ))}
@@ -289,8 +249,7 @@ function FeaturedSpeakers() {
     {
       name: "John Doe",
       title: "CEO of Tech Innovators",
-      description:
-        "A visionary leader with 20+ years of experience in the tech industry.",
+      description: "A visionary leader with 20+ years of experience in the tech industry.",
     },
     {
       name: "Jane Smith",
@@ -310,21 +269,16 @@ function FeaturedSpeakers() {
       content={
         <div className="space-y-4">
           <p className="text-muted-foreground">
-            Our event brings together leading experts from various industries to
-            share their knowledge and insights.
+            Our event brings together leading experts from various industries to share their
+            knowledge and insights.
           </p>
           <ul className="space-y-4">
             {speakers.map((speaker, index) => (
-              <li
-                key={index}
-                className="flex items-start space-x-3 bg-secondary/5 rounded-md p-3"
-              >
+              <li key={index} className="flex items-start space-x-3 bg-secondary/5 rounded-md p-3">
                 <Users className="w-5 h-5 text-primary mt-1" />
                 <div>
                   <div className="font-semibold">{speaker.name}</div>
-                  <div className="text-sm text-muted-foreground">
-                    {speaker.title}
-                  </div>
+                  <div className="text-sm text-muted-foreground">{speaker.title}</div>
                   <div className="mt-1 text-sm">{speaker.description}</div>
                 </div>
               </li>
@@ -350,16 +304,13 @@ function PastEventHighlights() {
       content={
         <div className="space-y-4">
           <p className="text-muted-foreground">
-            Our previous events have been highly successful, bringing together
-            professionals from various industries to collaborate and share
-            ideas. Here are some highlights from our last event:
+            Our previous events have been highly successful, bringing together professionals from
+            various industries to collaborate and share ideas. Here are some highlights from our
+            last event:
           </p>
           <ul className="space-y-2">
             {highlights.map((highlight, index) => (
-              <li
-                key={index}
-                className="flex items-start space-x-3 bg-secondary/5 rounded-md p-3"
-              >
+              <li key={index} className="flex items-start space-x-3 bg-secondary/5 rounded-md p-3">
                 <Star className="w-5 h-5 text-primary mt-1" />
                 <div>{highlight}</div>
               </li>
@@ -383,8 +334,7 @@ function EventSponsors() {
     },
     {
       name: "CloudX",
-      description:
-        "Cloud hosting and data storage solutions trusted by Fortune 500 companies.",
+      description: "Cloud hosting and data storage solutions trusted by Fortune 500 companies.",
     },
   ];
 
@@ -394,19 +344,14 @@ function EventSponsors() {
       content={
         <div className="space-y-4">
           <p className="text-muted-foreground">
-            We are proud to partner with the following companies to bring you
-            this incredible event:
+            We are proud to partner with the following companies to bring you this incredible event:
           </p>
           <ul className="space-y-2">
             {sponsors.map((sponsor, index) => (
-              <li
-                key={index}
-                className="flex items-start space-x-3 bg-secondary/5 rounded-md p-3"
-              >
+              <li key={index} className="flex items-start space-x-3 bg-secondary/5 rounded-md p-3">
                 <Coffee className="w-5 h-5 text-primary mt-1" />
                 <div>
-                  <span className="font-semibold">{sponsor.name}</span> -{" "}
-                  {sponsor.description}
+                  <span className="font-semibold">{sponsor.name}</span> - {sponsor.description}
                 </div>
               </li>
             ))}
@@ -440,14 +385,10 @@ function AdditionalInformation() {
       content={
         <ul className="space-y-2">
           {info.map((item, index) => (
-            <li
-              key={index}
-              className="flex items-start space-x-3 bg-secondary/5 rounded-md p-3"
-            >
+            <li key={index} className="flex items-start space-x-3 bg-secondary/5 rounded-md p-3">
               <MapPin className="w-5 h-5 text-primary mt-1" />
               <div>
-                <span className="font-semibold">{item.title}:</span>{" "}
-                {item.content}
+                <span className="font-semibold">{item.title}:</span> {item.content}
               </div>
             </li>
           ))}

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { BuyTicket, checkForPurchase, checkForSoldOut } from "@/app/actions";
 import prisma from "@/lib/db";
+import { ShoppingCart } from "lucide-react";
 
 const BuyButton = ({ eventId, ticketPrice, userEmail }: any) => {
   //   console.log(ticketPrice);
@@ -33,7 +34,7 @@ const BuyButton = ({ eventId, ticketPrice, userEmail }: any) => {
         type="submit"
         className=" bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition duration-300 ease-in-out"
       >
-        {ticketPrice} $
+        <ShoppingCart className="mr-2 h-4 w-4" /> Buy {ticketPrice} $
       </Button>
     </form>
   );
