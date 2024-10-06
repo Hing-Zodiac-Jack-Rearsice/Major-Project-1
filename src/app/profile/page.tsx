@@ -7,59 +7,90 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import Image from "next/image";
 
 const ProfilePage = () => {
   const { data: session, update } = useSession();
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [image, setImage] = useState("");
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    image: "",
+  });
   const [file, setFile] = useState<File | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
+  const fetchUserData = useCallback(async () => {
+    try {
+      const response = await fetch("/api/user/getUserInfo");
+      if (response.ok) {
+        const userData = await response.json();
+        setFormData({
+          name: userData.name || "",
+          email: userData.email || "",
+          password: "",
+          image: userData.image || "",
+        });
+        setPreviewImage(userData.image || "");
+      } else {
+        throw new Error("Failed to fetch user data");
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      alert("Failed to load user data. Please try again.");
+    }
+  }, []);
+
   useEffect(() => {
-    console.log("Session:", session);
     if (session?.user) {
       if (session.user.role !== "user") {
         router.push("/unauthorized");
         return;
       }
-      setName(session.user.name || "");
-      setEmail(session.user.email || "");
-      setImage(session.user.image || "");
+      fetchUserData();
     }
-  }, [session, router]);
+  }, [session, router, fetchUserData]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (selectedFile) {
+      setFile(selectedFile);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewImage(reader.result as string);
+      };
+      reader.readAsDataURL(selectedFile);
+    }
+  };
 
   const uploadImage = useCallback(async (file: File) => {
     const formData = new FormData();
     formData.append("file", file);
 
-    try {
-      const uploadResponse = await fetch("/api/user/upload-image", {
-        method: "POST",
-        body: formData,
-      });
+    const uploadResponse = await fetch("/api/user/upload-image", {
+      method: "POST",
+      body: formData,
+    });
 
-      if (!uploadResponse.ok) {
-        const errorData = await uploadResponse.json();
-        throw new Error(errorData.error || "Failed to upload image");
-      }
-
-      const { imageUrl } = await uploadResponse.json();
-      return imageUrl;
-    } catch (error) {
-      console.error("Error uploading image:", error);
-      throw error;
+    if (!uploadResponse.ok) {
+      const errorData = await uploadResponse.json();
+      throw new Error(errorData.error || "Failed to upload image");
     }
+
+    const { imageUrl } = await uploadResponse.json();
+    return imageUrl;
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      let imageUrl = image;
+      let imageUrl = formData.image;
       if (file) {
         imageUrl = await uploadImage(file);
       }
@@ -67,18 +98,19 @@ const ProfilePage = () => {
       const response = await fetch("/api/user/update", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password, image: imageUrl }),
+        body: JSON.stringify({ ...formData, image: imageUrl }),
       });
 
       if (response.ok) {
         const updatedUser = await response.json();
-        await update({ name, email, image: imageUrl });
-        setImage(imageUrl);
-        setPreviewImage(imageUrl); // Set preview image to the new URL
+        await update({ ...formData, image: imageUrl });
+        setFormData((prev) => ({ ...prev, image: imageUrl }));
+        setPreviewImage(imageUrl);
         alert("Profile updated successfully");
         setIsEditing(false);
-        setPassword("");
         setFile(null);
+        // Fetch the latest user data after update
+        fetchUserData();
       } else {
         const errorData = await response.json();
         throw new Error(errorData.error || "Failed to update profile");
@@ -104,8 +136,11 @@ const ProfilePage = () => {
           <CardTitle>User Profile</CardTitle>
           <div className="flex justify-center mb-4">
             <Avatar className="w-24 h-24">
-              <AvatarImage src={previewImage || image} alt={name} />
-              <AvatarFallback>{name?.charAt(0)}</AvatarFallback>
+              <AvatarImage
+                src={previewImage || formData.image}
+                alt={formData.name}
+              />
+              <AvatarFallback>{formData.name?.charAt(0)}</AvatarFallback>
             </Avatar>
           </div>
         </CardHeader>
@@ -116,19 +151,10 @@ const ProfilePage = () => {
                 <Label htmlFor="image">Profile Image</Label>
                 <Input
                   id="image"
+                  name="image"
                   type="file"
                   accept="image/*"
-                  onChange={(e) => {
-                    const selectedFile = e.target.files?.[0];
-                    if (selectedFile) {
-                      setFile(selectedFile);
-                      const reader = new FileReader();
-                      reader.onloadend = () => {
-                        setPreviewImage(reader.result as string);
-                      };
-                      reader.readAsDataURL(selectedFile);
-                    }
-                  }}
+                  onChange={handleFileChange}
                 />
               </div>
             )}
@@ -137,12 +163,13 @@ const ProfilePage = () => {
               {isEditing ? (
                 <Input
                   id="name"
+                  name="name"
                   type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  value={formData.name}
+                  onChange={handleInputChange}
                 />
               ) : (
-                <p>{name}</p>
+                <p>{formData.name}</p>
               )}
             </div>
             <div>
@@ -150,12 +177,13 @@ const ProfilePage = () => {
               {isEditing ? (
                 <Input
                   id="email"
+                  name="email"
                   type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={formData.email}
+                  onChange={handleInputChange}
                 />
               ) : (
-                <p>{email}</p>
+                <p>{formData.email}</p>
               )}
             </div>
             {isEditing && (
@@ -165,9 +193,10 @@ const ProfilePage = () => {
                 </Label>
                 <Input
                   id="password"
+                  name="password"
                   type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={formData.password}
+                  onChange={handleInputChange}
                 />
               </div>
             )}
