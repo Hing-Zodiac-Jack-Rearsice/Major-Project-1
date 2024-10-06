@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "@/components/ui/use-toast";
 import { UserCircle, CalendarClock, Users, AlertTriangle } from "lucide-react";
+import { signIn } from "next-auth/react"; // Import signIn
 
 export default function SuperAdminDashboard() {
   const { data: session, status } = useSession();
@@ -100,7 +101,8 @@ export default function SuperAdminDashboard() {
 
     if (res.ok) {
       toast({ title: "User role updated successfully" });
-      fetchUsers();
+      await signIn(); // Refresh the session
+      fetchUsers(); // Optionally refetch users if needed
     } else {
       const errorData = await res.json();
       toast({
