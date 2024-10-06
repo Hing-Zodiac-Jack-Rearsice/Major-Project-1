@@ -107,7 +107,7 @@ export function SignupFormDemo() {
       setError("You must accept the terms and conditions to sign up with Google.");
       return;
     }
-    signIn("google", { callbackUrl: "http://localhost:3000/events" });
+    signIn("google", { redirectTo: `${process.env.NEXT_PUBLIC_URL}/events` });
   };
 
   const termsAndConditions = `
