@@ -68,6 +68,7 @@ const EventForm: React.FC<EventFormProps> = ({
   const [categories, setCategories] = useState<any>([]);
   const [qrCodeTheme, setQrCodeTheme] = useState("modern");
   const [isOpen, setIsOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false); // Track submission status
 
   useEffect(() => {
     const getCategories = async () => {
@@ -139,6 +140,17 @@ const EventForm: React.FC<EventFormProps> = ({
   };
 
   const handleUpload = async () => {
+    if (isSubmitting) return; // Prevent multiple submissions
+    setIsSubmitting(true); // Set submitting state
+
+    // Validate required fields
+    if (!eventName || !startDate || !endDate || !location) {
+      setShowPopup(true);
+      setPStyle("fail");
+      setIsSubmitting(false); // Reset submitting state
+      return;
+    }
+
     if (file) {
       try {
         const imageUrl = await uploadImage(file);
@@ -171,10 +183,13 @@ const EventForm: React.FC<EventFormProps> = ({
         console.error("Error creating event:", error);
         setShowPopup(true);
         setPStyle("fail");
+      } finally {
+        setIsSubmitting(false); // Reset submitting state
       }
     } else {
       setShowPopup(true);
       setPStyle("fail");
+      setIsSubmitting(false); // Reset submitting state
     }
   };
 
@@ -377,8 +392,12 @@ const EventForm: React.FC<EventFormProps> = ({
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit" onClick={handleUpload}>
-              Create
+            <Button
+              type="submit"
+              onClick={handleUpload}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Creating..." : "Create"}
             </Button>
           </DialogFooter>
         </DialogContent>
