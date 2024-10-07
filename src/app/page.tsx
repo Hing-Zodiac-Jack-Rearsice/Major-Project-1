@@ -12,42 +12,66 @@ export default function Home() {
 
   return (
     <div className="bg-white dark:bg-black text-gray-900 dark:text-white">
-      <div className="w-full mx-auto h-screen overflow-hidden mt-14">
-        <Vortex
-          backgroundColor="transparent"
-          rangeY={500}
-          particleCount={350}
-          baseHue={150}
-          className="flex items-center flex-col justify-center px-2 md:px-10 py-4 w-full h-full z-0 [&>canvas]:opacity-30 dark:[&>canvas]:opacity-100"
-        >
-          <h2 className="text-2xl md:text-6xl font-bold text-center">
-            The Only Ticketing System You&apos;ll Ever Need
-          </h2>
-          <p className="text-sm md:text-2xl max-w-xl mt-6 text-center">
-            Sombot enables you to streamline your ticket sales and enhance your customer experience.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center gap-4 mt-6">
-            {session ? (
+      {session?.user.role === "admin" ? (
+        <div className="w-full mx-auto h-screen overflow-hidden mt-14">
+          <Vortex
+            backgroundColor="transparent"
+            rangeY={500}
+            particleCount={350}
+            baseHue={150}
+            className="flex items-center flex-col justify-center px-2 md:px-10 py-4 w-full h-full z-0 [&>canvas]:opacity-30 dark:[&>canvas]:opacity-100"
+          >
+            <h2 className="text-2xl md:text-6xl font-bold text-center">
+              The Only Ticketing System You&apos;ll Ever Need
+            </h2>
+            <p className="text-sm md:text-2xl max-w-xl mt-6 text-center">
+              Sombot enables you to streamline your ticket sales and enhance your customer
+              experience.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center gap-4 mt-6">
               <Link href="/plans">
                 <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white transition duration-200 rounded-lg shadow-[0px_2px_0px_0px_#FFFFFF40_inset]">
-                  Try 30 days free
+                  View events
                 </button>
               </Link>
-            ) : (
-              <Link href="/login">
+              <Link href="/plans">
+                <button className="px-4 py-2 border border-current rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition duration-200">
+                  Learn more
+                </button>
+              </Link>
+            </div>
+          </Vortex>
+        </div>
+      ) : (
+        <div className="w-full mx-auto h-screen overflow-hidden mt-14">
+          <Vortex
+            backgroundColor="transparent"
+            rangeY={500}
+            particleCount={350}
+            baseHue={150}
+            className="flex items-center flex-col justify-center px-2 md:px-10 py-4 w-full h-full z-0 [&>canvas]:opacity-30 dark:[&>canvas]:opacity-100"
+          >
+            <h2 className="text-2xl md:text-6xl font-bold text-center">
+              Looking to purchase tickets?
+            </h2>
+            <p className="text-sm md:text-2xl max-w-xl mt-6 text-center">
+              Find events and experiences that fit your desires
+            </p>
+            <div className="flex flex-col sm:flex-row items-center gap-4 mt-6">
+              <Link href="/events">
                 <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white transition duration-200 rounded-lg shadow-[0px_2px_0px_0px_#FFFFFF40_inset]">
-                  Try 30 days free
+                  Browse events
                 </button>
               </Link>
-            )}
-            <Link href="/plans">
-              <button className="px-4 py-2 border border-current rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition duration-200">
-                Learn more
-              </button>
-            </Link>
-          </div>
-        </Vortex>
-      </div>
+              <Link href="/plans">
+                <button className="px-4 py-2 border border-current rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition duration-200">
+                  Looking to sell tickets instead?
+                </button>
+              </Link>
+            </div>
+          </Vortex>
+        </div>
+      )}
       <Services />
       <section className="py-16 bg-gray-100 dark:bg-black">
         <div className="container mx-auto px-4">
