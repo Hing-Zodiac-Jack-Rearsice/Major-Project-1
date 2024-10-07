@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, Search, Plus } from "lucide-react";
+import { Calendar, Search, Plus, Bell } from "lucide-react"; // Import Bell icon
 import {
   Select,
   SelectContent,
@@ -18,9 +18,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { AnyTxtRecord } from "dns";
 import { checkForDelete } from "@/app/actions";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation"; // Import useRouter for navigation
 
 export default function AdminDashboard() {
   const [events, setEvents] = useState([]);
@@ -31,6 +31,8 @@ export default function AdminDashboard() {
   const [timeFilter, setTimeFilter] = useState("all");
   const [deletionStatus, setDeletionStatus] = useState({});
   const { data: session } = useSession();
+  const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0); // State for unread notifications count
+  const router = useRouter(); // Initialize router
 
   const fetchEvents = useCallback(async () => {
     try {
@@ -49,6 +51,17 @@ export default function AdminDashboard() {
     }
   }, [category]);
 
+  const fetchUnreadNotificationsCount = useCallback(async () => {
+    const res = await fetch("/api/events/notifications");
+    if (res.ok) {
+      const data = await res.json();
+      const unreadCount = data.notifications.filter(
+        (notification: { read: any }) => !notification.read
+      ).length;
+      setUnreadNotificationsCount(unreadCount);
+    }
+  }, []);
+
   const debouncedFetchEvents = useMemo(
     () => debounce(fetchEvents, 500),
     [fetchEvents]
@@ -64,6 +77,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     getCategories();
+    fetchUnreadNotificationsCount(); // Fetch unread notifications count on mount
   }, [getCategories]);
 
   useEffect(() => {
@@ -108,7 +122,7 @@ export default function AdminDashboard() {
         isAdminEvent && matchesSearch && matchesCategory && matchesTimeFilter
       );
     });
-  }, [events, searchTerm, category, timeFilter, session?.user?.email]);
+  }, [events, searchTerm, category, timeFilter, session]);
 
   const handleSearch = useCallback((e: any) => {
     setSearchTerm(e.target.value);
@@ -137,6 +151,10 @@ export default function AdminDashboard() {
     },
     [fetchEvents]
   );
+
+  const handleNotificationsClick = () => {
+    router.push("/admin/dashboard/notifications"); // Navigate to notifications page
+  };
 
   const memoizedEventGrid = useMemo(
     () => (
@@ -200,6 +218,14 @@ export default function AdminDashboard() {
                 <Plus className="mr-2 h-4 w-4" /> Add Event
               </Button>
             </EventForm>
+            <Button onClick={handleNotificationsClick} className="relative">
+              <Bell className="h-6 w-6" />
+              {unreadNotificationsCount > 0 && (
+                <span className="absolute top-0 right-0 h-4 w-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                  {unreadNotificationsCount}
+                </span>
+              )}
+            </Button>
           </div>
         </div>
 

@@ -17,6 +17,16 @@ export async function POST(request: Request, { params }: { params: { id: string 
             data: { status: approved ? 'approved' : 'rejected' },
         });
 
+        // Create a notification for the admin who created the event
+        if (approved) {
+            await prisma.notification.create({
+                data: {
+                    userEmail: updatedEvent.userEmail, // Assuming userEmail is stored in the event
+                    message: `Your event "${updatedEvent.eventName}" has been approved.`,
+                },
+            });
+        }
+
         return new NextResponse(JSON.stringify({ event: updatedEvent }), { status: 200 });
     } catch (error) {
         console.error('Error updating event status:', error);
