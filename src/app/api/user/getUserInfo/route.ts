@@ -34,6 +34,8 @@ export async function GET() {
             return NextResponse.json({ error: "User not found" }, { status: 404 });
         }
 
+
+
         // Store user data in cache
         userCache.set(session.user.id, user);
 

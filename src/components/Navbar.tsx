@@ -2,7 +2,7 @@
 import { CalendarDays } from "lucide-react";
 
 import React, { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
@@ -28,11 +28,12 @@ import {
 export default function Navbar() {
   const pathName = usePathname();
   const router = useRouter();
-  const { data: session } = useSession();
+  const { data: session, update } = useSession();
   const [userData, setUserData] = useState<any>(null);
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
+    console.log("Session data:", session);
     async function fetchUserData() {
       if (session?.user) {
         try {

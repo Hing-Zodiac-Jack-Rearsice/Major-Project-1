@@ -101,7 +101,7 @@ export default function SuperAdminDashboard() {
 
     if (res.ok) {
       toast({ title: "User role updated successfully" });
-      await signIn(); // Refresh the session
+      // await signIn(); // Refresh the session
       fetchUsers(); // Optionally refetch users if needed
     } else {
       const errorData = await res.json();

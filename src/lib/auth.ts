@@ -17,7 +17,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         email: {
           label: "email",
           type: "email",
-
         },
         password: {
           label: "password",
@@ -31,7 +30,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         try {
           const { email, password } = await signInSchema.parseAsync(credentials);
-          console.log("Attempting to authenticate user:", email);
           const user = await getUserFromDb(email, password);
           if (user) {
             return {
@@ -43,22 +41,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               stripeConnectedLinked: user.stripeConnectedLinked
             };
           }
-          if (!user) {
-            console.log("User not found or invalid credentials for:", email);
-            return null;
-          }
-          console.log("User authenticated successfully:", user);
-          return user;
+          return null;
         } catch (error) {
-          console.error("Error in authorize function:", error);
-          if (error instanceof ZodError) {
-            console.error("Validation error:", error.errors);
-          }
           return null;
         }
       },
-    })
-    ,
+    }),
     Google({
       profile(profile) {
         return {
@@ -75,7 +63,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   callbacks: {
-    jwt({ token, user }) {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
         token.email = user.email;
@@ -86,7 +74,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
       return token;
     },
-    session({ session, token }) {
+    async session({ session, token }) {
       if (token) {
         session.user = session.user || {};
         session.user.id = token.id as string;
@@ -95,6 +83,30 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.role = token.role as string;
         session.user.stripeConnectedLinked = token.stripeConnectedLinked as boolean;
         session.user.image = token.image as string;
+
+        // Fetch additional user data if needed
+        const userFromDb = await prisma.user.findUnique({
+          where: { id: token.id as string }, // Type assertion added here
+          select: {
+            // Add any additional fields you want to include
+            name: true,
+            email: true,
+            image: true,
+            role: true,
+            stripeConnectedLinked: true,
+          },
+        });
+
+        if (userFromDb) {
+          session.user = {
+            ...session.user,
+            ...userFromDb,
+            name: userFromDb.name || '',
+            email: userFromDb.email || '',
+            role: userFromDb.role || '',
+            image: userFromDb.image || null,
+          };
+        }
       }
       return session;
     },
@@ -104,8 +116,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   session: {
     strategy: "jwt",
-    // strategy: "database",
-    // maxAge: 30 * 24 * 60 * 60, // 30 days
-    // updateAge: 24 * 60 * 60, // 24 hours
+
   },
 });
