@@ -163,3 +163,11 @@ model Sale {
   user      User?  @relation(fields: [userEmail], references: [email])
   event     Event  @relation(fields: [eventId], references: [id])
 }
+
+model Notification {
+  id        String   @id @default(cuid()) @map("_id")
+  userEmail String
+  message   String
+  createdAt DateTime @default(now())
+  read      Boolean  @default(false)
+}
