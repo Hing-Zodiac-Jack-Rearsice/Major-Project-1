@@ -1,25 +1,15 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/db";
-import NodeCache from "node-cache";
 
-// Create a cache with a default TTL of 10 minutes
-const userCache = new NodeCache({ stdTTL: 600 });
-
-export async function GET() {
+export async function GET(request: Request) {
     try {
         const session = await auth();
         if (!session?.user?.id) {
             return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
         }
 
-        // Check if user data is in cache
-        const cachedUser = userCache.get(session.user.id);
-        if (cachedUser) {
-            return NextResponse.json(cachedUser);
-        }
-
-        // If not in cache, fetch from database
+        // Fetch user data from the database
         const user = await prisma.user.findUnique({
             where: { id: session.user.id },
             select: {
@@ -33,11 +23,6 @@ export async function GET() {
         if (!user) {
             return NextResponse.json({ error: "User not found" }, { status: 404 });
         }
-
-
-
-        // Store user data in cache
-        userCache.set(session.user.id, user);
 
         return NextResponse.json(user);
     } catch (error) {
