@@ -24,21 +24,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSquarePlus } from "@fortawesome/free-regular-svg-icons";
 import { Textarea } from "@/components/ui/textarea";
 import { add, format } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, Plus, Trash } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { TimePickerDemo } from "@/components/ui/time-picker-demo";
-import {
-  getStorage,
-  ref,
-  uploadBytesResumable,
-  getDownloadURL,
-} from "firebase/storage";
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { app } from "@/lib/firebase";
 import Popup from "@/components/popup/Popup";
 import QRCodePreview from "@/components/QRCodePreview";
@@ -49,11 +40,7 @@ interface EventFormProps {
   initialStatus: string;
 }
 
-const EventForm: React.FC<EventFormProps> = ({
-  children,
-  refreshCallback,
-  initialStatus,
-}) => {
+const EventForm: React.FC<EventFormProps> = ({ children, refreshCallback, initialStatus }) => {
   const [showPopup, setShowPopup] = useState(false);
   const [pStyle, setPStyle] = useState<"success" | "fail">("success");
   const [startDate, setStartDate] = React.useState<Date>();
@@ -69,7 +56,48 @@ const EventForm: React.FC<EventFormProps> = ({
   const [qrCodeTheme, setQrCodeTheme] = useState("modern");
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false); // Track submission status
-
+  const [guests, setGuests] = useState<any>([]);
+  const [highlights, setHighlights] = useState<any>([]);
+  const [sponsors, setSponsors] = useState<any>([]);
+  const addGuest = () => {
+    setGuests([...guests, { name: "", subtitle: "" }]);
+  };
+  const addSponsor = () => {
+    setSponsors([...sponsors, { name: "" }]);
+  };
+  const addHighlight = () => {
+    setHighlights([...highlights, { highlight: "" }]);
+  };
+  const updateGuest = (index: number, field: "name" | "subtitle", value: string) => {
+    const updatedGuests = [...guests];
+    updatedGuests[index][field] = value;
+    setGuests(updatedGuests);
+  };
+  const updateHighlight = (index: number, field: "highlight", value: string) => {
+    const updatedHighlights = [...highlights];
+    updatedHighlights[index][field] = value;
+    setHighlights(updatedHighlights);
+  };
+  const updateSponsor = (index: number, field: "name", value: string) => {
+    const updatedSponsors = [...sponsors];
+    updatedSponsors[index][field] = value;
+    setSponsors(updatedSponsors);
+  };
+  const deleteGuest = (index: number) => {
+    const updatedGuests = [...guests];
+    updatedGuests.splice(index, 1);
+    setGuests(updatedGuests);
+  };
+  const deleteHighlight = (index: number) => {
+    const updatedHighlights = [...highlights];
+    updatedHighlights.splice(index, 1);
+    setHighlights(updatedHighlights);
+  };
+  const deleteSponsor = (index: number) => {
+    const updatedSponsors = [...sponsors];
+    updatedSponsors.splice(index, 1);
+    setSponsors(updatedSponsors);
+  };
   useEffect(() => {
     const getCategories = async () => {
       const response = await fetch("/api/category");
@@ -120,8 +148,7 @@ const EventForm: React.FC<EventFormProps> = ({
       uploadTask.on(
         "state_changed",
         (snapshot) => {
-          const progress =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           console.log("Upload is " + progress + "% done");
         },
         (error) => {
@@ -171,6 +198,9 @@ const EventForm: React.FC<EventFormProps> = ({
             categoryName: category,
             qrCodeTheme,
             status: initialStatus,
+            featuredGuests: guests,
+            highlights,
+            sponsors,
           }),
         });
         if (response.ok) {
@@ -205,30 +235,20 @@ const EventForm: React.FC<EventFormProps> = ({
         <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Create Event</DialogTitle>
-            <DialogDescription>
-              Fill in the details to create a new event.
-            </DialogDescription>
+            <DialogDescription>Fill in the details to create a new event.</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="flex flex-col gap-2">
               <Label htmlFor="name" className="text-left">
                 Event name
               </Label>
-              <Input
-                id="name"
-                value={eventName}
-                onChange={(e) => setEventName(e.target.value)}
-              />
+              <Input id="name" value={eventName} onChange={(e) => setEventName(e.target.value)} />
             </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="location" className="text-left">
                 Location
               </Label>
-              <Input
-                id="location"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-              />
+              <Input id="location" value={location} onChange={(e) => setLocation(e.target.value)} />
             </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="description" className="text-left">
@@ -252,8 +272,7 @@ const EventForm: React.FC<EventFormProps> = ({
                   <SelectGroup>
                     {categories.map((cat: any) => (
                       <SelectItem key={cat.id} value={cat.category}>
-                        {cat.category.charAt(0).toUpperCase() +
-                          cat.category.slice(1).toLowerCase()}
+                        {cat.category.charAt(0).toUpperCase() + cat.category.slice(1).toLowerCase()}
                       </SelectItem>
                     ))}
                   </SelectGroup>
@@ -302,11 +321,7 @@ const EventForm: React.FC<EventFormProps> = ({
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {startDate ? (
-                      format(startDate, "PPP HH:mm:ss")
-                    ) : (
-                      <span>Pick a date</span>
-                    )}
+                    {startDate ? format(startDate, "PPP HH:mm:ss") : <span>Pick a date</span>}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0">
@@ -336,19 +351,12 @@ const EventForm: React.FC<EventFormProps> = ({
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {endDate ? (
-                      format(endDate, "PPP HH:mm:ss")
-                    ) : (
-                      <span>Pick a date</span>
-                    )}
+                    {endDate ? format(endDate, "PPP HH:mm:ss") : <span>Pick a date</span>}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0">
                   <div className="p-3 border-t border-border">
-                    <TimePickerDemo
-                      setDate={handleEndTimeChange}
-                      date={endDate}
-                    />
+                    <TimePickerDemo setDate={handleEndTimeChange} date={endDate} />
                   </div>
                 </PopoverContent>
               </Popover>
@@ -389,26 +397,102 @@ const EventForm: React.FC<EventFormProps> = ({
                 </Select>
                 <QRCodePreview theme={qrCodeTheme} />
               </div>
+              {/* Featured Guests Section */}
+              <div className="flex flex-col gap-2">
+                <Label className="text-left">Featured Guests</Label>
+                {guests.map((guest: any, index: any) => (
+                  <div key={index} className="grid grid-cols-[1fr_1fr_auto] gap-2 w-full">
+                    <Input
+                      placeholder="Guest Name"
+                      value={guest.name}
+                      onChange={(e) => updateGuest(index, "name", e.target.value)}
+                      className="w-full"
+                    />
+                    <Input
+                      placeholder="Subtitle"
+                      value={guest.subtitle}
+                      onChange={(e) => updateGuest(index, "subtitle", e.target.value)}
+                      className="w-full"
+                    />
+                    <Button
+                      className="w-10 h-10 p-0 flex items-center justify-center"
+                      onClick={() => deleteGuest(index)}
+                    >
+                      <Trash className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+                <Button type="button" onClick={addGuest} variant="outline" className="mt-2">
+                  <Plus className="mr-2 h-4 w-4" /> Add Guest
+                </Button>
+              </div>
+              {/* Highlights Section */}
+              <div className="flex flex-col gap-2">
+                <Label className="text-left">Event Highlights</Label>
+                {highlights.map((highlight: any, index: any) => (
+                  <div key={index} className="grid grid-rows-1 grid-cols-[1fr_auto] gap-2">
+                    <Input
+                      className="w-full"
+                      placeholder="Highlight"
+                      value={highlight.highlight}
+                      onChange={(e) => updateHighlight(index, "highlight", e.target.value)}
+                    />
+                    <Button
+                      className="w-10 h-10 p-0 flex items-center justify-center"
+                      onClick={() => deleteHighlight(index)}
+                    >
+                      <Trash className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+                <Button type="button" onClick={addHighlight} variant="outline" className="mt-2">
+                  <Plus className="mr-2 h-4 w-4" /> Add Highlight
+                </Button>
+              </div>
+              {/* Sponsors Section */}
+              <div className="flex flex-col gap-2">
+                <Label className="text-left">Event Sponsors</Label>
+                {sponsors.map((sponsor: any, index: any) => (
+                  <div key={index} className="grid grid-rows-1 grid-cols-[1fr_auto] gap-2">
+                    <Input
+                      placeholder="Sponsor Name"
+                      value={sponsor.name}
+                      onChange={(e) => updateSponsor(index, "name", e.target.value)}
+                    />
+                    <Button
+                      className="w-10 h-10 p-0 flex items-center justify-center"
+                      onClick={() => deleteSponsor(index)}
+                    >
+                      <Trash className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+                <Button type="button" onClick={addSponsor} variant="outline" className="mt-2">
+                  <Plus className="mr-2 h-4 w-4" /> Add Sponsor
+                </Button>
+              </div>
             </div>
           </div>
           <DialogFooter>
+            <Button type="submit" onClick={handleUpload} disabled={isSubmitting}>
+              {isSubmitting ? "Creating..." : "Create"}
+            </Button>
             <Button
-              type="submit"
-              onClick={handleUpload}
+              onClick={() => {
+                console.log(guests);
+                console.log(highlights);
+                console.log(sponsors);
+              }}
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Creating..." : "Create"}
+              Log out optional values
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
       {showPopup && (
         <Popup
-          message={
-            pStyle === "success"
-              ? "Event created successfully"
-              : "Failed to create event"
-          }
+          message={pStyle === "success" ? "Event created successfully" : "Failed to create event"}
           onClose={() => setShowPopup(false)}
           style={pStyle}
         />

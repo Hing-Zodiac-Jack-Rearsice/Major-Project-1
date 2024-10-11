@@ -121,6 +121,10 @@ model Event {
   // qrcode color
   // qrCodeColor String? @default("#000000")
   qrCodeTheme  String?      @default("classic")
+  // Optional event details if event organizers want to add
+  featuredGuests Json? 
+  highlights Json?
+  sponsors Json?
 }
 
 model Category {

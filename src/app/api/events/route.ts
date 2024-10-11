@@ -42,7 +42,14 @@ export async function POST(request: Request) {
     const body = await request.json();
 
     // Validate incoming data
-    const requiredFields = ["eventName", "ticketAmount", "ticketPrice", "location", "startDate", "endDate"];
+    const requiredFields = [
+      "eventName",
+      "ticketAmount",
+      "ticketPrice",
+      "location",
+      "startDate",
+      "endDate",
+    ];
     for (const field of requiredFields) {
       if (!body[field]) {
         return new NextResponse(JSON.stringify({ error: `${field} is required` }), { status: 400 });
@@ -60,7 +67,10 @@ export async function POST(request: Request) {
       });
 
       if (existingEvent) {
-        return new NextResponse(JSON.stringify({ error: "Event already exists for the given date range" }), { status: 409 });
+        return new NextResponse(
+          JSON.stringify({ error: "Event already exists for the given date range" }),
+          { status: 409 }
+        );
       }
 
       const uploadEvent = await prisma.event.create({
@@ -77,6 +87,9 @@ export async function POST(request: Request) {
           categoryName: body.categoryName,
           qrCodeTheme: body.qrCodeTheme,
           status: body.status || "pending",
+          featuredGuests: body.featuredGuests,
+          highlights: body.highlights,
+          sponsors: body.sponsors,
         },
       });
 
