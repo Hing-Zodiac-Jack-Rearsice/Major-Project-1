@@ -42,10 +42,16 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     if (ticketsSoldCount > 0) {
       // If at least one ticket is sold, restrict updates to ticket amount only
       if (body.ticketAmount !== undefined && body.ticketAmount < ticketsSoldCount) {
-        return NextResponse.json({ error: "Cannot reduce ticket amount below sold tickets" }, { status: 400 });
+        return NextResponse.json(
+          { error: "Cannot reduce ticket amount below sold tickets" },
+          { status: 400 }
+        );
       } else {
         // Prevent other updates if tickets are sold
-        return NextResponse.json({ error: "Cannot update event details after tickets are sold" }, { status: 400 });
+        return NextResponse.json(
+          { error: "Cannot update event details after tickets are sold" },
+          { status: 400 }
+        );
       }
     }
 
@@ -63,6 +69,9 @@ export async function PATCH(request: Request, { params }: { params: { id: string
         imageUrl: body.imageUrl,
         categoryName: body.categoryName,
         qrCodeTheme: body.qrCodeTheme,
+        featuredGuests: body.featuredGuests,
+        highlights: body.highlights,
+        sponsors: body.sponsors,
       },
     });
 
@@ -71,7 +80,9 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     console.error("Error updating event:", error);
     return NextResponse.json(
       {
-        error: `Failed to update event: ${error instanceof Error ? error.message : "Unknown error"}`,
+        error: `Failed to update event: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`,
       },
       { status: 500 }
     );
