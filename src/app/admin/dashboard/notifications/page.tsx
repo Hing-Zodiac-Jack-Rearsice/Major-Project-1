@@ -1,34 +1,37 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation"; // Import useRouter
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChevronLeft } from "lucide-react"; // Import the ChevronLeft icon
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { ChevronLeft, Bell, Trash2, CheckCircle } from "lucide-react";
 
 type Notification = {
   id: string;
   message: string;
   createdAt: string;
-  read: boolean; // Add read property
+  read: boolean;
 };
 
-const NotificationsPage = () => {
+export default function NotificationsPage() {
   const { data: session } = useSession();
-  const router = useRouter(); // Initialize router
+  const router = useRouter();
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0); // State for unread notifications count
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const fetchNotifications = async () => {
     const res = await fetch("/api/events/notifications");
     const data = await res.json();
     setNotifications(data.notifications);
-    updateUnreadCount(data.notifications); // Update unread count after fetching
+    updateUnreadCount(data.notifications);
   };
 
   const updateUnreadCount = (notifications: Notification[]) => {
-    const count = notifications.filter(
-      (notification) => !notification.read
-    ).length;
+    const count = notifications.filter((notification) => !notification.read).length;
     setUnreadCount(count);
   };
 
@@ -44,12 +47,8 @@ const NotificationsPage = () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id }),
     });
-    setNotifications(
-      notifications.filter((notification) => notification.id !== id)
-    );
-    updateUnreadCount(
-      notifications.filter((notification) => notification.id !== id)
-    ); // Update count after deletion
+    setNotifications(notifications.filter((notification) => notification.id !== id));
+    updateUnreadCount(notifications.filter((notification) => notification.id !== id));
   };
 
   const handleMarkAsRead = async (id: string) => {
@@ -62,59 +61,99 @@ const NotificationsPage = () => {
       notification.id === id ? { ...notification, read: true } : notification
     );
     setNotifications(updatedNotifications);
-    updateUnreadCount(updatedNotifications); // Update count after marking as read
+    updateUnreadCount(updatedNotifications);
   };
 
   useEffect(() => {
     const interval = setInterval(() => {
-      fetchNotifications(); // Poll for notifications every few seconds
-    }, 5000); // Adjust the interval as needed (e.g., every 5 seconds)
+      fetchNotifications();
+    }, 5000);
 
-    return () => clearInterval(interval); // Cleanup on unmount
+    return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="container mx-auto p-6">
-      <button
+    <div className="container mx-auto sm:p-6 sm:pl-20 p-4">
+      <Button
         onClick={() => router.back()}
-        className="mb-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        variant="outline"
+        className="mb-6 inline-flex items-center"
       >
-        <ChevronLeft className="mr-2 h-4 w-4" /> {/* Icon added here */}
+        <ChevronLeft className="mr-2 h-4 w-4" />
         Back
-      </button>
-      <Card>
-        <CardHeader>
-          <CardTitle>Notifications ({unreadCount})</CardTitle>
+      </Button>
+      <Card className="w-full mx-auto">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-2xl font-bold">Notifications</CardTitle>
+          <Badge variant="secondary" className="text-sm font-medium">
+            {unreadCount} unread
+          </Badge>
         </CardHeader>
         <CardContent>
           {notifications.length === 0 ? (
-            <p>No notifications</p>
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <Bell className="h-12 w-12 text-muted-foreground mb-4" />
+              <p className="text-xl font-semibold text-muted-foreground">No notifications</p>
+            </div>
           ) : (
-            notifications.map((notification: Notification) => (
-              <div key={notification.id} className="mb-2">
-                <p
-                  className={notification.read ? "text-gray-500" : "font-bold"}
-                >
-                  {notification.message}
-                </p>
-                <small>
-                  {new Date(notification.createdAt).toLocaleString()}
-                </small>
-                <div className="flex space-x-2">
-                  <button onClick={() => handleMarkAsRead(notification.id)}>
-                    Mark as Read
-                  </button>
-                  <button onClick={() => handleDelete(notification.id)}>
-                    Delete
-                  </button>
+            <div className="space-y-4">
+              {notifications.map((notification: Notification) => (
+                <div key={notification.id} className="space-y-2">
+                  <div className="flex items-start justify-between">
+                    <div className="space-y-1">
+                      <p
+                        className={`text-sm ${
+                          notification.read ? "text-muted-foreground" : "font-medium"
+                        }`}
+                      >
+                        {notification.message}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(notification.createdAt).toLocaleString()}
+                      </p>
+                    </div>
+                    <div className="flex space-x-2">
+                      <TooltipProvider>
+                        {!notification.read && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handleMarkAsRead(notification.id)}
+                              >
+                                <CheckCircle className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Mark as Read</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleDelete(notification.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Delete</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                  </div>
+                  <Separator />
                 </div>
-              </div>
-            ))
+              ))}
+            </div>
           )}
         </CardContent>
       </Card>
     </div>
   );
-};
-
-export default NotificationsPage;
+}

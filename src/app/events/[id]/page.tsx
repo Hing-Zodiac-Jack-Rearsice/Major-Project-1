@@ -1,4 +1,3 @@
-/* eslint-disable react/no-unescaped-entities */
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -20,6 +19,9 @@ interface Event {
   description: string;
   imageUrl: string;
   ticketPrice: number;
+  featuredGuests?: { name: string; subtitle: string }[];
+  highlights?: { highlight: string }[];
+  sponsors?: { name: string }[];
 }
 
 export default function EventPage() {
@@ -132,22 +134,15 @@ export default function EventPage() {
           </div>
           <div className="md:col-span-2 space-y-8">
             <EventSection title="About This Event" content={event.description} />
-            <EventSection
-              title="What to Expect"
-              content={
-                <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                  <li>Engaging presentations from industry experts</li>
-                  <li>Networking opportunities with like-minded professionals</li>
-                  <li>Interactive workshops and hands-on sessions</li>
-                  <li>Delicious refreshments and meals provided</li>
-                </ul>
-              }
-            />
-            <EventSchedule />
-            <FeaturedSpeakers />
-            <PastEventHighlights />
-            <EventSponsors />
-            <AdditionalInformation />
+            {event.featuredGuests && event.featuredGuests.length > 0 && (
+              <FeaturedSpeakers featuredGuests={event.featuredGuests} />
+            )}
+            {event.highlights && event.highlights.length > 0 && (
+              <EventHighlights highlights={event.highlights} />
+            )}
+            {event.sponsors && event.sponsors.length > 0 && (
+              <EventSponsors sponsors={event.sponsors} />
+            )}
           </div>
         </CardContent>
       </Card>
@@ -203,66 +198,11 @@ function EventSection({ title, content }: { title: string; content: React.ReactN
   );
 }
 
-function EventSchedule() {
-  const scheduleItems = [
-    { time: "9:00 AM", event: "Registration and Welcome Coffee" },
-    {
-      time: "10:00 AM",
-      event: "Opening Keynote by John Doe, CEO of Tech Innovators",
-    },
-    { time: "11:30 AM", event: 'Panel Discussion: "The Future of Technology"' },
-    { time: "1:00 PM", event: "Networking Lunch" },
-    {
-      time: "2:00 PM",
-      event: 'Workshop: "Hands-on with AI and Machine Learning"',
-    },
-    { time: "4:00 PM", event: "Closing Remarks & Raffle" },
-  ];
-
-  return (
-    <EventSection
-      title="Event Schedule"
-      content={
-        <div className="space-y-4">
-          <p className="text-muted-foreground">
-            The event will feature a full-day schedule packed with keynote sessions, panel
-            discussions, and interactive workshops. Here's a breakdown of the day's schedule:
-          </p>
-          <ul className="space-y-2">
-            {scheduleItems.map((item, index) => (
-              <li key={index} className="flex items-start space-x-3 bg-secondary/5 rounded-md p-3">
-                <Clock className="w-5 h-5 text-primary mt-1" />
-                <div>
-                  <span className="font-semibold">{item.time}:</span> {item.event}
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      }
-    />
-  );
-}
-
-function FeaturedSpeakers() {
-  const speakers = [
-    {
-      name: "John Doe",
-      title: "CEO of Tech Innovators",
-      description: "A visionary leader with 20+ years of experience in the tech industry.",
-    },
-    {
-      name: "Jane Smith",
-      title: "CTO of FutureTech",
-      description: "Known for her expertise in AI and big data.",
-    },
-    {
-      name: "Emily Zhang",
-      title: "Head of Product at NextGen",
-      description: "Leading product development in the SaaS space.",
-    },
-  ];
-
+function FeaturedSpeakers({
+  featuredGuests,
+}: {
+  featuredGuests: { name: string; subtitle: string }[];
+}) {
   return (
     <EventSection
       title="Featured Speakers"
@@ -273,13 +213,12 @@ function FeaturedSpeakers() {
             knowledge and insights.
           </p>
           <ul className="space-y-4">
-            {speakers.map((speaker, index) => (
+            {featuredGuests.map((speaker, index) => (
               <li key={index} className="flex items-start space-x-3 bg-secondary/5 rounded-md p-3">
                 <Users className="w-5 h-5 text-primary mt-1" />
                 <div>
                   <div className="font-semibold">{speaker.name}</div>
-                  <div className="text-sm text-muted-foreground">{speaker.title}</div>
-                  <div className="mt-1 text-sm">{speaker.description}</div>
+                  <div className="text-sm text-muted-foreground">{speaker.subtitle}</div>
                 </div>
               </li>
             ))}
@@ -290,17 +229,10 @@ function FeaturedSpeakers() {
   );
 }
 
-function PastEventHighlights() {
-  const highlights = [
-    "Over 500 attendees from top companies like Google, Facebook, and Microsoft.",
-    "Keynote presentations that inspired innovation and future-thinking in tech.",
-    "Interactive workshops that provided hands-on experience with emerging technologies.",
-    "Extensive networking sessions that led to new business partnerships and collaborations.",
-  ];
-
+function EventHighlights({ highlights }: { highlights: { highlight: string }[] }) {
   return (
     <EventSection
-      title="Past Event Highlights"
+      title="Event Highlights"
       content={
         <div className="space-y-4">
           <p className="text-muted-foreground">
@@ -309,10 +241,10 @@ function PastEventHighlights() {
             last event:
           </p>
           <ul className="space-y-2">
-            {highlights.map((highlight, index) => (
+            {highlights.map((item, index) => (
               <li key={index} className="flex items-start space-x-3 bg-secondary/5 rounded-md p-3">
                 <Star className="w-5 h-5 text-primary mt-1" />
-                <div>{highlight}</div>
+                <div>{item.highlight}</div>
               </li>
             ))}
           </ul>
@@ -322,22 +254,7 @@ function PastEventHighlights() {
   );
 }
 
-function EventSponsors() {
-  const sponsors = [
-    {
-      name: "Tech Innovators",
-      description: "A leading company in AI and machine learning solutions.",
-    },
-    {
-      name: "NextGen Solutions",
-      description: "Providing state-of-the-art SaaS platforms for businesses.",
-    },
-    {
-      name: "CloudX",
-      description: "Cloud hosting and data storage solutions trusted by Fortune 500 companies.",
-    },
-  ];
-
+function EventSponsors({ sponsors }: { sponsors: { name: string }[] }) {
   return (
     <EventSection
       title="Event Sponsors"
@@ -351,48 +268,12 @@ function EventSponsors() {
               <li key={index} className="flex items-start space-x-3 bg-secondary/5 rounded-md p-3">
                 <Coffee className="w-5 h-5 text-primary mt-1" />
                 <div>
-                  <span className="font-semibold">{sponsor.name}</span> - {sponsor.description}
+                  <span className="font-semibold">{sponsor.name}</span>
                 </div>
               </li>
             ))}
           </ul>
         </div>
-      }
-    />
-  );
-}
-
-function AdditionalInformation() {
-  const info = [
-    {
-      title: "Parking",
-      content: "Free parking is available on-site for all attendees.",
-    },
-    {
-      title: "COVID-19 Guidelines",
-      content:
-        "We will be following all local health and safety guidelines to ensure the safety of our attendees.",
-    },
-    {
-      title: "Dress Code",
-      content: "Business casual is recommended for all participants.",
-    },
-  ];
-
-  return (
-    <EventSection
-      title="Additional Information"
-      content={
-        <ul className="space-y-2">
-          {info.map((item, index) => (
-            <li key={index} className="flex items-start space-x-3 bg-secondary/5 rounded-md p-3">
-              <MapPin className="w-5 h-5 text-primary mt-1" />
-              <div>
-                <span className="font-semibold">{item.title}:</span> {item.content}
-              </div>
-            </li>
-          ))}
-        </ul>
       }
     />
   );

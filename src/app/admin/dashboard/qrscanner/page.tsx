@@ -86,7 +86,7 @@ const Page = () => {
       <div className="max-w-3xl w-full rounded-lg p-6">
         <h1 className="text-2xl font-bold text-center mb-4">QR Code Scanner</h1>
         <p className="text-center mb-4">
-          Scan your event&apos QR code to register your attendance.
+          Scan your event&apos;s QR code to register your attendance.
         </p>
 
         {/* Larger camera view */}

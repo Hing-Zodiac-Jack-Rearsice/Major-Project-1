@@ -429,28 +429,33 @@ const EventUpdateForm = ({ event, refreshCallback }: any) => {
               {/* Featured Guests Section */}
               <div className="flex flex-col gap-2">
                 <Label className="text-left">Featured Guests</Label>
-                {guests.map((guest: any, index: any) => (
-                  <div key={index} className="grid grid-cols-[1fr_1fr_auto] gap-2 w-full">
-                    <Input
-                      placeholder="Guest Name"
-                      value={guest.name}
-                      onChange={(e) => updateGuest(index, "name", e.target.value)}
-                      className="w-full"
-                    />
-                    <Input
-                      placeholder="Subtitle"
-                      value={guest.subtitle}
-                      onChange={(e) => updateGuest(index, "subtitle", e.target.value)}
-                      className="w-full"
-                    />
-                    <Button
-                      className="w-10 h-10 p-0 flex items-center justify-center"
-                      onClick={() => deleteGuest(index)}
-                    >
-                      <Trash className="h-4 w-4" />
-                    </Button>
+                {guests && guests.length > 0 && (
+                  <div>
+                    {guests.map((guest: any, index: any) => (
+                      <div key={index} className="grid grid-cols-[1fr_1fr_auto] gap-2 w-full">
+                        <Input
+                          placeholder="Guest Name"
+                          value={guest.name}
+                          onChange={(e) => updateGuest(index, "name", e.target.value)}
+                          className="w-full"
+                        />
+                        <Input
+                          placeholder="Subtitle"
+                          value={guest.subtitle}
+                          onChange={(e) => updateGuest(index, "subtitle", e.target.value)}
+                          className="w-full"
+                        />
+                        <Button
+                          className="w-10 h-10 p-0 flex items-center justify-center"
+                          onClick={() => deleteGuest(index)}
+                        >
+                          <Trash className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                )}
+
                 <Button type="button" onClick={addGuest} variant="outline" className="mt-2">
                   <Plus className="mr-2 h-4 w-4" /> Add Guest
                 </Button>
@@ -458,22 +463,28 @@ const EventUpdateForm = ({ event, refreshCallback }: any) => {
               {/* Highlights Section */}
               <div className="flex flex-col gap-2">
                 <Label className="text-left">Event Highlights</Label>
-                {highlights.map((highlight: any, index: any) => (
-                  <div key={index} className="grid grid-rows-1 grid-cols-[1fr_auto] gap-2">
-                    <Input
-                      className="w-full"
-                      placeholder="Highlight"
-                      value={highlight.highlight}
-                      onChange={(e) => updateHighlight(index, "highlight", e.target.value)}
-                    />
-                    <Button
-                      className="w-10 h-10 p-0 flex items-center justify-center"
-                      onClick={() => deleteHighlight(index)}
-                    >
-                      <Trash className="h-4 w-4" />
-                    </Button>
+                {highlights && highlights.length > 0 && (
+                  <div>
+                    {" "}
+                    {highlights.map((highlight: any, index: any) => (
+                      <div key={index} className="grid grid-rows-1 grid-cols-[1fr_auto] gap-2">
+                        <Input
+                          className="w-full"
+                          placeholder="Highlight"
+                          value={highlight.highlight}
+                          onChange={(e) => updateHighlight(index, "highlight", e.target.value)}
+                        />
+                        <Button
+                          className="w-10 h-10 p-0 flex items-center justify-center"
+                          onClick={() => deleteHighlight(index)}
+                        >
+                          <Trash className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                )}
+
                 <Button type="button" onClick={addHighlight} variant="outline" className="mt-2">
                   <Plus className="mr-2 h-4 w-4" /> Add Highlight
                 </Button>
@@ -481,21 +492,26 @@ const EventUpdateForm = ({ event, refreshCallback }: any) => {
               {/* Sponsors Section */}
               <div className="flex flex-col gap-2">
                 <Label className="text-left">Event Sponsors</Label>
-                {sponsors.map((sponsor: any, index: any) => (
-                  <div key={index} className="grid grid-rows-1 grid-cols-[1fr_auto] gap-2">
-                    <Input
-                      placeholder="Sponsor Name"
-                      value={sponsor.name}
-                      onChange={(e) => updateSponsor(index, "name", e.target.value)}
-                    />
-                    <Button
-                      className="w-10 h-10 p-0 flex items-center justify-center"
-                      onClick={() => deleteSponsor(index)}
-                    >
-                      <Trash className="h-4 w-4" />
-                    </Button>
+                {sponsors && sponsors.length > 0 && (
+                  <div>
+                    {sponsors.map((sponsor: any, index: any) => (
+                      <div key={index} className="grid grid-rows-1 grid-cols-[1fr_auto] gap-2">
+                        <Input
+                          placeholder="Sponsor Name"
+                          value={sponsor.name}
+                          onChange={(e) => updateSponsor(index, "name", e.target.value)}
+                        />
+                        <Button
+                          className="w-10 h-10 p-0 flex items-center justify-center"
+                          onClick={() => deleteSponsor(index)}
+                        >
+                          <Trash className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                )}
+
                 <Button type="button" onClick={addSponsor} variant="outline" className="mt-2">
                   <Plus className="mr-2 h-4 w-4" /> Add Sponsor
                 </Button>

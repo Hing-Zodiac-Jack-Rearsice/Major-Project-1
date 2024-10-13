@@ -16,24 +16,26 @@ import InviteForm from "@/components/dashboard/events/InviteForm";
 import { AttendanceChart } from "@/components/dashboard/events/AttendanceChart";
 import { SalesCard } from "@/components/dashboard/events/SalesCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, MapPin, Ticket, ChevronLeft, Users } from "lucide-react";
+import { Calendar, MapPin, Ticket, ChevronLeft, Users, Star, Award, UserCheck } from "lucide-react";
 import Link from "next/link";
 import EventUpdateForm from "@/components/dashboard/events/EventUpdateForm";
 import { remainingTickets } from "@/app/actions";
 import { Progress } from "@/components/ui/progress";
 
-const EventPage = () => {
+export default function Component(props: { prop1: string } = { prop1: "default" }) {
   const [event, setEvent] = useState<any>(null);
   const [attendance, setAttendance] = useState<any>(null);
   const { id } = useParams();
   const [ticketsLeft, setTicketsLeft] = useState(0);
-  const [loading, setLoading] = useState(true); // Track loading state
+  const [loading, setLoading] = useState(true);
 
   const fetchEvent = async () => {
-    setLoading(true); // Set loading state
+    setLoading(true);
     try {
       const resEvent = await fetch(`/api/events/${id}`);
       if (!resEvent.ok) throw new Error("Failed to fetch event");
@@ -43,7 +45,7 @@ const EventPage = () => {
     } catch (error) {
       console.error("Error fetching event:", error);
     } finally {
-      setLoading(false); // Reset loading state
+      setLoading(false);
     }
   };
 
@@ -58,16 +60,12 @@ const EventPage = () => {
     }
   };
 
-  const handleUpdateEvent = (updatedEvent: any) => {
-    setEvent(updatedEvent);
-  };
-
   useEffect(() => {
     fetchEvent();
     fetchAttendance();
-  }, [id]); // Fetch data when the ID changes
+  }, [id]);
 
-  if (loading) return <LoadingSpinner />; // Show loading spinner while fetching
+  if (loading) return <LoadingSpinner />;
 
   const eventDate = new Date(event.startDate);
   const eventEndDate = new Date(event.endDate);
@@ -181,10 +179,80 @@ const EventPage = () => {
           <TabsContent value="details">
             <Card>
               <CardHeader>
-                <CardTitle className="text-xl font-semibold">Event Description</CardTitle>
+                <CardTitle className="text-2xl font-semibold">Event Details</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">{event.description}</p>
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">Description</h3>
+                    <p className="text-muted-foreground">{event.description}</p>
+                  </div>
+                  <Separator />
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2 flex items-center">
+                      <Star className="mr-2 h-5 w-5 text-yellow-500" />
+                      Event Highlights
+                    </h3>
+                    {event.highlights && event.highlights.length > 0 ? (
+                      <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        {event.highlights.map((item: any, index: number) => (
+                          <li key={index} className="flex items-start">
+                            <span className="mr-2 mt-1 text-yellow-500">•</span>
+                            <span>{item.highlight}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-muted-foreground">No highlights set</p>
+                    )}
+                  </div>
+                  <Separator />
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2 flex items-center">
+                      <Award className="mr-2 h-5 w-5 text-primary" />
+                      Sponsors
+                    </h3>
+                    {event.sponsors && event.sponsors.length > 0 ? (
+                      <div className="flex flex-wrap gap-4">
+                        {event.sponsors.map((item: any, index: number) => (
+                          <Badge key={index} variant="outline" className="text-sm py-1 px-2">
+                            {item.name}
+                          </Badge>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-muted-foreground">No sponsors set</p>
+                    )}
+                  </div>
+                  <Separator />
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2 flex items-center">
+                      <UserCheck className="mr-2 h-5 w-5 text-green-500" />
+                      Featured Guests
+                    </h3>
+                    {event.featuredGuests && event.featuredGuests.length > 0 ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {event.featuredGuests.map((item: any, index: number) => (
+                          <div
+                            key={index}
+                            className="flex items-center space-x-4 p-3 bg-secondary rounded-lg"
+                          >
+                            {/* <Avatar>
+                              <AvatarImage src={`https://i.pravatar.cc/150?u=${item.name}`} />
+                              <AvatarFallback>{item.name.charAt(0)}</AvatarFallback>
+                            </Avatar> */}
+                            <div>
+                              <p className="font-medium">{item.name}</p>
+                              <p className="text-sm text-muted-foreground">{item.subtitle}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-muted-foreground">No featured guests set</p>
+                    )}
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -264,6 +332,4 @@ const EventPage = () => {
       </div>
     </div>
   );
-};
-
-export default EventPage;
+}
