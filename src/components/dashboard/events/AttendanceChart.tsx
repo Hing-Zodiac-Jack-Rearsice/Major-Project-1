@@ -17,6 +17,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 const chartConfig = {
   attended: {
@@ -70,21 +71,16 @@ export function AttendanceChart({ eventId }: any) {
       ]
     : [];
 
-  if (isLoading)
-    return (
-      <Card>
-        <CardContent>Loading...</CardContent>
-      </Card>
-    );
+  if (isLoading) return <LoadingSpinner />;
   if (error)
     return (
-      <Card>
+      <Card className="border-none">
         <CardContent>Error: {error}</CardContent>
       </Card>
     );
 
   return (
-    <Card className="flex flex-col">
+    <Card className="flex flex-col border-none">
       <CardHeader className="items-center pb-0">
         <CardTitle>Attendance</CardTitle>
       </CardHeader>

@@ -307,21 +307,21 @@ export default function Component(props: { prop1: string } = { prop1: "default" 
                 <CardTitle className="text-2xl font-semibold">Analytics</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg">Attendance</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <AttendanceChart eventId={id} />
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardHeader>
+                <div className="grid grid-cols-1 gap-6">
+                  <Card className="border-none">
+                    {/* <CardHeader>
                       <CardTitle className="text-lg">Sales</CardTitle>
-                    </CardHeader>
+                    </CardHeader> */}
                     <CardContent>
                       <SalesCard eventId={id} />
+                    </CardContent>
+                  </Card>
+                  <Card className="border-none">
+                    {/* <CardHeader>
+                      <CardTitle className="text-lg">Attendance</CardTitle>
+                    </CardHeader> */}
+                    <CardContent>
+                      <AttendanceChart eventId={id} />
                     </CardContent>
                   </Card>
                 </div>

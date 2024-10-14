@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { DollarSign } from "lucide-react";
+import { DollarSign, TrendingUp, ShoppingCart } from "lucide-react";
 
 import {
   Card,
@@ -41,35 +41,36 @@ export function SalesCard({ eventId }: any) {
   }, [fetchSales]);
 
   return (
-    <Card className="flex flex-col">
+    <Card className="border-none bg-gradient-to-br from-primary/5 to-secondary/5 h-full">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <DollarSign className="h-5 w-5 text-primary" />
-          Sales and Revenue
-        </CardTitle>
+        <CardTitle className="text-2xl font-bold text-primary">Sales Overview</CardTitle>
         <CardDescription>Total sales and revenue for this event</CardDescription>
       </CardHeader>
-      <CardContent className="flex-1">
+      <CardContent>
         {isLoading ? (
-          <div className="flex items-center justify-center h-24">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <div className="flex items-center justify-center h-40">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
           </div>
         ) : (
-          <div className="text-center space-y-4">
-            <div>
-              <span className="text-4xl font-bold text-primary">{totalSales.toLocaleString()}</span>
-              <p className="text-sm text-muted-foreground mt-1">Total Sales</p>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-card p-4 rounded-lg shadow-sm">
+              <div className="flex items-center justify-between mb-2">
+                <ShoppingCart className="h-6 w-6 text-primary" />
+                <span className="text-xs font-medium text-muted-foreground">Total Sales</span>
+              </div>
+              <div className="text-2xl font-bold">{totalSales.toLocaleString()}</div>
             </div>
-            <div>
-              <span className="text-4xl font-bold text-primary">
-                ${totalRevenue.toLocaleString()}
-              </span>
-              <p className="text-sm text-muted-foreground mt-1">Total Revenue</p>
+            <div className="bg-card p-4 rounded-lg shadow-sm">
+              <div className="flex items-center justify-between mb-2">
+                <TrendingUp className="h-6 w-6 text-primary" />
+                <span className="text-xs font-medium text-muted-foreground">Total Revenue</span>
+              </div>
+              <div className="text-2xl font-bold">${totalRevenue.toLocaleString()}</div>
             </div>
           </div>
         )}
       </CardContent>
-      <CardFooter className="text-sm text-muted-foreground">
+      <CardFooter className="text-xs text-muted-foreground">
         Last updated: {new Date().toLocaleString()}
       </CardFooter>
     </Card>
