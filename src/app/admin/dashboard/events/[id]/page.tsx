@@ -27,7 +27,7 @@ import EventUpdateForm from "@/components/dashboard/events/EventUpdateForm";
 import { remainingTickets } from "@/app/actions";
 import { Progress } from "@/components/ui/progress";
 
-export default function Component(props: { prop1: string } = { prop1: "default" }) {
+export default function Component(props: any) {
   const [event, setEvent] = useState<any>(null);
   const [attendance, setAttendance] = useState<any>(null);
   const { id } = useParams();
