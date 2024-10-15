@@ -63,9 +63,7 @@ const InviteForm = ({ eventId, onInviteSuccess }: any) => {
         <DialogContent className="sm:max-w-[425px] text-sm max-h-96 overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Invite Attendees</DialogTitle>
-            <DialogDescription>
-              Enter user email to invite them.
-            </DialogDescription>
+            <DialogDescription>Enter user email to invite them.</DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-2">
             <Label htmlFor="name" className="text-left">
@@ -81,7 +79,7 @@ const InviteForm = ({ eventId, onInviteSuccess }: any) => {
           </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="name" className="text-left">
-              Attendee&apos name
+              Attendee&apos;s name
             </Label>
             <Input
               id="name"
@@ -100,13 +98,7 @@ const InviteForm = ({ eventId, onInviteSuccess }: any) => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      {showPopup && (
-        <Popup
-          message={msg}
-          onClose={() => setShowPopup(false)}
-          style={pStyle}
-        />
-      )}
+      {showPopup && <Popup message={msg} onClose={() => setShowPopup(false)} style={pStyle} />}
     </div>
   );
 };
