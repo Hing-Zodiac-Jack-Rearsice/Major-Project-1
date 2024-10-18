@@ -106,7 +106,7 @@ export default function PricingPage() {
   return (
     <div className="container mx-auto py-12 px-4 md:px-6 mt-16">
       <h1 className="text-4xl font-bold text-center">
-        Simple pricing for powerful event management
+        Simple pricing for powerful ticket management
       </h1>
       <p className="my-4 text-center text-muted-foreground">
         Get started with our comprehensive plan and streamline your ticket sales without limits. Use

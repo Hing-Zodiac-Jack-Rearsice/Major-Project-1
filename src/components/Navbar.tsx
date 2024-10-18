@@ -117,7 +117,7 @@ export default function Navbar() {
                   variant="default"
                   className="bg-blue-500 hover:bg-blue-600 text-white font-bold p-2"
                 >
-                  ADMIN
+                  ORGANIZER
                 </Button>
               </HoverCardTrigger>
               <HoverCardContent className="w-fit">

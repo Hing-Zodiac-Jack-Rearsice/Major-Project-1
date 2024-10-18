@@ -37,9 +37,7 @@ export default function AdminDashboard() {
   const fetchEvents = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch(
-        `/api/events/category/${category}?includeAll=true`
-      );
+      const res = await fetch(`/api/events/category/${category}?includeAll=true`);
       const data = await res.json();
       setEvents(data.data || []);
       checkDeletionStatus(data.data || []);
@@ -62,10 +60,7 @@ export default function AdminDashboard() {
     }
   }, []);
 
-  const debouncedFetchEvents = useMemo(
-    () => debounce(fetchEvents, 500),
-    [fetchEvents]
-  );
+  const debouncedFetchEvents = useMemo(() => debounce(fetchEvents, 500), [fetchEvents]);
 
   const getCategories = useCallback(async () => {
     const response = await fetch("/api/category");
@@ -107,10 +102,8 @@ export default function AdminDashboard() {
     return events.filter((event: any) => {
       const isAdminEvent = event.userEmail === session?.user?.email;
       const matchesSearch =
-        searchTerm === "" ||
-        event.eventName.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCategory =
-        category === "all" || event.categoryName === category;
+        searchTerm === "" || event.eventName.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = category === "all" || event.categoryName === category;
       const eventDate = new Date(event.startDate);
       const matchesTimeFilter =
         timeFilter === "all" ||
@@ -118,9 +111,7 @@ export default function AdminDashboard() {
         (timeFilter === "past" && eventDate <= now) ||
         (timeFilter === "pending" && event.status === "pending");
 
-      return (
-        isAdminEvent && matchesSearch && matchesCategory && matchesTimeFilter
-      );
+      return isAdminEvent && matchesSearch && matchesCategory && matchesTimeFilter;
     });
   }, [events, searchTerm, category, timeFilter, session]);
 
@@ -173,7 +164,7 @@ export default function AdminDashboard() {
       <div className="container mx-auto p-6 sm:pl-20">
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle className="text-3xl font-bold">Welcome, Admin</CardTitle>
+            <CardTitle className="text-3xl font-bold">Welcome, {session?.user?.name}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">
@@ -206,8 +197,7 @@ export default function AdminDashboard() {
                   <SelectItem value="all">All Categories</SelectItem>
                   {categories.map((cat: any) => (
                     <SelectItem key={cat.id} value={cat.category}>
-                      {cat.category.charAt(0).toUpperCase() +
-                        cat.category.slice(1).toLowerCase()}
+                      {cat.category.charAt(0).toUpperCase() + cat.category.slice(1).toLowerCase()}
                     </SelectItem>
                   ))}
                 </SelectGroup>
@@ -229,26 +219,18 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        <Tabs
-          defaultValue="all"
-          className="mb-8"
-          onValueChange={handleTimeFilterChange}
-        >
+        <Tabs defaultValue="all" className="mb-8" onValueChange={handleTimeFilterChange}>
           <TabsList>
             <TabsTrigger value="all">All Events</TabsTrigger>
             <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
             <TabsTrigger value="past">Past</TabsTrigger>
             <TabsTrigger value="pending">Pending</TabsTrigger>
           </TabsList>
-          <TabsContent value="all">
-            {loading ? <LoadingSpinner /> : memoizedEventGrid}
-          </TabsContent>
+          <TabsContent value="all">{loading ? <LoadingSpinner /> : memoizedEventGrid}</TabsContent>
           <TabsContent value="upcoming">
             {loading ? <LoadingSpinner /> : memoizedEventGrid}
           </TabsContent>
-          <TabsContent value="past">
-            {loading ? <LoadingSpinner /> : memoizedEventGrid}
-          </TabsContent>
+          <TabsContent value="past">{loading ? <LoadingSpinner /> : memoizedEventGrid}</TabsContent>
           <TabsContent value="pending">
             {loading ? <LoadingSpinner /> : memoizedEventGrid}
           </TabsContent>
@@ -270,22 +252,20 @@ export default function AdminDashboard() {
   );
 }
 
-const EventGrid = React.memo(
-  ({ events, deletionStatus, onDelete, callBack }: any) => {
-    return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-        {events.map((event: any) => (
-          <EventCard
-            key={event.id}
-            event={event}
-            canDelete={deletionStatus[event.id]}
-            onDelete={onDelete}
-            requestRefresh={callBack}
-          />
-        ))}
-      </div>
-    );
-  }
-);
+const EventGrid = React.memo(({ events, deletionStatus, onDelete, callBack }: any) => {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+      {events.map((event: any) => (
+        <EventCard
+          key={event.id}
+          event={event}
+          canDelete={deletionStatus[event.id]}
+          onDelete={onDelete}
+          requestRefresh={callBack}
+        />
+      ))}
+    </div>
+  );
+});
 
 EventGrid.displayName = "EventGrid";
