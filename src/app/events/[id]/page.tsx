@@ -117,20 +117,18 @@ export default function EventPage() {
               content={event.location}
             />
             {loadingTickets ? <LoadingSpinner /> : <TicketsLeftCard ticketsLeft={ticketsLeft} />}
-            <CardFooter className="flex justify-start pt-6 sm:flex-row sm:justify-between sm:space-x-4">
-              {session?.user.role === "admin" ? (
-                <Button variant="secondary" className="w-full sm:max-w-min sm:flex-1">
-                  Admins are in view only
-                </Button>
-              ) : (
-                <BuyButton
-                  eventId={event.id}
-                  ticketPrice={event.ticketPrice}
-                  userEmail={session?.user.email}
-                  className="sm:flex-1"
-                />
-              )}
-            </CardFooter>
+            {session?.user.role === "admin" ? (
+              <Button variant="secondary" className="w-full">
+                Admins are in view only
+              </Button>
+            ) : (
+              <BuyButton
+                eventId={event.id}
+                ticketPrice={event.ticketPrice}
+                userEmail={session?.user.email}
+              />
+            )}
+            {/* <CardFooter className="flex justify-start pt-6 sm:flex-row sm:justify-between sm:space-x-4"></CardFooter> */}
           </div>
           <div className="md:col-span-2 space-y-8">
             <EventSection title="About This Event" content={event.description} />
