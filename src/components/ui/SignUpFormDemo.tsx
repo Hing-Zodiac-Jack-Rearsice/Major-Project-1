@@ -24,7 +24,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -108,6 +107,13 @@ export function SignupFormDemo() {
       return;
     }
     signIn("google", { redirectTo: `${process.env.NEXT_PUBLIC_URL}/events` });
+  };
+
+  const handleTermsChange = (checked: boolean) => {
+    setAcceptTerms(checked);
+    if (checked) {
+      setShowTerms(true);
+    }
   };
 
   const termsAndConditions = `
@@ -245,7 +251,7 @@ export function SignupFormDemo() {
                     <Checkbox
                       id="terms"
                       checked={acceptTerms}
-                      onCheckedChange={(checked) => setAcceptTerms(checked as boolean)}
+                      onCheckedChange={handleTermsChange}
                     />
                     <label
                       htmlFor="terms"
