@@ -205,8 +205,8 @@ const SideNav = () => {
           <Logo width={32} height={32} />
           <h1 className="text-xl font-bold italic text-black dark:text-white">SOMBOT</h1>
         </Link>
-        <div className="relative ml-auto ">
-          <p className="w-full font-medium text-sm">{userData?.name}</p>
+        <div className="relative ml-auto">
+          <p className="w-full font-medium text-sm hidden sm:block">{userData?.name}</p>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

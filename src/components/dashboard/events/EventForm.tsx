@@ -477,7 +477,7 @@ const EventForm: React.FC<EventFormProps> = ({ children, refreshCallback, initia
             <Button type="submit" onClick={handleUpload} disabled={isSubmitting}>
               {isSubmitting ? "Creating..." : "Create"}
             </Button>
-            <Button
+            {/* <Button
               onClick={() => {
                 console.log(guests);
                 console.log(highlights);
@@ -486,7 +486,7 @@ const EventForm: React.FC<EventFormProps> = ({ children, refreshCallback, initia
               disabled={isSubmitting}
             >
               Log out optional values
-            </Button>
+            </Button> */}
           </DialogFooter>
         </DialogContent>
       </Dialog>
