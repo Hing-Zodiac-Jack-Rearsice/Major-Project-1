@@ -29,6 +29,7 @@ const Page = () => {
   const getCategories = async () => {
     const response = await fetch("/api/category");
     if (response.ok) {
+      // Handle successful response
       const data = await response.json();
       setCategories(data.categories);
     }
