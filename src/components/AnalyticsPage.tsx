@@ -170,6 +170,37 @@ const AnalyticsPage: React.FC = () => {
       yPosition += 120;
     });
 
+    // Add new sections
+    doc.addPage();
+    doc.setFontSize(24);
+    doc.text("Customer Insights", 14, 20);
+
+    (doc as any).autoTable({
+      startY: 30,
+      head: [["Metric", "Value"]],
+      body: [
+        [
+          "Customer Retention Rate",
+          `${analyticsData.customerRetentionRate.toFixed(2)}%`,
+        ],
+        [
+          "Customer Lifetime Value",
+          `$${analyticsData.customerLifetimeValue.toFixed(2)}`,
+        ],
+        [
+          "Customer Acquisition Cost",
+          `$${analyticsData.customerAcquisitionCost.toFixed(2)}`,
+        ],
+      ],
+      theme: "grid",
+      headStyles: {
+        fillColor: [41, 128, 185],
+        fontSize: 12,
+        fontStyle: "bold",
+      },
+      styles: { fontSize: 11, cellPadding: 5 },
+    });
+
     doc.save("analytics_report.pdf");
   };
 
@@ -345,6 +376,18 @@ const AnalyticsPage: React.FC = () => {
             title: "Avg Attendance",
             value: `${(analyticsData.averageAttendanceRate || 0).toFixed(2)}%`,
           },
+          {
+            title: "Capacity Utilization",
+            value: `${analyticsData.capacityUtilization.toFixed(2)}%`,
+          },
+          {
+            title: "Customer Retention",
+            value: `${analyticsData.customerRetentionRate.toFixed(2)}%`,
+          },
+          {
+            title: "Avg Ticket Price",
+            value: `$${analyticsData.averageTicketPrice.toFixed(2)}`,
+          },
         ].map((item, index) => (
           <StatCard
             key={index}
@@ -390,7 +433,7 @@ const AnalyticsPage: React.FC = () => {
                 label: "Remaining Tickets",
                 data:
                   analyticsData.remainingTicketsPerEvent?.map(
-                    (item: any) => item.remainingTickets 
+                    (item: any) => item.remainingTickets
                   ) || [],
                 backgroundColor: "rgba(255, 99, 132, 0.8)",
                 borderColor: "rgba(255, 99, 132, 1)",
@@ -504,6 +547,71 @@ const AnalyticsPage: React.FC = () => {
                   ) || [],
                 backgroundColor: "rgba(75, 192, 192, 0.8)",
                 borderColor: "rgba(75, 192, 192, 1)",
+                borderWidth: 2,
+              },
+            ],
+          }}
+        />
+        <ChartCard
+          title="Monthly Revenue Trends"
+          ChartComponent={Line}
+          data={{
+            labels:
+              analyticsData.revenueByMonth?.map((item: any) => item.month) ||
+              [],
+            datasets: [
+              {
+                label: "Revenue",
+                data:
+                  analyticsData.revenueByMonth?.map(
+                    (item: any) => item.revenue
+                  ) || [],
+                backgroundColor: "rgba(75, 192, 192, 0.8)",
+                borderColor: "rgba(75, 192, 192, 1)",
+                borderWidth: 2,
+              },
+            ],
+          }}
+        />
+        <ChartCard
+          title="Event Popularity Scores"
+          ChartComponent={Bar}
+          data={{
+            labels:
+              analyticsData.eventPopularityScore?.map(
+                (item: any) => item.eventName
+              ) || [],
+            datasets: [
+              {
+                label: "Popularity Score",
+                data:
+                  analyticsData.eventPopularityScore?.map(
+                    (item: any) => item.popularity
+                  ) || [],
+                backgroundColor: "rgba(153, 102, 255, 0.8)",
+                borderColor: "rgba(153, 102, 255, 1)",
+                borderWidth: 2,
+              },
+            ],
+          }}
+        />
+        <ChartCard
+          title="Customer Retention Analysis"
+          ChartComponent={Line}
+          data={{
+            labels:
+              analyticsData.customerRetentionTrend?.map(
+                (item: any) => item.period
+              ) || [],
+            datasets: [
+              {
+                label: "Retention Rate",
+                data:
+                  analyticsData.customerRetentionTrend?.map(
+                    (item: any) => item.rate
+                  ) || [],
+                backgroundColor: "rgba(255, 159, 64, 0.8)",
+                borderColor: "rgba(255, 159, 64, 1)",
                 borderWidth: 2,
               },
             ],

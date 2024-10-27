@@ -39,6 +39,7 @@ import Link from "next/link";
 import EventUpdateForm from "@/components/dashboard/events/EventUpdateForm";
 import { remainingTickets } from "@/app/actions";
 import { Progress } from "@/components/ui/progress";
+import { EventAnalytics } from "@/components/dashboard/events/EventAnalytics";
 
 export default function Component(props: any) {
   const [event, setEvent] = useState<any>(null);
@@ -349,24 +350,13 @@ export default function Component(props: any) {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 gap-6">
-                  <Card className="border-none">
-                    {/* <CardHeader>
-                      <CardTitle className="text-lg">Sales</CardTitle>
-                    </CardHeader> */}
-                    <CardContent>
-                      <SalesCard eventId={id} />
-                    </CardContent>
-                  </Card>
-                  <Card className="border-none">
-                    {/* <CardHeader>
-                      <CardTitle className="text-lg">Attendance</CardTitle>
-                    </CardHeader> */}
-                    <CardContent>
-                      <AttendanceChart eventId={id} />
-                    </CardContent>
-                  </Card>
-                </div>
+                {loading ? (
+                  <div className="flex items-center justify-center h-40">
+                    <LoadingSpinner />
+                  </div>
+                ) : (
+                  <EventAnalytics event={event} ticketsLeft={ticketsLeft} />
+                )}
               </CardContent>
             </Card>
           </TabsContent>
