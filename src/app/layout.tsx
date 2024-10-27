@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/providers/ThemeProvider";
 import Navbar from "@/components/Navbar";
 import { MyFooter } from "@/components/MyFooter";
 import AuthProvider from "@/providers/AuthProvider";
+import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,9 +16,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   // BELOW : only works on server components
   // const headersList = headers();
   // const pathname = headersList.get("x-invoke-path") || "";
@@ -38,6 +39,7 @@ export default function RootLayout({
             <MyFooter />
           </ThemeProvider>
         </AuthProvider>
+        <Toaster />
       </body>
     </html>
   );
