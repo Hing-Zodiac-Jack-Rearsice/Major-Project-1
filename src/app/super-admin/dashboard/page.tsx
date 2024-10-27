@@ -26,16 +26,34 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { toast } from "@/components/ui/use-toast";
 import { UserCircle, CalendarClock, Users, AlertTriangle } from "lucide-react";
 import { signIn } from "next-auth/react"; // Import signIn
+
+// Update the Event interface to include additional properties
+interface Event {
+  id: string;
+  eventName: string;
+  organizer: string;
+  startDate: string;
+  endDate: string;
+  description: string;
+  ticketPrice: number;
+  ticketAmount: number;
+  ticketsSold: number;
+  location: string; // New property added
+  imageUrl: string; // New property added
+}
 
 export default function SuperAdminDashboard() {
   const { data: session, status } = useSession();
   const [users, setUsers] = useState([]);
   const [pendingEvents, setPendingEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [isConfirmDialogOpen, setConfirmDialogOpen] = useState(false);
 
   const fetchUsers = useCallback(async () => {
     try {
@@ -101,8 +119,7 @@ export default function SuperAdminDashboard() {
 
     if (res.ok) {
       toast({ title: "User role updated successfully" });
-      // await signIn(); // Refresh the session
-      fetchUsers(); // Optionally refetch users if needed
+      fetchUsers();
     } else {
       const errorData = await res.json();
       toast({
@@ -134,6 +151,14 @@ export default function SuperAdminDashboard() {
         description: error instanceof Error ? error.message : "Unknown error",
         variant: "destructive",
       });
+    }
+  };
+
+  const confirmApproval = async () => {
+    if (selectedEvent) {
+      await handleEventApproval(selectedEvent.id, true);
+      setConfirmDialogOpen(false);
+      setSelectedEvent(null);
     }
   };
 
@@ -322,7 +347,10 @@ export default function SuperAdminDashboard() {
                       <TableCell>
                         <div className="flex space-x-2">
                           <Button
-                            onClick={() => handleEventApproval(event.id, true)}
+                            onClick={() => {
+                              setSelectedEvent(event);
+                              setConfirmDialogOpen(true);
+                            }}
                             size="sm"
                           >
                             Approve
@@ -343,6 +371,84 @@ export default function SuperAdminDashboard() {
             </CardContent>
           </Card>
         </TabsContent>
+
+        {/* Confirmation Dialog */}
+        <Dialog open={isConfirmDialogOpen} onOpenChange={setConfirmDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Review Event Details</DialogTitle>
+              <DialogDescription>
+                Here are the details of the event you are about to approve.
+              </DialogDescription>
+            </DialogHeader>
+            {selectedEvent && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Event Information</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <img
+                      src={selectedEvent.imageUrl}
+                      alt={selectedEvent.eventName}
+                      className="w-full h-48 object-cover rounded-md mb-4"
+                    />
+                    <p>
+                      <strong>Event Name:</strong> {selectedEvent.eventName}
+                    </p>
+                    <p>
+                      <strong>Organizer:</strong> {selectedEvent.organizer}
+                    </p>
+                    <p>
+                      <strong>Description:</strong> {selectedEvent.description}
+                    </p>
+                    <p>
+                      <strong>Date:</strong>{" "}
+                      {new Date(selectedEvent.startDate).toLocaleDateString()}
+                    </p>
+                    <p>
+                      <strong>Location:</strong> {selectedEvent.location}
+                    </p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Additional Details</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p>
+                      <strong>Start Date:</strong>{" "}
+                      {new Date(selectedEvent.startDate).toLocaleString()}
+                    </p>
+                    <p>
+                      <strong>End Date:</strong>{" "}
+                      {new Date(selectedEvent.endDate).toLocaleString()}
+                    </p>
+                    <p>
+                      <strong>Ticket Price:</strong> $
+                      {selectedEvent.ticketPrice}
+                    </p>
+                    <p>
+                      <strong>Tickets Available:</strong>{" "}
+                      {selectedEvent.ticketAmount - selectedEvent.ticketsSold}
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+            <div className="flex justify-end space-x-2 mt-4">
+              <Button
+                variant="outline"
+                onClick={() => setConfirmDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button onClick={confirmApproval} variant="destructive">
+                Confirm Approval
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </Tabs>
     </div>
   );
