@@ -22,6 +22,24 @@ import { checkForDelete } from "@/app/actions";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation"; // Import useRouter for navigation
 
+// Add this new function at the top level
+const checkDeletionStatusBatch = async (eventIds: string[]) => {
+  try {
+    const response = await fetch('/api/events/deletion-status', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ eventIds }),
+    });
+    if (!response.ok) throw new Error('Failed to fetch deletion status');
+    return await response.json();
+  } catch (error) {
+    console.error('Error checking deletion status:', error);
+    return {};
+  }
+};
+
 export default function AdminDashboard() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -87,14 +105,9 @@ export default function AdminDashboard() {
   }, [category, debouncedFetchEvents]);
 
   const checkDeletionStatus = useCallback(async (eventList: any) => {
-    const statusPromises = eventList.map(async (event: any) => {
-      const result = await checkForDelete(event.id);
-      return { [event.id]: result };
-    });
-
-    const statusResults = await Promise.all(statusPromises);
-    const newDeletionStatus = Object.assign({}, ...statusResults);
-    setDeletionStatus(newDeletionStatus);
+    const eventIds = eventList.map((event: any) => event.id);
+    const statusResults = await checkDeletionStatusBatch(eventIds);
+    setDeletionStatus(statusResults);
   }, []);
 
   const filteredEvents = useMemo(() => {

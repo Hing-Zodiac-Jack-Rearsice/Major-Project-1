@@ -88,14 +88,13 @@ export function EventCard({ event, requestRefresh, canDelete, onDelete }: any) {
       </CardContent>
       <CardFooter className="flex justify-between">
         {canDelete === undefined ? (
-          <Button disabled variant="outline">
+          <Button disabled variant="outline" className="w-24">
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Loading
           </Button>
         ) : canDelete ? (
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="destructive">Cancel</Button>
+              <Button variant="destructive" className="w-24">Cancel</Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
@@ -118,7 +117,7 @@ export function EventCard({ event, requestRefresh, canDelete, onDelete }: any) {
             <HoverCardTrigger asChild>
               <Button
                 variant="outline"
-                className="cursor-not-allowed opacity-50"
+                className="cursor-not-allowed opacity-50 w-24"
               >
                 Cancel
               </Button>
