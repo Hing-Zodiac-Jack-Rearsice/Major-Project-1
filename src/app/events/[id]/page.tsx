@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -41,7 +39,9 @@ interface Event {
 }
 
 async function getEvent(id: string): Promise<Event> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/events/${id}`);
+  const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/events/${id}`, {
+    cache: "no-store",
+  });
   if (!res.ok) {
     throw new Error("Failed to fetch event");
   }
