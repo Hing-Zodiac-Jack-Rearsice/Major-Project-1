@@ -1,5 +1,6 @@
 "use client";
-import React, { useEffect, useState } from "react";
+
+import React from "react";
 import {
   Dialog,
   DialogContent,
@@ -9,23 +10,25 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-
 import { Button } from "@/components/ui/button";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faWallet } from "@fortawesome/free-solid-svg-icons";
-
+import { Wallet } from "lucide-react";
 import { CreateStripeAccountLink, getStripeDashboardLink } from "@/app/actions";
-import { auth } from "@/lib/auth";
 import { useSession } from "next-auth/react";
 
-const Billing = () => {
+export default function Billing() {
   const { data: session } = useSession();
   const stripeConnectedLinked = session?.user?.stripeConnectedLinked;
+  const [open, setOpen] = React.useState(false);
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="ghost" className="pl-3 sm:px-2 sm:py-4">
-          <FontAwesomeIcon icon={faWallet} className="w-4 h-4" />
+        <Button
+          variant="ghost"
+          className={`pl-3 sm:px-2 sm:py-4 ${open ? "bg-accent text-accent-foreground" : ""}`}
+        >
+          <Wallet className={`w-5 h-5 ${open ? "fill-current" : ""}`} />
+          <span className="sr-only">Billing</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] text-sm max-h-96 overflow-y-auto">
@@ -51,6 +54,4 @@ const Billing = () => {
       </DialogContent>
     </Dialog>
   );
-};
-
-export default Billing;
+}
