@@ -1,10 +1,12 @@
 import { Loader2 } from "lucide-react";
 
-export default function LoadingSpinner() {
+export default function LoadingSpinner({ className = "" }: { className?: string }) {
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-background w-full">
-      <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      <p className="mt-2 text-sm text-muted-foreground">Loading...</p>
+    <div
+      className={`inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent motion-reduce:animate-[spin_1.5s_linear_infinite] ${className}`}
+      role="status"
+    >
+      <span className="sr-only">Loading...</span>
     </div>
   );
 }

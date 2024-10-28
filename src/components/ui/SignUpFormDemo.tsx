@@ -16,7 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, CheckCircle } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
@@ -26,6 +26,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { useToast } from "@/components/ui/use-toast";
 
 export function SignupFormDemo() {
   const router = useRouter();
@@ -40,70 +42,86 @@ export function SignupFormDemo() {
   const { data: session } = useSession();
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+  const [registrationSuccess, setRegistrationSuccess] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     setError("");
+    setRegistrationSuccess(false);
 
-    if (activeTab === "register" && !acceptTerms) {
-      setError("You must accept the terms and conditions to sign up.");
-      return;
-    }
-
-    if (activeTab === "login") {
-      const result = await signIn("credentials", {
-        email: loginEmail,
-        password: loginPassword,
-        redirect: false,
-      });
-      if (result?.error) {
-        setError("Invalid email or password. Please try again.");
-      } else if (result?.ok) {
-        console.log("Login successful");
-        const session = await getSession();
-        console.log("Session after login:", session);
-        router.push("/events");
-      }
-    } else {
-      if (registerPassword !== confirmPassword) {
-        setError("Passwords do not match");
-        return;
-      }
-      try {
-        const response = await fetch("/api/auth/register", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: registerEmail, password: registerPassword, name }),
+    try {
+      if (activeTab === "login") {
+        const result = await signIn("credentials", {
+          email: loginEmail,
+          password: loginPassword,
+          redirect: false,
         });
 
-        if (response.ok) {
-          const result = await response.json();
-          console.log("User registered:", result.user);
-          const signInResult = await signIn("credentials", {
+        if (result?.error) {
+          setError(result.error);
+        } else {
+          // Check user role and redirect accordingly
+          const session = await getSession();
+          if (session?.user?.role === "super_admin") {
+            router.push("/super-admin/dashboard");
+          } else {
+            router.push("/");
+          }
+        }
+      } else {
+        // Register logic
+        if (!acceptTerms) {
+          setError("Please accept the terms and conditions");
+          setIsLoading(false);
+          return;
+        }
+        if (registerPassword !== confirmPassword) {
+          setError("Passwords do not match");
+          setIsLoading(false);
+          return;
+        }
+
+        const res = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
             email: registerEmail,
             password: registerPassword,
-            redirect: false,
-          });
-          if (signInResult?.ok) {
-            console.log("Login successful after registration");
-            router.push("/events");
-          } else {
-            setError("Registration successful, but login failed. Please try logging in.");
-          }
-        } else {
-          const error = await response.json();
-          setError(error.error || "Failed to sign up");
+            name: name,
+          }),
+        });
+
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.error || "Registration failed");
         }
-      } catch (error) {
-        console.error("Registration error:", error);
-        setError("Failed to sign up");
+
+        // Clear registration form
+        setRegisterEmail("");
+        setRegisterPassword("");
+        setConfirmPassword("");
+        setName("");
+        setAcceptTerms(false);
+
+        // Show success message and switch to login tab
+        setRegistrationSuccess(true);
+        setActiveTab("login");
       }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleGoogleSignIn = () => {
     if (activeTab === "register" && !acceptTerms) {
-      setError("You must accept the terms and conditions to sign up with Google.");
+      setError(
+        "You must accept the terms and conditions to sign up with Google."
+      );
       return;
     }
     signIn("google", { redirectTo: `${process.env.NEXT_PUBLIC_URL}/events` });
@@ -159,16 +177,34 @@ export function SignupFormDemo() {
 
       <Card className="w-full md:w-1/2 rounded-none md:rounded-lg shadow-none md:shadow-lg flex flex-col">
         <CardHeader className="p-4 md:p-8">
-          <CardTitle>{activeTab === "login" ? "Welcome back" : "Create an account"}</CardTitle>
+          <CardTitle>
+            {activeTab === "login" ? "Welcome back" : "Create an account"}
+          </CardTitle>
           <CardDescription>
-            {activeTab === "login" ? "Sign in to your account" : "Sign up for a new account"}
+            {activeTab === "login"
+              ? "Sign in to your account"
+              : "Sign up for a new account"}
           </CardDescription>
         </CardHeader>
         <CardContent className="p-4 md:p-8 flex-grow flex flex-col">
+          {registrationSuccess && (
+            <Alert className="mb-4" variant="success">
+              <CheckCircle className="h-4 w-4" />
+              <AlertTitle>Registration Successful!</AlertTitle>
+              <AlertDescription>
+                Your account has been created. Please login with your email and password.
+              </AlertDescription>
+            </Alert>
+          )}
+          
           <Tabs
             defaultValue="login"
             value={activeTab}
-            onValueChange={(value) => setActiveTab(value)}
+            onValueChange={(value) => {
+              setActiveTab(value);
+              setRegistrationSuccess(false);
+              setError("");
+            }}
             className="flex-grow flex flex-col"
           >
             <TabsList className="grid w-full grid-cols-2">
@@ -199,8 +235,21 @@ export function SignupFormDemo() {
                     />
                   </div>
                 </div>
-                <Button className="w-full mt-4" type="submit">
-                  Sign in
+                <Button
+                  className="w-full mt-4"
+                  type="submit"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <div className="flex items-center justify-center">
+                      <LoadingSpinner className="mr-2" />
+                      {activeTab === "login"
+                        ? "Signing in..."
+                        : "Creating account..."}
+                    </div>
+                  ) : (
+                    <>{activeTab === "login" ? "Sign in" : "Create account"}</>
+                  )}
                 </Button>
               </form>
             </TabsContent>
@@ -268,8 +317,21 @@ export function SignupFormDemo() {
                     </label>
                   </div>
                 </div>
-                <Button className="w-full mt-4" type="submit">
-                  Sign up
+                <Button
+                  className="w-full mt-4"
+                  type="submit"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <div className="flex items-center justify-center">
+                      <LoadingSpinner className="mr-2" />
+                      {activeTab === "login"
+                        ? "Signing in..."
+                        : "Creating account..."}
+                    </div>
+                  ) : (
+                    <>{activeTab === "login" ? "Sign in" : "Create account"}</>
+                  )}
                 </Button>
               </form>
             </TabsContent>
@@ -288,12 +350,20 @@ export function SignupFormDemo() {
               <span className="w-full border-t" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+              <span className="bg-background px-2 text-muted-foreground">
+                Or continue with
+              </span>
             </div>
           </div>
-          <Button variant="outline" className="w-full" onClick={handleGoogleSignIn}>
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={handleGoogleSignIn}
+          >
             <IconBrandGoogle className="mr-2 h-4 w-4" />
-            {activeTab === "login" ? "Sign in with Google" : "Sign up with Google"}
+            {activeTab === "login"
+              ? "Sign in with Google"
+              : "Sign up with Google"}
           </Button>
         </CardFooter>
       </Card>
@@ -302,7 +372,9 @@ export function SignupFormDemo() {
         <DialogContent className="max-w-3xl max-h-[80vh] overflow-hidden flex flex-col">
           <DialogHeader>
             <DialogTitle>Terms and Conditions</DialogTitle>
-            <DialogDescription>Please read our terms and conditions carefully.</DialogDescription>
+            <DialogDescription>
+              Please read our terms and conditions carefully.
+            </DialogDescription>
           </DialogHeader>
           <ScrollArea className="flex-grow h-screen">
             <div className="p-4 space-y-4">

@@ -33,6 +33,8 @@ import { UserCircle, CalendarClock, Users, AlertTriangle } from "lucide-react";
 import { signIn } from "next-auth/react"; // Import signIn
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import ConfirmationDialog from "@/components/ui/improved-confirmation-dialog";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/components/ui/use-toast"; // Add this import
 
 // Update the Event interface to include additional properties
 interface Event {
@@ -56,6 +58,8 @@ export default function SuperAdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isConfirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const { toast } = useToast();
+  const router = useRouter();
 
   const fetchUsers = useCallback(async () => {
     try {
@@ -101,7 +105,9 @@ export default function SuperAdminDashboard() {
 
   useEffect(() => {
     if (session?.user?.role === "super_admin") {
-      Promise.all([fetchUsers(), fetchPendingEvents()]).then(() => setLoading(false));
+      Promise.all([fetchUsers(), fetchPendingEvents()]).then(() =>
+        setLoading(false)
+      );
     }
   }, [session, fetchUsers, fetchPendingEvents]);
 
@@ -111,19 +117,35 @@ export default function SuperAdminDashboard() {
       return;
     }
 
-    const res = await fetch(`/api/userManagement/${userId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ role: newRole }),
-    });
+    try {
+      const res = await fetch(`/api/userManagement/${userId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role: newRole }),
+      });
 
-    if (res.ok) {
-      toast({ title: "User role updated successfully" });
-      fetchUsers();
-    } else {
-      const errorData = await res.json();
+      if (res.ok) {
+        toast({
+          title: "Role updated successfully",
+          description: "The page will refresh to apply changes...",
+        });
+
+        // Add a slight delay before refreshing
+        setTimeout(() => {
+          router.refresh();
+          fetchUsers();
+        }, 1500);
+      } else {
+        const errorData = await res.json();
+        toast({
+          title: `Failed to update user role: ${errorData.error}`,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
       toast({
-        title: `Failed to update user role: ${errorData.error}`,
+        title: "An error occurred",
+        description: "Failed to update user role",
         variant: "destructive",
       });
     }
@@ -163,7 +185,11 @@ export default function SuperAdminDashboard() {
   };
 
   if (status === "loading")
-    return <div className="flex items-center justify-center h-screen">Loading session...</div>;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        Loading session...
+      </div>
+    );
   if (!session)
     return (
       <div className="flex items-center justify-center h-screen">
@@ -182,7 +208,9 @@ export default function SuperAdminDashboard() {
     <div className="container mx-auto p-6 mt-20 bg-background min-h-screen">
       <div className="mb-8">
         <h1 className="text-4xl font-bold mb-2">Super Admin Dashboard</h1>
-        <p className="text-muted-foreground">Welcome back, {session.user.name}</p>
+        <p className="text-muted-foreground">
+          Welcome back, {session.user.name}
+        </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -197,7 +225,9 @@ export default function SuperAdminDashboard() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending Events</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Pending Events
+            </CardTitle>
             <CalendarClock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -210,7 +240,9 @@ export default function SuperAdminDashboard() {
             <UserCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold capitalize">{session.user.role}</div>
+            <div className="text-2xl font-bold capitalize">
+              {session.user.role}
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -244,7 +276,9 @@ export default function SuperAdminDashboard() {
                       <TableCell>
                         <Select
                           value={user.role}
-                          onValueChange={(value) => handleUserRoleChange(user.id, value)}
+                          onValueChange={(value) =>
+                            handleUserRoleChange(user.id, value)
+                          }
                           disabled={user.role === "super_admin"}
                         >
                           <SelectTrigger className="w-[180px]">
@@ -263,7 +297,10 @@ export default function SuperAdminDashboard() {
                             <Button
                               variant="destructive"
                               size="sm"
-                              disabled={user.role === "super_admin" || user.role === "banned"}
+                              disabled={
+                                user.role === "super_admin" ||
+                                user.role === "banned"
+                              }
                             >
                               {user.role === "banned" ? "Banned" : "Ban User"}
                             </Button>
@@ -277,8 +314,13 @@ export default function SuperAdminDashboard() {
                               <p>Are you sure you want to ban this user?</p>
                             </div>
                             <Button
-                              onClick={() => handleUserRoleChange(user.id, "banned")}
-                              disabled={user.role === "super_admin" || user.role === "banned"}
+                              onClick={() =>
+                                handleUserRoleChange(user.id, "banned")
+                              }
+                              disabled={
+                                user.role === "super_admin" ||
+                                user.role === "banned"
+                              }
                               variant="destructive"
                             >
                               Confirm Ban
@@ -312,9 +354,13 @@ export default function SuperAdminDashboard() {
                 <TableBody>
                   {pendingEvents.map((event: any) => (
                     <TableRow key={event.id}>
-                      <TableCell className="font-medium">{event.eventName}</TableCell>
+                      <TableCell className="font-medium">
+                        {event.eventName}
+                      </TableCell>
                       <TableCell>{event.organizer}</TableCell>
-                      <TableCell>{new Date(event.startDate).toLocaleDateString()}</TableCell>
+                      <TableCell>
+                        {new Date(event.startDate).toLocaleDateString()}
+                      </TableCell>
                       <TableCell>
                         <div className="flex space-x-2">
                           <Button
