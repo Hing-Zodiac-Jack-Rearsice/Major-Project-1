@@ -71,20 +71,20 @@ export function ClientEventCard({ event }: any) {
           </motion.div>
         )}
         <AnimatePresence>
-          {isHovered && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              transition={{ duration: 0.2 }}
-              className="absolute top-4 left-4"
-            >
-              <ShareEventButtons
-                event={event}
-                className="bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm"
-              />
-            </motion.div>
-          )}
+          {/* {isHovered && ( */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.2 }}
+            className="absolute top-4 left-4"
+          >
+            <ShareEventButtons
+              event={event}
+              className="bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm"
+            />
+          </motion.div>
+          {/* )} */}
         </AnimatePresence>
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -92,9 +92,7 @@ export function ClientEventCard({ event }: any) {
           transition={{ delay: 0.1 }}
           className="absolute bottom-4 left-4 right-4"
         >
-          <h3 className="text-white text-2xl font-bold truncate mb-2">
-            {event.eventName}
-          </h3>
+          <h3 className="text-white text-2xl font-bold truncate mb-2">{event.eventName}</h3>
           <div className="flex items-center text-white text-sm mb-1">
             <Calendar className="w-4 h-4 mr-2" />
             <span>{formattedDate}</span>
