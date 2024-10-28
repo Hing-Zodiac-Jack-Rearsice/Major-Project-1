@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Calendar, Clock, MapPin, Ticket } from "lucide-react";
 import { motion } from "framer-motion";
 import { remainingTickets } from "@/app/actions";
+import { ShareEventButtons } from "./ShareEventButtons";
 
 export function ClientEventCard({ event }: any) {
   const eventDate = new Date(event.startDate);
@@ -53,6 +54,10 @@ export function ClientEventCard({ event }: any) {
             Only {ticketsLeft} left!
           </div>
         )}
+        <ShareEventButtons
+          event={event}
+          className="absolute top-4 left-4 bg-white/10 hover:bg-white/20 text-white"
+        />
         <div className="absolute bottom-4 left-4 right-4">
           <h3 className="text-white text-2xl font-bold truncate mb-2">
             {event.eventName}
