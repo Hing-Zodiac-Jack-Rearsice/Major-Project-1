@@ -32,6 +32,7 @@ import { toast } from "@/components/ui/use-toast";
 import { UserCircle, CalendarClock, Users, AlertTriangle } from "lucide-react";
 import { signIn } from "next-auth/react"; // Import signIn
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import ConfirmationDialog from "@/components/ui/improved-confirmation-dialog";
 
 // Update the Event interface to include additional properties
 interface Event {
@@ -343,77 +344,12 @@ export default function SuperAdminDashboard() {
         </TabsContent>
 
         {/* Confirmation Dialog */}
-        <Dialog open={isConfirmDialogOpen} onOpenChange={setConfirmDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Review Event Details</DialogTitle>
-              <DialogDescription>
-                Here are the details of the event you are about to approve.
-              </DialogDescription>
-            </DialogHeader>
-            {selectedEvent && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Event Information</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <img
-                      src={selectedEvent.imageUrl}
-                      alt={selectedEvent.eventName}
-                      className="w-full h-48 object-cover rounded-md mb-4"
-                    />
-                    <p>
-                      <strong>Event Name:</strong> {selectedEvent.eventName}
-                    </p>
-                    <p>
-                      <strong>Organizer:</strong> {selectedEvent.organizer}
-                    </p>
-                    <p>
-                      <strong>Description:</strong> {selectedEvent.description}
-                    </p>
-                    <p>
-                      <strong>Date:</strong>{" "}
-                      {new Date(selectedEvent.startDate).toLocaleDateString()}
-                    </p>
-                    <p>
-                      <strong>Location:</strong> {selectedEvent.location}
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Additional Details</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p>
-                      <strong>Start Date:</strong>{" "}
-                      {new Date(selectedEvent.startDate).toLocaleString()}
-                    </p>
-                    <p>
-                      <strong>End Date:</strong> {new Date(selectedEvent.endDate).toLocaleString()}
-                    </p>
-                    <p>
-                      <strong>Ticket Price:</strong> ${selectedEvent.ticketPrice}
-                    </p>
-                    <p>
-                      <strong>Tickets Available:</strong>{" "}
-                      {selectedEvent.ticketAmount - selectedEvent.ticketsSold}
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
-            <div className="flex justify-end space-x-2 mt-4">
-              <Button variant="outline" onClick={() => setConfirmDialogOpen(false)}>
-                Cancel
-              </Button>
-              <Button onClick={confirmApproval} variant="destructive">
-                Confirm Approval
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+        <ConfirmationDialog
+          isOpen={isConfirmDialogOpen}
+          onClose={() => setConfirmDialogOpen(false)}
+          onConfirm={confirmApproval}
+          selectedEvent={selectedEvent}
+        />
       </Tabs>
     </div>
   );
