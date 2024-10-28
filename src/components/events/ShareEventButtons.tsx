@@ -30,6 +30,9 @@ interface ShareEventButtonsProps {
     eventName: string;
     description?: string;
     imageUrl: string;
+    startDate: string;
+    endDate: string;
+    location?: string;
   };
   className?: string;
 }
@@ -37,8 +40,21 @@ interface ShareEventButtonsProps {
 export function ShareEventButtons({ event, className }: ShareEventButtonsProps) {
   const [copied, setCopied] = React.useState(false);
   const url = `${process.env.NEXT_PUBLIC_URL}/events/${event.id}`;
-  const title = event.eventName;
-  const description = event.description || `Check out ${event.eventName}!`;
+  
+  // Format date for sharing
+  const eventDate = new Date(event.startDate);
+  const formattedDate = eventDate.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+  // Create formatted sharing text
+  const title = `${event.eventName} - ${formattedDate}`;
+  const description = `${event.description || `Join us for ${event.eventName}`}\n\n📅 ${formattedDate}\n📍 ${event.location || 'Location TBA'}\n\nGet your tickets now!`;
+  
+  // Create hashtags
+  const hashtags = [`event`, `${event.eventName.replace(/\s+/g, '')}`, 'tickets'];
 
   const handleInstagramShare = () => {
     const caption = `Check out ${event.eventName}! 🎉\n\n${description}\n\nGet your tickets at: ${url}`;
@@ -86,7 +102,9 @@ export function ShareEventButtons({ event, className }: ShareEventButtonsProps) 
             color="#1877F2"
             url={url}
             title={title}
-            hashtag={`#YourHashtag ${event.eventName}`}
+            description={description}
+            hashtag={hashtags[0]} // Facebook only allows one hashtag
+            quote={description}   // Facebook-specific quote
           >
             Facebook
           </ShareButton>
@@ -96,6 +114,8 @@ export function ShareEventButtons({ event, className }: ShareEventButtonsProps) 
             color="#1DA1F2"
             url={url}
             title={title}
+            hashtags={hashtags}
+            via="YourTwitterHandle" // Add your platform's Twitter handle
           >
             Twitter
           </ShareButton>
@@ -106,6 +126,7 @@ export function ShareEventButtons({ event, className }: ShareEventButtonsProps) 
             url={url}
             title={title}
             summary={description}
+            source={process.env.NEXT_PUBLIC_URL}
           >
             LinkedIn
           </ShareButton>
@@ -114,7 +135,7 @@ export function ShareEventButtons({ event, className }: ShareEventButtonsProps) 
             Icon={WhatsappIcon}
             color="#25D366"
             url={url}
-            title={title}
+            title={`${title}\n\n${description}`}
           >
             WhatsApp
           </ShareButton>
@@ -123,7 +144,7 @@ export function ShareEventButtons({ event, className }: ShareEventButtonsProps) 
             Icon={TelegramIcon}
             color="#0088CC"
             url={url}
-            title={title}
+            title={`${title}\n\n${description}`}
           >
             Telegram
           </ShareButton>
