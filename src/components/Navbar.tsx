@@ -135,7 +135,7 @@ export default function Navbar() {
                 variant="default"
                 className="bg-purple-500 hover:bg-purple-600 text-white font-bold p-2"
               >
-                ADMIN
+                SUPER ADMIN
               </Button>
             </Link>
           )}

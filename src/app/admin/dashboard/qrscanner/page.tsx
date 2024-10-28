@@ -94,7 +94,7 @@ const Page = () => {
           <video ref={ref} className="w-full h-full object-cover" />
         </div>
 
-        <div className="text-center">
+        {/* <div className="text-center">
           {parsedResult && (
             <div>
               <h2 className="text-lg font-semibold">Scan Successful</h2>
@@ -102,7 +102,7 @@ const Page = () => {
               <p>User: {parsedResult.userEmail}</p>
             </div>
           )}
-        </div>
+        </div> */}
       </div>
 
       {/* Popup Component for feedback */}
