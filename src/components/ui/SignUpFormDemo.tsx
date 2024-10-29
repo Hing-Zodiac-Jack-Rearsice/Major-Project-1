@@ -119,9 +119,7 @@ export function SignupFormDemo() {
 
   const handleGoogleSignIn = () => {
     if (activeTab === "register" && !acceptTerms) {
-      setError(
-        "You must accept the terms and conditions to sign up with Google."
-      );
+      setError("You must accept the terms and conditions to sign up with Google.");
       return;
     }
     signIn("google", { redirectTo: `${process.env.NEXT_PUBLIC_URL}/events` });
@@ -170,20 +168,16 @@ export function SignupFormDemo() {
           <img
             src="/iphoneQR.png"
             alt="QR Code"
-            className="w-full h-full object-contain rounded-lg shadow-lg"
+            className="w-full h-full object-contain rounded-lg"
           />
         </div>
       </div>
 
       <Card className="w-full md:w-1/2 rounded-none md:rounded-lg shadow-none md:shadow-lg flex flex-col">
         <CardHeader className="p-4 md:p-8">
-          <CardTitle>
-            {activeTab === "login" ? "Welcome back" : "Create an account"}
-          </CardTitle>
+          <CardTitle>{activeTab === "login" ? "Welcome back" : "Create an account"}</CardTitle>
           <CardDescription>
-            {activeTab === "login"
-              ? "Sign in to your account"
-              : "Sign up for a new account"}
+            {activeTab === "login" ? "Sign in to your account" : "Sign up for a new account"}
           </CardDescription>
         </CardHeader>
         <CardContent className="p-4 md:p-8 flex-grow flex flex-col">
@@ -196,7 +190,7 @@ export function SignupFormDemo() {
               </AlertDescription>
             </Alert>
           )}
-          
+
           <Tabs
             defaultValue="login"
             value={activeTab}
@@ -235,17 +229,11 @@ export function SignupFormDemo() {
                     />
                   </div>
                 </div>
-                <Button
-                  className="w-full mt-4"
-                  type="submit"
-                  disabled={isLoading}
-                >
+                <Button className="w-full mt-4" type="submit" disabled={isLoading}>
                   {isLoading ? (
                     <div className="flex items-center justify-center">
                       <LoadingSpinner className="mr-2" />
-                      {activeTab === "login"
-                        ? "Signing in..."
-                        : "Creating account..."}
+                      {activeTab === "login" ? "Signing in..." : "Creating account..."}
                     </div>
                   ) : (
                     <>{activeTab === "login" ? "Sign in" : "Create account"}</>
@@ -317,17 +305,11 @@ export function SignupFormDemo() {
                     </label>
                   </div>
                 </div>
-                <Button
-                  className="w-full mt-4"
-                  type="submit"
-                  disabled={isLoading}
-                >
+                <Button className="w-full mt-4" type="submit" disabled={isLoading}>
                   {isLoading ? (
                     <div className="flex items-center justify-center">
                       <LoadingSpinner className="mr-2" />
-                      {activeTab === "login"
-                        ? "Signing in..."
-                        : "Creating account..."}
+                      {activeTab === "login" ? "Signing in..." : "Creating account..."}
                     </div>
                   ) : (
                     <>{activeTab === "login" ? "Sign in" : "Create account"}</>
@@ -350,20 +332,12 @@ export function SignupFormDemo() {
               <span className="w-full border-t" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">
-                Or continue with
-              </span>
+              <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
             </div>
           </div>
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={handleGoogleSignIn}
-          >
+          <Button variant="outline" className="w-full" onClick={handleGoogleSignIn}>
             <IconBrandGoogle className="mr-2 h-4 w-4" />
-            {activeTab === "login"
-              ? "Sign in with Google"
-              : "Sign up with Google"}
+            {activeTab === "login" ? "Sign in with Google" : "Sign up with Google"}
           </Button>
         </CardFooter>
       </Card>
@@ -372,9 +346,7 @@ export function SignupFormDemo() {
         <DialogContent className="max-w-3xl max-h-[80vh] overflow-hidden flex flex-col">
           <DialogHeader>
             <DialogTitle>Terms and Conditions</DialogTitle>
-            <DialogDescription>
-              Please read our terms and conditions carefully.
-            </DialogDescription>
+            <DialogDescription>Please read our terms and conditions carefully.</DialogDescription>
           </DialogHeader>
           <ScrollArea className="flex-grow h-screen">
             <div className="p-4 space-y-4">
