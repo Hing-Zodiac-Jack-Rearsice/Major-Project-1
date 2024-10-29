@@ -78,26 +78,10 @@
   cursor: none;
 }
 
-.events-listing-page .event-card-hover .custom-cursor-wrapper {
-  display: none;
-  mix-blend-mode: difference;
+.custom-cursor-wrapper {
   pointer-events: none;
-}
-
-.events-listing-page .event-card-hover:hover .custom-cursor-wrapper {
-  display: block;
-  animation: cursorAppear 0.3s ease-out;
-}
-
-@keyframes cursorAppear {
-  from {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+  z-index: 9999;
+  mix-blend-mode: difference;
 }
 
 /* Hide the cursor when hovering over event cards */
@@ -126,9 +110,4 @@
   100% {
     transform: rotate(360deg);
   }
-}
-
-.custom-cursor-wrapper {
-  pointer-events: none;
-  z-index: 9999;
 }

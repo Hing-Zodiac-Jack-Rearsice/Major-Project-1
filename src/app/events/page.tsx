@@ -773,9 +773,16 @@ const Page = () => {
                   className="transform transition-all hover:scale-[1.02] event-card-hover relative group"
                 >
                   <ClientEventCard event={event} />
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                    <CustomCursor />
-                  </div>
+                  <AnimatePresence>
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="group-hover:block hidden"
+                    >
+                      <CustomCursor />
+                    </motion.div>
+                  </AnimatePresence>
                 </motion.div>
               ))}
             </motion.div>
