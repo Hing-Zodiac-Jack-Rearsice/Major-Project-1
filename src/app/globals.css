@@ -70,15 +70,21 @@
 
 /* Add these styles at the end of your globals.css file */
 .event-card-hover {
+  cursor: pointer;
+}
+
+/* Only apply custom cursor effects within the events listing page */
+.events-listing-page .event-card-hover:hover {
   cursor: none;
 }
 
-.event-card-hover .custom-cursor-wrapper {
+.events-listing-page .event-card-hover .custom-cursor-wrapper {
   display: none;
   mix-blend-mode: difference;
+  pointer-events: none;
 }
 
-.event-card-hover:hover .custom-cursor-wrapper {
+.events-listing-page .event-card-hover:hover .custom-cursor-wrapper {
   display: block;
   animation: cursorAppear 0.3s ease-out;
 }
@@ -96,7 +102,7 @@
 
 /* Hide the cursor when hovering over event cards */
 .event-card-hover:hover {
-  cursor: none;
+  cursor: pointer;
 }
 
 /* Add a subtle gradient animation to the cursor */
@@ -120,4 +126,9 @@
   100% {
     transform: rotate(360deg);
   }
+}
+
+.custom-cursor-wrapper {
+  pointer-events: none;
+  z-index: 9999;
 }

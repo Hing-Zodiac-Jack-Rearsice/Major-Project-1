@@ -85,5 +85,9 @@ export async function generateMetadata({
 }
 
 export default function EventPage() {
-  return <EventPageClient />;
+  return (
+    <div className="relative">
+      <EventPageClient />
+    </div>
+  );
 }

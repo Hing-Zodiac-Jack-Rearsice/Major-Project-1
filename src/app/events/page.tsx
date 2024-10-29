@@ -31,6 +31,7 @@ import debounce from "lodash/debounce"; // Import debounce
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { CustomCursor } from "@/components/ui/CustomCursor";
+
 import { Skeleton } from "@/components/ui/skeleton";
 
 const Page = () => {
@@ -320,7 +321,7 @@ const Page = () => {
   };
 
   return (
-    <div className="mt-16 min-h-screen bg-gradient-to-b from-background to-secondary/10">
+    <div className="mt-16 min-h-screen bg-gradient-to-b from-background to-secondary/10 events-listing-page">
       {/* Hero Section with Video Background */}
       <div className="relative h-[500px] overflow-hidden">
         <video
@@ -770,12 +771,6 @@ const Page = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: index * 0.1 }}
                   className="transform transition-all hover:scale-[1.02] event-card-hover relative group"
-                  onMouseEnter={() => {
-                    document.body.style.cursor = "none";
-                  }}
-                  onMouseLeave={() => {
-                    document.body.style.cursor = "auto";
-                  }}
                 >
                   <ClientEventCard event={event} />
                   <div className="opacity-0 group-hover:opacity-100 transition-opacity">
