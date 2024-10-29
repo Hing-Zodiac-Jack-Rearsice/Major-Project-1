@@ -25,7 +25,6 @@
 // // middleware for checking the role from the req.auth object
 // export const config = { matcher: ["/admin/:path*"] };
 
-
 import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
 
@@ -38,6 +37,22 @@ export default auth((req) => {
       return NextResponse.redirect(new URL("/unauthorized", req.url));
     } else {
       console.log("Authorized access to super-admin route");
+    }
+  }
+  if (req.nextUrl.pathname.startsWith("/admin")) {
+    if (req.auth?.user.role !== "admin") {
+      console.log("Unauthorized access to admin route");
+      return NextResponse.redirect(new URL("/unauthorized", req.url));
+    } else {
+      console.log("Authorized access to admin route");
+    }
+  }
+  if (req.nextUrl.pathname.startsWith("/tickets")) {
+    if (req.auth?.user.role !== "user") {
+      console.log("Unauthorized access to this route");
+      return NextResponse.redirect(new URL("/unauthorized", req.url));
+    } else {
+      console.log("Authorized access to this route");
     }
   }
 });
