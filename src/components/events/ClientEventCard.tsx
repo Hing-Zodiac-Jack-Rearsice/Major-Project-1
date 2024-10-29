@@ -37,7 +37,7 @@ export function ClientEventCard({ event }: any) {
 
   return (
     <Link href={`/events/${event.id}`}>
-      <motion.div className="group relative rounded-xl overflow-hidden bg-card shadow-lg hover:shadow-xl transition-all duration-300">
+      <motion.div className="group relative rounded-xl overflow-hidden bg-card shadow-lg hover:shadow-xl transition-all duration-300 event-card">
         <div className="relative h-56 w-full overflow-hidden">
           <Image
             src={event.imageUrl}
