@@ -200,6 +200,12 @@ const Page = () => {
     );
   };
 
+  // Update the category change handler
+  const handleCategoryChange = (value: string) => {
+    setCategory(value);
+    setCurrentPage(1); // Reset to first page when category changes
+  };
+
   return (
     <div className="mt-16 min-h-screen bg-gradient-to-b from-background to-secondary/10">
       <div className="relative h-96 overflow-hidden">
@@ -253,7 +259,7 @@ const Page = () => {
             />
           </div>
 
-          <Select onValueChange={setCategory} value={category}>
+          <Select onValueChange={handleCategoryChange} value={category}>
             <SelectTrigger className="w-full md:w-auto rounded-full shadow-md">
               <SelectValue placeholder="Select a category" />
             </SelectTrigger>
