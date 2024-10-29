@@ -188,7 +188,7 @@ export function SignupFormDemo() {
         </CardHeader>
         <CardContent className="p-4 md:p-8 flex-grow flex flex-col">
           {registrationSuccess && (
-            <Alert className="mb-4" variant="success">
+            <Alert className="mb-4" variant="default">
               <CheckCircle className="h-4 w-4" />
               <AlertTitle>Registration Successful!</AlertTitle>
               <AlertDescription>
