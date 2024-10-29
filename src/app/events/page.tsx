@@ -11,7 +11,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Calendar, Loader2, Ticket, Plus } from "lucide-react";
+import {
+  Search,
+  Calendar,
+  Loader2,
+  Ticket,
+  Plus,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -25,13 +33,31 @@ const Page = () => {
   const [categories, setCategories] = useState<any>([]);
   const [loading, setLoading] = useState(true);
   const [timeUntilNextEvent, setTimeUntilNextEvent] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const eventsPerPage = 12; // Changed from 9 to 12 events per page
 
   const getCategories = async () => {
-    const response = await fetch("/api/category");
-    if (response.ok) {
-      // Handle successful response
+    try {
+      const response = await fetch("/api/category");
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       const data = await response.json();
-      setCategories(data.categories);
+      // Add console.log to debug the response
+      console.log("Categories response:", data);
+
+      // Make sure we're setting the correct data structure
+      if (Array.isArray(data)) {
+        setCategories(data);
+      } else if (Array.isArray(data.categories)) {
+        setCategories(data.categories);
+      } else {
+        console.error("Unexpected categories data structure:", data);
+        setCategories([]);
+      }
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      setCategories([]);
     }
   };
 
@@ -67,11 +93,16 @@ const Page = () => {
   useEffect(() => {
     const updateCountdown = () => {
       const now = new Date();
-      const nextEvent = events.find((event: any) => new Date(event.startDate) > now);
+      const nextEvent = events.find(
+        (event: any) => new Date(event.startDate) > now
+      );
       if (nextEvent) {
-        const timeDiff = new Date(nextEvent.startDate).getTime() - now.getTime();
+        const timeDiff =
+          new Date(nextEvent.startDate).getTime() - now.getTime();
         const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const hours = Math.floor(
+          (timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+        );
         const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
         setTimeUntilNextEvent(`${days}d ${hours}h ${minutes}m ${seconds}s`);
@@ -90,7 +121,9 @@ const Page = () => {
   const requestSearchApi = debounce(async (query: string) => {
     try {
       const res = await fetch(
-        `/api/events/category/${category}/search?query=${encodeURIComponent(query)}`
+        `/api/events/category/${category}/search?query=${encodeURIComponent(
+          query
+        )}`
       );
       const data = await res.json();
       setSearchedEvents(data.data || []);
@@ -111,12 +144,71 @@ const Page = () => {
   };
 
   const eventsToDisplay =
-    search === "" ? filterUpcomingEvents(events) : filterUpcomingEvents(searchedEvents);
+    search === ""
+      ? filterUpcomingEvents(events)
+      : filterUpcomingEvents(searchedEvents);
+
+  // Calculate pagination
+  const indexOfLastEvent = currentPage * eventsPerPage;
+  const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
+  const currentEvents = eventsToDisplay.slice(
+    indexOfFirstEvent,
+    indexOfLastEvent
+  );
+  const totalPages = Math.ceil(eventsToDisplay.length / eventsPerPage);
+
+  const paginate = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  // Add this component for pagination controls
+  const PaginationControls = () => {
+    if (totalPages <= 1) return null;
+
+    return (
+      <div className="flex items-center justify-center gap-2 mt-8">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => paginate(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+
+        {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
+          <Button
+            key={number}
+            variant={currentPage === number ? "default" : "outline"}
+            onClick={() => paginate(number)}
+            className="w-8 h-8"
+          >
+            {number}
+          </Button>
+        ))}
+
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => paginate(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+    );
+  };
 
   return (
     <div className="mt-16 min-h-screen bg-gradient-to-b from-background to-secondary/10">
       <div className="relative h-96 overflow-hidden">
-        <video autoPlay loop muted className="absolute w-full h-full object-cover">
+        <video
+          autoPlay
+          loop
+          muted
+          className="absolute w-full h-full object-cover"
+        >
           <source src="/videos/trailer-video.mp4" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
@@ -169,8 +261,12 @@ const Page = () => {
               <SelectGroup>
                 <SelectItem value="all">All Categories</SelectItem>
                 {categories.map((cat: any) => (
-                  <SelectItem key={cat.id} value={cat.category}>
-                    {cat.category.charAt(0).toUpperCase() + cat.category.slice(1).toLowerCase()}
+                  <SelectItem
+                    key={cat.id || cat._id}
+                    value={cat.category || cat.name || cat}
+                  >
+                    {(cat.category || cat.name || cat).charAt(0).toUpperCase() +
+                      (cat.category || cat.name || cat).slice(1).toLowerCase()}
                   </SelectItem>
                 ))}
               </SelectGroup>
@@ -183,23 +279,26 @@ const Page = () => {
             <LoadingSpinner />
           </div>
         ) : eventsToDisplay.length > 0 ? (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, staggerChildren: 0.1 }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
-          >
-            {eventsToDisplay.map((event: any, index: any) => (
-              <motion.div
-                key={event.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.1 }}
-              >
-                <ClientEventCard event={event} />
-              </motion.div>
-            ))}
-          </motion.div>
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, staggerChildren: 0.1 }}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
+            >
+              {currentEvents.map((event: any, index: any) => (
+                <motion.div
+                  key={event.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                >
+                  <ClientEventCard event={event} />
+                </motion.div>
+              ))}
+            </motion.div>
+            <PaginationControls />
+          </>
         ) : (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
