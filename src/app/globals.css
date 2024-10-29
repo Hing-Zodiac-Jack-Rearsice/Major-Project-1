@@ -67,3 +67,57 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Add these styles at the end of your globals.css file */
+.event-card-hover {
+  cursor: none;
+}
+
+.event-card-hover .custom-cursor-wrapper {
+  display: none;
+  mix-blend-mode: difference;
+}
+
+.event-card-hover:hover .custom-cursor-wrapper {
+  display: block;
+  animation: cursorAppear 0.3s ease-out;
+}
+
+@keyframes cursorAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Hide the cursor when hovering over event cards */
+.event-card-hover:hover {
+  cursor: none;
+}
+
+/* Add a subtle gradient animation to the cursor */
+.custom-cursor-wrapper::before {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  background: linear-gradient(45deg, 
+    rgba(var(--primary), 0.2),
+    rgba(var(--primary), 0.1),
+    rgba(var(--primary), 0.2)
+  );
+  filter: blur(10px);
+  animation: gradientShift 3s linear infinite;
+}
+
+@keyframes gradientShift {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
