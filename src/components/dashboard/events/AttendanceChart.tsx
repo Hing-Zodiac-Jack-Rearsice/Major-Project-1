@@ -30,7 +30,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function AttendanceChart({ eventId }: any) {
+export function AttendanceChart({ eventId }: { eventId: string }) {
   const [attendance, setAttendance] = React.useState<{ attended: number; absent: number } | null>(
     null
   );
@@ -78,6 +78,19 @@ export function AttendanceChart({ eventId }: any) {
         <CardContent>Error: {error}</CardContent>
       </Card>
     );
+
+  if (!attendance || getTotalAttendees() === 0) {
+    return (
+      <Card className="flex flex-col border-none">
+        <CardHeader className="items-center pb-0">
+          <CardTitle>Attendance</CardTitle>
+        </CardHeader>
+        <CardContent className="flex-1 pb-0 flex items-center justify-center">
+          <p className="text-muted-foreground text-center">No attendance data available</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="flex flex-col border-none">
