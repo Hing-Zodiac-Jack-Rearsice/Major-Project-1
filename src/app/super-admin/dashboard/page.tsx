@@ -36,7 +36,7 @@ import ConfirmationDialog from "@/components/ui/improved-confirmation-dialog";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast"; // Add this import
 
-// Update the Event interface to include additional properties
+// Update the Event interface to include additional properties/
 interface Event {
   id: string;
   eventName: string;
@@ -116,7 +116,7 @@ export default function SuperAdminDashboard() {
       toast({ title: "Cannot promote to super admin", variant: "destructive" });
       return;
     }
-
+    // try 
     try {
       const res = await fetch(`/api/userManagement/${userId}`, {
         method: "PATCH",
