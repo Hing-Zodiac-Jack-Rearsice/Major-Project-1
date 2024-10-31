@@ -30,6 +30,9 @@ import { Button } from "@/components/ui/button";
 import debounce from "lodash/debounce"; // Import debounce
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
+import { CustomCursor } from "@/components/ui/CustomCursor";
+
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Page = () => {
   const [events, setEvents] = useState<any>([]);
@@ -256,8 +259,69 @@ const Page = () => {
     return () => clearInterval(timer);
   }, [currentSlide]);
 
+  const CarouselSkeleton = () => {
+    return (
+      <div className="mb-12">
+        <div className="flex items-center justify-between mb-6">
+          <Skeleton className="h-8 w-48" />
+          <div className="flex gap-2">
+            <Skeleton className="h-10 w-10 rounded-full" />
+            <Skeleton className="h-10 w-10 rounded-full" />
+          </div>
+        </div>
+        <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-background/80 to-background shadow-2xl border border-white/10">
+          <div className="grid md:grid-cols-[1.3fr,1fr] gap-8 p-8">
+            <Skeleton className="h-[400px] rounded-xl" />
+            <div className="space-y-6">
+              <div>
+                <Skeleton className="h-10 w-3/4 mb-3" />
+                <Skeleton className="h-4 w-full mb-2" />
+                <Skeleton className="h-4 w-5/6" />
+              </div>
+              <div className="space-y-4">
+                <Skeleton className="h-12 w-full rounded-lg" />
+                <Skeleton className="h-12 w-full rounded-lg" />
+                <Skeleton className="h-12 w-full rounded-lg" />
+              </div>
+              <Skeleton className="h-12 w-full mt-6" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Add this new component near the CarouselSkeleton component
+  const NextEventCountdownSkeleton = () => {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.5 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5, delay: 0.4 }}
+        className="bg-white/10 backdrop-blur-none rounded-xl p-6 mt-1 w-full max-w-2xl"
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Timer className="h-6 w-6 text-primary" />
+            <Skeleton className="h-7 w-48" />
+          </div>
+          <Skeleton className="h-8 w-32" />
+        </div>
+        <motion.div className="mt-4 p-4 bg-white/5 rounded-lg">
+          <div className="flex items-center justify-between">
+            <div className="space-y-2">
+              <Skeleton className="h-6 w-48" />
+              <Skeleton className="h-4 w-32" />
+            </div>
+            <Skeleton className="h-10 w-32" />
+          </div>
+        </motion.div>
+      </motion.div>
+    );
+  };
+
   return (
-    <div className="mt-16 min-h-screen bg-gradient-to-b from-background to-secondary/10">
+    <div className="mt-16 min-h-screen bg-gradient-to-b from-background to-secondary/10 events-listing-page">
       {/* Hero Section with Video Background */}
       <div className="relative h-[500px] overflow-hidden">
         <video
@@ -288,50 +352,54 @@ const Page = () => {
           </motion.p>
 
           {/* Next Event Countdown Section */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="bg-white/10 backdrop-blur-none rounded-xl p-6 mt-1 w-full max-w-2xl"
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Timer className="h-6 w-6 text-primary" />
-                <h3 className="text-xl font-semibold">
-                  Next Event Starting In:
-                </h3>
-              </div>
-              <div className="text-3xl font-bold font-mono">
-                {timeUntilNextEvent}
-              </div>
-            </div>
-
-            {/* Quick Access to Nearest Event */}
-            {getNearestUpcomingEvent() && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 }}
-                className="mt-4 p-4 bg-white/5 rounded-lg flex items-center justify-between"
-              >
-                <div>
-                  <h4 className="font-semibold">
-                    {getNearestUpcomingEvent()?.eventName}
-                  </h4>
-                  <p className="text-sm opacity-80">
-                    {new Date(
-                      getNearestUpcomingEvent()?.startDate
-                    ).toLocaleDateString()}
-                  </p>
+          {loading ? (
+            <NextEventCountdownSkeleton />
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="bg-white/10 backdrop-blur-none rounded-xl p-6 mt-1 w-full max-w-2xl"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Timer className="h-6 w-6 text-primary" />
+                  <h3 className="text-xl font-semibold">
+                    Next Event Starting In:
+                  </h3>
                 </div>
-                <Link href={`/events/${getNearestUpcomingEvent()?.id}`}>
-                  <Button variant="secondary" className="gap-2">
-                    Check it out <ArrowRight className="h-4 w-4" />
-                  </Button>
-                </Link>
-              </motion.div>
-            )}
-          </motion.div>
+                <div className="text-3xl font-bold font-mono">
+                  {timeUntilNextEvent}
+                </div>
+              </div>
+
+              {/* Quick Access to Nearest Event */}
+              {getNearestUpcomingEvent() && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6 }}
+                  className="mt-4 p-4 bg-white/5 rounded-lg flex items-center justify-between"
+                >
+                  <div>
+                    <h4 className="font-semibold">
+                      {getNearestUpcomingEvent()?.eventName}
+                    </h4>
+                    <p className="text-sm opacity-80">
+                      {new Date(
+                        getNearestUpcomingEvent()?.startDate
+                      ).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <Link href={`/events/${getNearestUpcomingEvent()?.id}`}>
+                    <Button variant="secondary" className="gap-2">
+                      Check it out <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                </motion.div>
+              )}
+            </motion.div>
+          )}
         </div>
       </div>
 
@@ -353,17 +421,31 @@ const Page = () => {
                   className="pl-12 pr-4 py-6 w-full rounded-xl shadow-sm focus:ring-2 focus:ring-primary/50 bg-background/50 backdrop-blur-sm text-lg"
                   value={search}
                   onChange={handleSearch}
+                  disabled={loading}
                 />
+                {loading && (
+                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  </div>
+                )}
               </div>
             </div>
 
             <div className="w-full md:w-auto">
-              <Select onValueChange={handleCategoryChange} value={category}>
+              <Select
+                onValueChange={handleCategoryChange}
+                value={category}
+                disabled={loading}
+              >
                 <SelectTrigger className="w-full md:w-[240px] rounded-xl py-6 shadow-sm bg-background/50 backdrop-blur-sm">
-                  <SelectValue
-                    placeholder="Select a category"
-                    className="text-lg"
-                  />
+                  {loading ? (
+                    <Skeleton className="h-6 w-[180px]" />
+                  ) : (
+                    <SelectValue
+                      placeholder="Select a category"
+                      className="text-lg"
+                    />
+                  )}
                 </SelectTrigger>
                 <SelectContent className="rounded-xl">
                   <SelectGroup>
@@ -392,7 +474,9 @@ const Page = () => {
         </div>
 
         {/* Happening Soon Carousel Section */}
-        {getRecommendedEvents().length > 0 ? (
+        {loading ? (
+          <CarouselSkeleton />
+        ) : getRecommendedEvents().length > 0 ? (
           <div className="mb-12" ref={carouselRef}>
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2">
@@ -428,7 +512,6 @@ const Page = () => {
             </div>
 
             <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-background/80 to-background shadow-2xl border border-white/10">
-              {/* Remove the blur overlay */}
               <AnimatePresence initial={false} mode="wait">
                 <motion.div
                   key={currentSlide}
@@ -687,9 +770,19 @@ const Page = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: index * 0.1 }}
-                  className="transform transition-all hover:scale-[1.02]"
+                  className="transform transition-all hover:scale-[1.02] event-card-hover relative group"
                 >
                   <ClientEventCard event={event} />
+                  <AnimatePresence>
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="group-hover:block hidden"
+                    >
+                      <CustomCursor />
+                    </motion.div>
+                  </AnimatePresence>
                 </motion.div>
               ))}
             </motion.div>
