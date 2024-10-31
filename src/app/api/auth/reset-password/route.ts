@@ -34,6 +34,7 @@ export async function POST(request: Request) {
             }
         });
 
+
         return NextResponse.json({
             message: "Password has been reset successfully"
         });
