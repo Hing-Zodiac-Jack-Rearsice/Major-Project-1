@@ -48,6 +48,7 @@ const Page = () => {
   const carouselRef = useRef(null);
   const isInView = useInView(carouselRef);
 
+  // get categories
   const getCategories = async () => {
     try {
       const response = await fetch("/api/category");
@@ -109,15 +110,19 @@ const Page = () => {
       const upcomingEvents = events
         .filter((event: any) => new Date(event.startDate) > now)
         .sort(
-          (a: any, b: any) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+          (a: any, b: any) =>
+            new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
         );
 
       const nextEvent = upcomingEvents[0]; // Get the nearest event
 
       if (nextEvent) {
-        const timeDiff = new Date(nextEvent.startDate).getTime() - now.getTime();
+        const timeDiff =
+          new Date(nextEvent.startDate).getTime() - now.getTime();
         const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const hours = Math.floor(
+          (timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+        );
         const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
         setTimeUntilNextEvent(`${days}d ${hours}h ${minutes}m ${seconds}s`);
@@ -136,7 +141,9 @@ const Page = () => {
   const requestSearchApi = debounce(async (query: string) => {
     try {
       const res = await fetch(
-        `/api/events/category/${category}/search?query=${encodeURIComponent(query)}`
+        `/api/events/category/${category}/search?query=${encodeURIComponent(
+          query
+        )}`
       );
       const data = await res.json();
       setSearchedEvents(data.data || []);
@@ -157,12 +164,17 @@ const Page = () => {
   };
 
   const eventsToDisplay =
-    search === "" ? filterUpcomingEvents(events) : filterUpcomingEvents(searchedEvents);
+    search === ""
+      ? filterUpcomingEvents(events)
+      : filterUpcomingEvents(searchedEvents);
 
   // Calculate pagination
   const indexOfLastEvent = currentPage * eventsPerPage;
   const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
-  const currentEvents = eventsToDisplay.slice(indexOfFirstEvent, indexOfLastEvent);
+  const currentEvents = eventsToDisplay.slice(
+    indexOfFirstEvent,
+    indexOfLastEvent
+  );
   const totalPages = Math.ceil(eventsToDisplay.length / eventsPerPage);
 
   const paginate = (pageNumber: number) => {
@@ -220,7 +232,8 @@ const Page = () => {
     return events
       .filter((event: any) => new Date(event.startDate) > now)
       .sort(
-        (a: any, b: any) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+        (a: any, b: any) =>
+          new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
       )[0];
   };
 
@@ -229,14 +242,19 @@ const Page = () => {
     const now = new Date();
     return events
       .filter((event: any) => new Date(event.startDate) > now)
-      .sort((a: any, b: any) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
+      .sort(
+        (a: any, b: any) =>
+          new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+      )
       .slice(0, 5);
   };
 
   // Add auto-rotation effect
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev < getRecommendedEvents().length - 1 ? prev + 1 : 0));
+      setCurrentSlide((prev) =>
+        prev < getRecommendedEvents().length - 1 ? prev + 1 : 0
+      );
     }, 5000); // Change slide every 5 seconds
 
     return () => clearInterval(timer);
@@ -307,7 +325,12 @@ const Page = () => {
     <div className="mt-16 min-h-screen bg-gradient-to-b from-background to-secondary/10 events-listing-page">
       {/* Hero Section with Video Background */}
       <div className="relative h-[500px] overflow-hidden">
-        <video autoPlay loop muted className="absolute w-full h-full object-cover">
+        <video
+          autoPlay
+          loop
+          muted
+          className="absolute w-full h-full object-cover"
+        >
           <source src="/videos/trailer-video.mp4" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
@@ -342,9 +365,13 @@ const Page = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Timer className="h-6 w-6 text-primary" />
-                  <h3 className="text-xl font-semibold">Next Event Starting In:</h3>
+                  <h3 className="text-xl font-semibold">
+                    Next Event Starting In:
+                  </h3>
                 </div>
-                <div className="text-3xl font-bold font-mono">{timeUntilNextEvent}</div>
+                <div className="text-3xl font-bold font-mono">
+                  {timeUntilNextEvent}
+                </div>
               </div>
 
               {/* Quick Access to Nearest Event */}
@@ -356,9 +383,13 @@ const Page = () => {
                   className="mt-4 p-4 bg-white/5 rounded-lg flex items-center justify-between"
                 >
                   <div>
-                    <h4 className="font-semibold">{getNearestUpcomingEvent()?.eventName}</h4>
+                    <h4 className="font-semibold">
+                      {getNearestUpcomingEvent()?.eventName}
+                    </h4>
                     <p className="text-sm opacity-80">
-                      {new Date(getNearestUpcomingEvent()?.startDate).toLocaleDateString()}
+                      {new Date(
+                        getNearestUpcomingEvent()?.startDate
+                      ).toLocaleDateString()}
                     </p>
                   </div>
                   <Link href={`/events/${getNearestUpcomingEvent()?.id}`}>
@@ -402,12 +433,19 @@ const Page = () => {
             </div>
 
             <div className="w-full md:w-auto">
-              <Select onValueChange={handleCategoryChange} value={category} disabled={loading}>
+              <Select
+                onValueChange={handleCategoryChange}
+                value={category}
+                disabled={loading}
+              >
                 <SelectTrigger className="w-full md:w-[240px] rounded-xl py-6 shadow-sm bg-background/50 backdrop-blur-sm">
                   {loading ? (
                     <Skeleton className="h-6 w-[180px]" />
                   ) : (
-                    <SelectValue placeholder="Select a category" className="text-lg" />
+                    <SelectValue
+                      placeholder="Select a category"
+                      className="text-lg"
+                    />
                   )}
                 </SelectTrigger>
                 <SelectContent className="rounded-xl">
@@ -421,8 +459,12 @@ const Page = () => {
                         value={cat.category || cat.name || cat}
                         className="text-base"
                       >
-                        {(cat.category || cat.name || cat).charAt(0).toUpperCase() +
-                          (cat.category || cat.name || cat).slice(1).toLowerCase()}
+                        {(cat.category || cat.name || cat)
+                          .charAt(0)
+                          .toUpperCase() +
+                          (cat.category || cat.name || cat)
+                            .slice(1)
+                            .toLowerCase()}
                       </SelectItem>
                     ))}
                   </SelectGroup>
@@ -523,20 +565,26 @@ const Page = () => {
                                 className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-end p-6"
                               >
                                 <div className="space-y-3">
-                                  <h4 className="text-xl font-bold text-white">Quick Details</h4>
+                                  <h4 className="text-xl font-bold text-white">
+                                    Quick Details
+                                  </h4>
 
                                   <div className="space-y-2">
                                     <div className="flex items-center gap-2 text-white/90">
                                       <Calendar className="h-4 w-4 text-primary" />
                                       <span className="text-sm">
-                                        {new Date(event.startDate).toLocaleDateString()}
+                                        {new Date(
+                                          event.startDate
+                                        ).toLocaleDateString()}
                                       </span>
                                     </div>
 
                                     <div className="flex items-center gap-2 text-white/90">
                                       <Timer className="h-4 w-4 text-primary" />
                                       <span className="text-sm">
-                                        {new Date(event.startDate).toLocaleTimeString([], {
+                                        {new Date(
+                                          event.startDate
+                                        ).toLocaleTimeString([], {
                                           hour: "2-digit",
                                           minute: "2-digit",
                                         })}
@@ -545,7 +593,9 @@ const Page = () => {
 
                                     <div className="flex items-center gap-2 text-white/90">
                                       <MapPin className="h-4 w-4 text-primary" />
-                                      <span className="text-sm">{event.location}</span>
+                                      <span className="text-sm">
+                                        {event.location}
+                                      </span>
                                     </div>
 
                                     <div className="flex items-center gap-2 text-white/90">
@@ -597,7 +647,9 @@ const Page = () => {
                                 >
                                   <Calendar className="h-5 w-5 text-primary" />
                                   <span>
-                                    {new Date(event.startDate).toLocaleDateString(undefined, {
+                                    {new Date(
+                                      event.startDate
+                                    ).toLocaleDateString(undefined, {
                                       weekday: "long",
                                       year: "numeric",
                                       month: "long",
@@ -614,7 +666,9 @@ const Page = () => {
                                 >
                                   <Timer className="h-5 w-5 text-primary" />
                                   <span>
-                                    {new Date(event.startDate).toLocaleTimeString([], {
+                                    {new Date(
+                                      event.startDate
+                                    ).toLocaleTimeString([], {
                                       hour: "2-digit",
                                       minute: "2-digit",
                                     })}
@@ -640,7 +694,10 @@ const Page = () => {
                               className="mt-6"
                             >
                               <Link href={`/events/${event.id}`}>
-                                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                                <motion.div
+                                  whileHover={{ scale: 1.02 }}
+                                  whileTap={{ scale: 0.98 }}
+                                >
                                   <Button className="w-full gap-2 h-12 text-lg shadow-lg hover:shadow-primary/20 transition-all duration-300">
                                     View Event Details
                                     <ArrowRight className="h-5 w-5" />
@@ -685,7 +742,9 @@ const Page = () => {
           >
             <Timer className="h-12 w-12 text-primary mx-auto mb-4" />
             <h3 className="text-xl font-semibold">No Upcoming Events</h3>
-            <p className="text-muted-foreground">Check back later for new events</p>
+            <p className="text-muted-foreground">
+              Check back later for new events
+            </p>
           </motion.div>
         )}
 
