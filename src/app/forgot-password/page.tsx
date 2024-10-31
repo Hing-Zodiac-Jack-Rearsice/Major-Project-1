@@ -1,19 +1,20 @@
 "use client";
-
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useToast } from "@/components/ui/use-toast";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
-export default function ForgotPasswordPage() {
+export default function ForgotPassword() {
   const [email, setEmail] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { toast } = useToast();
+  const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
+    setIsLoading(true);
+    setMessage("");
 
     try {
       const response = await fetch("/api/auth/forgot-password", {
@@ -24,49 +25,62 @@ export default function ForgotPasswordPage() {
 
       const data = await response.json();
 
-      toast({
-        title: response.ok ? "Success" : "Error",
-        description: data.message || data.error,
-        variant: response.ok ? "default" : "destructive",
-      });
-
       if (response.ok) {
-        setEmail("");
+        setStatus("success");
+        setMessage(
+          "Reset link has been sent to your email. Please check your inbox."
+        );
+      } else {
+        setStatus("error");
+        setMessage(data.error || "Something went wrong");
       }
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "An error occurred. Please try again.",
-        variant: "destructive",
-      });
+      setStatus("error");
+      setMessage("Failed to send reset link. Please try again.");
     } finally {
-      setIsSubmitting(false);
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="container mx-auto mt-16 p-4">
-      <Card className="max-w-md mx-auto">
-        <CardHeader>
-          <CardTitle>Reset Password</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <Input
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 dark:bg-zinc-950">
+      <div className="w-full max-w-md space-y-8 rounded-lg bg-white p-6 shadow dark:bg-zinc-900">
+        <div className="text-center">
+          <h2 className="text-3xl font-bold">Forgot Password</h2>
+          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+            Enter your email address and we&apos;ll send you a link to reset your
+            password.
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+          <div>
+            <Input
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full"
+              disabled={isLoading}
+            />
+          </div>
+
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? <LoadingSpinner /> : "Send Reset Link"}
+          </Button>
+
+          {message && (
+            <div
+              className={`mt-4 text-center text-sm ${
+                status === "success" ? "text-green-600" : "text-red-600"
+              }`}
+            >
+              {message}
             </div>
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? "Sending..." : "Send Reset Link"}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+          )}
+        </form>
+      </div>
     </div>
   );
 }
