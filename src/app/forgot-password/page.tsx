@@ -1,15 +1,27 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import Link from "next/link";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const [cooldown, setCooldown] = useState(0);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (cooldown > 0) {
+      timer = setInterval(() => {
+        setCooldown((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [cooldown]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,6 +42,7 @@ export default function ForgotPassword() {
         setMessage(
           "Reset link has been sent to your email. Please check your inbox."
         );
+        setCooldown(60); // Set 60 seconds cooldown
       } else {
         setStatus("error");
         setMessage(data.error || "Something went wrong");
@@ -48,8 +61,8 @@ export default function ForgotPassword() {
         <div className="text-center">
           <h2 className="text-3xl font-bold">Forgot Password</h2>
           <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-            Enter your email address and we&apos;ll send you a link to reset your
-            password.
+            Enter your email address and we&apos;ll send you a link to reset
+            your password.
           </p>
         </div>
 
@@ -62,12 +75,22 @@ export default function ForgotPassword() {
               onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full"
-              disabled={isLoading}
+              disabled={isLoading || cooldown > 0}
             />
           </div>
 
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? <LoadingSpinner /> : "Send Reset Link"}
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={isLoading || cooldown > 0}
+          >
+            {isLoading ? (
+              <LoadingSpinner />
+            ) : cooldown > 0 ? (
+              `Resend in ${cooldown}s`
+            ) : (
+              "Send Reset Link"
+            )}
           </Button>
 
           {message && (
@@ -79,6 +102,15 @@ export default function ForgotPassword() {
               {message}
             </div>
           )}
+
+          <div className="text-center">
+            <Link
+              href="/login"
+              className="text-sm text-primary hover:text-primary/80 dark:text-primary/80 dark:hover:text-primary transition-colors"
+            >
+              Back to Login
+            </Link>
+          </div>
         </form>
       </div>
     </div>
