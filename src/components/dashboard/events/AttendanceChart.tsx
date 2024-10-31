@@ -1,7 +1,14 @@
 "use client";
 
 import * as React from "react";
-import { Label, Pie, PieChart } from "recharts";
+import {
+  Cell,
+  Label,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+} from "recharts";
 
 import {
   Card,
@@ -31,9 +38,10 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function AttendanceChart({ eventId }: { eventId: string }) {
-  const [attendance, setAttendance] = React.useState<{ attended: number; absent: number } | null>(
-    null
-  );
+  const [attendance, setAttendance] = React.useState<{
+    attended: number;
+    absent: number;
+  } | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
 
@@ -50,8 +58,10 @@ export function AttendanceChart({ eventId }: { eventId: string }) {
       }
       const data = await res.json();
       setAttendance({
-        attended: data.attendance.filter((a: any) => a.status === "attended").length,
-        absent: data.attendance.filter((a: any) => a.status === "absent").length,
+        attended: data.attendance.filter((a: any) => a.status === "attended")
+          .length,
+        absent: data.attendance.filter((a: any) => a.status === "absent")
+          .length,
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
@@ -64,82 +74,144 @@ export function AttendanceChart({ eventId }: { eventId: string }) {
     return attendance ? attendance.attended + attendance.absent : 0;
   };
 
+  const formatTooltipValue = (value: number, total: number) => {
+    const percentage = ((value / total) * 100).toFixed(1);
+    return `${value} (${percentage}%)`;
+  };
+
   const chartData = attendance
     ? [
-        { status: "attended", value: attendance.attended, fill: chartConfig.attended.color },
-        { status: "absent", value: attendance.absent, fill: chartConfig.absent.color },
+        {
+          status: "Attended",
+          value: attendance.attended,
+          fill: chartConfig.attended.color,
+        },
+        {
+          status: "Absent",
+          value: attendance.absent,
+          fill: chartConfig.absent.color,
+        },
       ]
     : [];
 
-  if (isLoading) return <LoadingSpinner />;
-  if (error)
-    return (
-      <Card className="border-none">
-        <CardContent>Error: {error}</CardContent>
-      </Card>
-    );
-
-  if (!attendance || getTotalAttendees() === 0) {
-    return (
-      <Card className="flex flex-col border-none">
-        <CardHeader className="items-center pb-0">
-          <CardTitle>Attendance</CardTitle>
-        </CardHeader>
-        <CardContent className="flex-1 pb-0 flex items-center justify-center">
-          <p className="text-muted-foreground text-center">No attendance data available</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
-    <Card className="flex flex-col border-none">
-      <CardHeader className="items-center pb-0">
-        <CardTitle>Attendance</CardTitle>
+    <Card>
+      <CardHeader>
+        <CardTitle>Attendance Overview</CardTitle>
+        <CardDescription>
+          Track attendance statistics for this event
+        </CardDescription>
       </CardHeader>
-      <CardContent className="flex-1 pb-0">
-        <ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[250px]">
-          <PieChart>
-            <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-            <Pie data={chartData} dataKey="value" nameKey="status" innerRadius={60} strokeWidth={5}>
-              <Label
-                content={({ viewBox }) => {
-                  if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                    return (
-                      <text
-                        x={viewBox.cx}
-                        y={viewBox.cy}
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                      >
-                        <tspan
-                          x={viewBox.cx}
-                          y={viewBox.cy}
-                          className="fill-foreground text-3xl font-bold"
-                        >
-                          {getTotalAttendees().toLocaleString()}
-                        </tspan>
-                        <tspan
-                          x={viewBox.cx}
-                          y={(viewBox.cy || 0) + 24}
-                          className="fill-muted-foreground"
-                        >
-                          Attendees
-                        </tspan>
-                      </text>
-                    );
-                  }
-                }}
-              />
-            </Pie>
-          </PieChart>
-        </ChartContainer>
+      <CardContent>
+        {isLoading ? (
+          <div className="flex items-center justify-center h-[200px]">
+            <LoadingSpinner />
+          </div>
+        ) : error ? (
+          <div className="text-center text-red-500">{error}</div>
+        ) : attendance && getTotalAttendees() > 0 ? (
+          <div className="space-y-4">
+            <div className="h-[200px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={chartData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={80}
+                    paddingAngle={5}
+                    dataKey="value"
+                  >
+                    {chartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.fill} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    content={({ active, payload }) => {
+                      if (active && payload && payload.length) {
+                        const total = getTotalAttendees();
+                        const value = payload[0].value as number;
+                        const percentage = ((value / total) * 100).toFixed(1);
+                        return (
+                          <div className="rounded-lg border bg-background p-3 shadow-md">
+                            <div className="flex flex-col gap-1">
+                              <span className="text-sm font-semibold">
+                                {payload[0].name}
+                              </span>
+                              <div className="flex items-center gap-2">
+                                <span className="text-lg font-bold">
+                                  {value}
+                                </span>
+                                <span className="text-sm text-muted-foreground">
+                                  ({percentage}%)
+                                </span>
+                              </div>
+                              <span className="text-xs text-muted-foreground">
+                                of {total} total attendees
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Added Legend */}
+            <div className="flex justify-center items-center gap-4 pt-4">
+              <div className="flex items-center gap-2">
+                <div
+                  className="w-3 h-3 rounded-full"
+                  style={{ backgroundColor: chartConfig.attended.color }}
+                />
+                <span className="text-sm font-medium">
+                  Attended ({attendance.attended})
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div
+                  className="w-3 h-3 rounded-full"
+                  style={{ backgroundColor: chartConfig.absent.color }}
+                />
+                <span className="text-sm font-medium">
+                  Absent ({attendance.absent})
+                </span>
+              </div>
+            </div>
+
+            <div className="pt-4 border-t">
+              <div className="grid grid-cols-2 gap-4 text-center">
+                <div>
+                  <p className="text-sm text-muted-foreground">
+                    Attendance Rate
+                  </p>
+                  <p className="text-2xl font-bold">
+                    {(
+                      (attendance.attended / getTotalAttendees()) *
+                      100
+                    ).toFixed(1)}
+                    %
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">
+                    Total Attendees
+                  </p>
+                  <p className="text-2xl font-bold">{getTotalAttendees()}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="text-center text-muted-foreground py-8">
+            No attendance data available
+          </div>
+        )}
       </CardContent>
-      <CardFooter className="flex-col gap-2 text-sm">
-        <div className="leading-none text-muted-foreground">
-          Showing difference between attendees who were absent and attended
-        </div>
-      </CardFooter>
     </Card>
   );
 }

@@ -354,8 +354,10 @@ export default function Component(props: any) {
                   <div className="flex items-center justify-center h-40">
                     <LoadingSpinner />
                   </div>
-                ) : (
+                ) : event ? (
                   <EventAnalytics event={event} ticketsLeft={ticketsLeft} />
+                ) : (
+                  <div>No event data available</div>
                 )}
               </CardContent>
             </Card>
