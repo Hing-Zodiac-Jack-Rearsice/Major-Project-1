@@ -36,27 +36,28 @@ interface Event {
 export default function EventPageClient() {
   const { data: session } = useSession();
   const [event, setEvent] = useState<Event | null>(null);
-  const { id } = useParams();
+  const params = useParams();
   const [ticketsLeft, setTicketsLeft] = useState<number>(0);
   const [loadingTickets, setLoadingTickets] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchEvent = async () => {
+    async function fetchEvent() {
       try {
-        const res = await fetch(`/api/events/${id}`);
-        if (!res.ok) {
-          throw new Error("Failed to fetch event");
-        }
+        const res = await fetch(`/api/events/${params.id}`);
+        if (!res.ok) throw new Error("Failed to fetch event");
         const data = await res.json();
         setEvent(data.event);
       } catch (error) {
         console.error("Error fetching event:", error);
+      } finally {
+        setLoading(false);
       }
-    };
+    }
 
     const getRemainingTickets = async () => {
       try {
-        const remaining = await remainingTickets(id);
+        const remaining = await remainingTickets(params.id);
         setTicketsLeft(remaining);
       } catch (error) {
         console.error("Error fetching remaining tickets:", error);
@@ -65,19 +66,14 @@ export default function EventPageClient() {
       }
     };
 
-    if (id) {
+    if (params.id) {
       fetchEvent();
       getRemainingTickets();
     }
-  }, [id]);
+  }, [params.id]);
 
-  if (!event) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <LoadingSpinner />
-      </div>
-    );
-  }
+  if (loading) return <LoadingSpinner />;
+  if (!event) return <div>Event not found</div>;
 
   const eventDate = new Date(event.startDate);
   const eventEndDate = new Date(event.endDate);

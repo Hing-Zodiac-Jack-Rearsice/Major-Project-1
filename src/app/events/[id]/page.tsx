@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
@@ -87,7 +87,9 @@ export async function generateMetadata({
 export default function EventPage() {
   return (
     <div className="relative">
-      <EventPageClient />
+      <Suspense fallback={<LoadingSpinner />}>
+        <EventPageClient />
+      </Suspense>
     </div>
   );
 }
