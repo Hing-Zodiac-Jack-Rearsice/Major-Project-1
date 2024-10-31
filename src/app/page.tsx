@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, Suspense } from "react";
 import Services from "@/components/Services";
 import { Vortex } from "@/components/ui/vortex";
 import { useSession } from "next-auth/react";
@@ -10,8 +10,7 @@ import { useSearchParams } from "next/navigation";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/ui/use-toast";
 
-export default function Home() {
-  const { data: session } = useSession();
+function SearchParamsHandler() {
   const searchParams = useSearchParams();
   const message = searchParams.get("message");
   const messageShown = useRef(false);
@@ -19,7 +18,6 @@ export default function Home() {
 
   useEffect(() => {
     if (message && !messageShown.current) {
-      // Show the toast only if it hasn't been shown yet
       toast({
         title: "Notification",
         description: message,
@@ -27,15 +25,23 @@ export default function Home() {
       });
       messageShown.current = true;
 
-      // Remove the message from the URL
       const newUrl = new URL(window.location.href);
       newUrl.searchParams.delete("message");
       window.history.replaceState({}, "", newUrl);
     }
   }, [message, toast]);
 
+  return null;
+}
+
+export default function Home() {
+  const { data: session } = useSession();
+
   return (
     <div className="bg-white dark:bg-black text-gray-900 dark:text-white">
+      <Suspense fallback={null}>
+        <SearchParamsHandler />
+      </Suspense>
       {session?.user.role === "admin" ? (
         <div className="w-full mx-auto h-screen overflow-hidden mt-14">
           <Vortex
