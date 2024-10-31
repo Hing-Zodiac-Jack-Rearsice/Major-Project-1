@@ -20,7 +20,7 @@ import { faCalendarDays } from "@fortawesome/free-regular-svg-icons";
 import { ThemeToggle } from "../ui/ThemeToggle";
 import Billing from "./Billing";
 import { faHouse, faQrcode } from "@fortawesome/free-solid-svg-icons";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LineChartIcon, PanelLeftIcon, SettingsIcon } from "lucide-react";
 
@@ -223,7 +223,8 @@ const SideNav = () => {
             <DropdownMenuItem>Settings</DropdownMenuItem>
             <DropdownMenuItem>Support</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Logout</DropdownMenuItem>
+            {/* TODO Add logout */}
+            <DropdownMenuItem onClick={() => signOut()}>Logout</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </header>

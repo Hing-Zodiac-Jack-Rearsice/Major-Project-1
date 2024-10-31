@@ -1,14 +1,38 @@
 "use client";
-import React from "react";
+
+import React, { useEffect, useRef } from "react";
 import Services from "@/components/Services";
 import { Vortex } from "@/components/ui/vortex";
 import { useSession } from "next-auth/react";
-import Image from "next/image";
 import Link from "next/link";
 import { CreditCard, Lock, Zap, BarChart2, QrCode, Mail } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { Toaster } from "@/components/ui/toaster";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function Home() {
   const { data: session } = useSession();
+  const searchParams = useSearchParams();
+  const message = searchParams.get("message");
+  const messageShown = useRef(false);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (message && !messageShown.current) {
+      // Show the toast only if it hasn't been shown yet
+      toast({
+        title: "Notification",
+        description: message,
+        duration: 5000,
+      });
+      messageShown.current = true;
+
+      // Remove the message from the URL
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.delete("message");
+      window.history.replaceState({}, "", newUrl);
+    }
+  }, [message, toast]);
 
   return (
     <div className="bg-white dark:bg-black text-gray-900 dark:text-white">
@@ -149,6 +173,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+      <Toaster />
     </div>
   );
 }

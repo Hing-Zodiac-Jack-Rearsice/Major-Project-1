@@ -41,20 +41,27 @@ export default auth((req) => {
   }
   if (req.nextUrl.pathname.startsWith("/admin")) {
     if (req.auth?.user.role !== "admin") {
+      const redirectUrl = new URL("/", req.url);
+      // Add a message parameter
+      redirectUrl.searchParams.set("message", "You must be an event organizer to access this page");
       console.log("Unauthorized access to admin route");
-      return NextResponse.redirect(new URL("/unauthorized", req.url));
+      return NextResponse.redirect(redirectUrl);
     } else {
       console.log("Authorized access to admin route");
     }
   }
   if (req.nextUrl.pathname.startsWith("/tickets")) {
     if (req.auth?.user.role !== "user") {
-      console.log("Unauthorized access to this route");
-      return NextResponse.redirect(new URL("/unauthorized", req.url));
+      // Add a message parameter
+      const redirectUrl = new URL("/", req.url);
+      // Add a message parameter
+      redirectUrl.searchParams.set("message", "You must be logged in order to view tickets");
+      console.log("Unauthorized access to admin route");
+      return NextResponse.redirect(redirectUrl);
     } else {
       console.log("Authorized access to this route");
     }
   }
 });
 
-export const config = { matcher: ["/admin/:path*", "/super-admin/:path*"] };
+export const config = { matcher: ["/admin/:path*", "/super-admin/:path*", "/tickets"] };
