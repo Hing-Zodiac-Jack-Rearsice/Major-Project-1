@@ -5,7 +5,12 @@ import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Logo from "../ui/SombotLogo";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -92,7 +97,9 @@ const SideNav = () => {
             />
             <NavLink
               href="/admin/dashboard/events"
-              icon={<FontAwesomeIcon icon={faCalendarDays} className="w-5 h-5" />}
+              icon={
+                <FontAwesomeIcon icon={faCalendarDays} className="w-5 h-5" />
+              }
               label="Events"
             />
             <NavLink
@@ -201,30 +208,51 @@ const SideNav = () => {
             </nav>
           </SheetContent>
         </Sheet>
-        <Link href="/" className="flex items-center gap-2 text-lg font-semibold" prefetch={false}>
+        <Link
+          href="/"
+          className="flex items-center gap-2 text-lg font-semibold"
+          prefetch={false}
+        >
           <Logo width={32} height={32} />
-          <h1 className="text-xl font-bold italic text-black dark:text-white">SOMBOT</h1>
+          <h1 className="text-xl font-bold italic text-black dark:text-white">
+            SOMBOT
+          </h1>
         </Link>
         <div className="relative ml-auto">
-          <p className="w-full font-medium text-sm hidden sm:block">{userData?.name}</p>
+          <p className="w-full font-medium text-sm hidden sm:block">
+            {userData?.name}
+          </p>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="icon" className="overflow-hidden rounded-full">
+            <Button
+              variant="outline"
+              size="icon"
+              className="overflow-hidden rounded-full"
+            >
               <Avatar className="h-10 w-10">
-                <AvatarImage src={userData?.image || ""} alt={userData?.name || ""} />
-                <AvatarFallback>{userData?.name?.charAt(0) || "U"}</AvatarFallback>
+                <AvatarImage
+                  src={userData?.image || ""}
+                  alt={userData?.name || ""}
+                />
+                <AvatarFallback>
+                  {userData?.name?.charAt(0) || "U"}
+                </AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Settings</DropdownMenuItem>
-            <DropdownMenuItem>Support</DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/profile" className="cursor-pointer">
+                Profile
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
-            {/* TODO Add logout */}
-            <DropdownMenuItem onClick={() => signOut()}>Logout</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => signOut()}>
+              Logout
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </header>

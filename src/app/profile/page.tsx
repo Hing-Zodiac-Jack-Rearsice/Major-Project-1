@@ -45,13 +45,9 @@ const ProfilePage = () => {
 
   useEffect(() => {
     if (session?.user) {
-      if (session.user.role !== "user") {
-        router.push("/unauthorized");
-        return;
-      }
       fetchUserData();
     }
-  }, [session, router, fetchUserData]);
+  }, [session, fetchUserData]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -128,10 +124,6 @@ const ProfilePage = () => {
       setIsSubmitting(false); // Reset loading state
     }
   };
-
-  if (!session || session.user.role !== "user") {
-    return null;
-  }
 
   return (
     <div className="container mx-auto mt-16 p-4">
