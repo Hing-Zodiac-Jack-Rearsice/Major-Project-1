@@ -20,7 +20,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         },
         password: {
           label: "password",
-          type: "password"
+          type: "password",
         },
       },
       async authorize(credentials) {
@@ -38,7 +38,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               email: user.email,
               image: user.image,
               role: user.role || undefined,
-              stripeConnectedLinked: user.stripeConnectedLinked
+              stripeConnectedLinked: user.stripeConnectedLinked,
             };
           }
           return null;
@@ -96,14 +96,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             stripeConnectedLinked: true,
           },
         });
-
         if (userFromDb) {
           session.user = {
             ...session.user,
             ...userFromDb,
-            name: userFromDb.name || '',
-            email: userFromDb.email || '',
-            role: userFromDb.role || '',
+            name: userFromDb.name || "",
+            email: userFromDb.email || "",
+            role: userFromDb.role || "",
             image: userFromDb.image || null,
           };
         }
@@ -112,10 +111,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
   },
   pages: {
-    signIn: '/login',
+    signIn: "/login",
   },
   session: {
     strategy: "jwt",
-
   },
 });
