@@ -52,7 +52,7 @@ export default auth((req) => {
   }
   if (req.nextUrl.pathname.startsWith("/tickets")) {
     if (req.auth?.user.role !== "user") {
-      // Add a message parameter
+      
       const redirectUrl = new URL("/", req.url);
       // Add a message parameter
       redirectUrl.searchParams.set("message", "You must be logged in order to view tickets");
