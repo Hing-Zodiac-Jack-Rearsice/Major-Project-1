@@ -64,7 +64,7 @@
     "flowbite-react": "^0.10.1",
     "framer-motion": "^11.3.30",
     "input-otp": "^1.2.4",
-    "jspdf": "^2.5.2",
+    "jspdf": "^4.0.0",
     "jspdf-autotable": "^3.8.4",
     "lodash": "^4.17.21",
     "lucide-react": "^0.408.0",
